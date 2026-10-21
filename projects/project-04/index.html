@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrandStage - מנוע המלצות, הופעות חיות וצפייה בתיאטרון ובלט</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Playfair Display', 'David Libre', 'Georgia', 'serif'],
+                        sans: ['Rubik', 'Segoe UI', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207',
+                        },
+                        velvet: {
+                            800: '#4a0404',
+                            900: '#2b0202',
+                            950: '#1a0101',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+        }
+        .font-serif-title {
+            font-family: 'Playfair Display', 'Georgia', serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(17, 24, 39, 0.8);
+        }
+        html.light ::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        html.light ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ca8a04;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 dark:bg-gray-950 dark:text-gray-100 light:bg-slate-50 light:text-gray-900 transition-colors duration-300 min-h-screen flex flex-col selection:bg-gold-500 selection:text-black">
+
+    <!-- Toast Notification Overlay -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Header / Curtain Navigation -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-gray-950/85 dark:bg-gray-950/85 light:bg-white/90 border-b border-gold-600/30 dark:border-gold-600/30 light:border-amber-300 shadow-2xl transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-gold-400 via-gold-600 to-amber-800 flex items-center justify-center text-gray-950 shadow-lg shadow-gold-600/20">
+                    <i data-lucide="clapperboard" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold font-serif-title tracking-wide bg-gradient-to-r from-amber-200 via-gold-400 to-amber-500 light:from-amber-700 light:via-gold-600 light:to-amber-900 bg-clip-text text-transparent">GrandStage</h1>
+                    <p class="text-[10px] text-gold-400/80 light:text-amber-700/80 tracking-widest uppercase font-medium">תיאטרון, בלט ומחזות זמר</p>
+                </div>
+            </div>
+
+            <!-- Global Search -->
+            <div class="flex-1 max-w-lg hidden md:block">
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-gold-500/70"></i>
+                    <input type="text" id="globalSearch" oninput="handleSearch(this.value)" placeholder="חפש מופע בלט, מחזמר, אופרה או תגית..." 
+                           class="w-full pl-4 pr-11 py-2.5 rounded-2xl border border-gold-600/30 dark:border-gold-600/30 light:border-amber-200 bg-gray-900/90 dark:bg-gray-900/90 light:bg-white text-sm text-gray-100 light:text-gray-900 placeholder-gray-500 focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/50 transition-all">
+                </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" id="themeToggleBtn" title="החלף מצב לילה/יום" class="p-2.5 text-gold-400 dark:text-gold-400 light:text-amber-700 bg-gold-500/10 border border-gold-500/20 dark:border-gold-500/20 light:border-amber-300 rounded-xl hover:bg-gold-500/20 transition-all">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+                </button>
+
+                <!-- Navigation Tabs -->
+                <button onclick="switchMainTab('recommendations')" id="navRecsBtn" class="px-3 py-2 text-xs font-semibold rounded-xl transition-all border border-gold-500/30 bg-gold-500/20 text-gold-300">
+                    <i data-lucide="sparkles" class="w-4 h-4 inline-block ml-1"></i>
+                    <span>המלצות וצפייה</span>
+                </button>
+
+                <button onclick="switchMainTab('globalStreams')" id="navGlobalBtn" class="px-3 py-2 text-xs font-semibold rounded-xl transition-all border border-gold-500/20 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20 flex items-center">
+                    <i data-lucide="globe" class="w-4 h-4 inline-block ml-1"></i>
+                    <span>שידורים בעולם</span>
+                    <span class="mr-1.5 flex h-2 w-2 relative">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                </button>
+
+                <button onclick="switchMainTab('events')" id="navEventsBtn" class="px-3 py-2 text-xs font-semibold rounded-xl transition-all border border-gold-500/20 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20">
+                    <i data-lucide="ticket" class="w-4 h-4 inline-block ml-1"></i>
+                    <span>לוח הופעות</span>
+                </button>
+
+                <!-- Share App Button -->
+                <button onclick="openShareModal()" title="שתף את האתר" class="p-2.5 sm:px-3.5 sm:py-2 text-xs font-semibold text-gold-400 dark:text-gold-400 light:text-amber-700 bg-gold-500/10 border border-gold-500/20 dark:border-gold-500/20 light:border-amber-300 rounded-xl hover:bg-gold-500/20 transition-all flex items-center gap-1.5">
+                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">שתף</span>
+                </button>
+
+                <button id="myHubBtn" onclick="openHubModal()" class="flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold bg-gradient-to-r from-gold-600 to-amber-700 text-gray-950 rounded-xl hover:brightness-110 shadow-lg shadow-gold-600/20 transition-all">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    <span>האזור האישי</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div class="px-4 pb-3 md:hidden border-t border-gray-900 dark:border-gray-900 light:border-gray-200 pt-2">
+            <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-gold-500/70"></i>
+                <input type="text" id="mobileSearch" oninput="handleSearch(this.value)" placeholder="חפש מופע, תגית או ז'אנר..." 
+                       class="w-full pl-4 pr-11 py-2 rounded-xl border border-gold-600/30 dark:border-gold-600/30 light:border-amber-200 bg-gray-900 dark:bg-gray-900 light:bg-white text-sm text-gray-100 light:text-gray-900 placeholder-gray-500 focus:outline-none focus:border-gold-500">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-10">
+
+        <!-- VIEW 1: RECOMMENDATIONS & ONLINE SHOWS -->
+        <div id="viewRecommendations" class="space-y-10">
+
+            <!-- Active Tag Filter Banner -->
+            <div id="activeTagBanner" class="hidden items-center justify-between p-3.5 px-5 rounded-2xl bg-gold-500/10 border border-gold-500/30 text-gold-300 dark:text-gold-300 light:text-amber-800">
+                <div class="flex items-center gap-2 text-xs sm:text-sm font-medium">
+                    <i data-lucide="filter" class="w-4 h-4 text-gold-400"></i>
+                    <span>מסנן לפי תגית: <strong id="activeTagName" class="underline"></strong></span>
+                </div>
+                <button onclick="clearTagFilter()" class="text-xs bg-gold-500/20 hover:bg-gold-500/30 px-3 py-1 rounded-lg font-bold transition-all flex items-center gap-1">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    <span>ניקוי תגית</span>
+                </button>
+            </div>
+
+            <!-- Hero Stage Banner & Persona Selector -->
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-velvet-950 via-gray-900 to-velvet-900 dark:from-velvet-950 dark:via-gray-900 dark:to-velvet-900 light:from-amber-100 light:via-orange-50 light:to-amber-50 border border-gold-600/30 dark:border-gold-600/30 light:border-amber-300 p-6 sm:p-10 shadow-2xl transition-colors duration-300">
+                <div class="absolute -right-20 -top-20 w-80 h-80 bg-gold-500/10 light:bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-red-900/20 light:bg-orange-300/20 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="space-y-3 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-gold-500/10 dark:bg-gold-500/10 light:bg-amber-200 border border-gold-500/30 dark:border-gold-500/30 light:border-amber-400 text-gold-300 dark:text-gold-300 light:text-amber-900">
+                            <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                            <span id="personaBadge">פרופיל פעיל: חובב בלט קלאסי ואופרה</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-4xl font-extrabold font-serif-title tracking-tight text-white dark:text-white light:text-gray-900 leading-tight">
+                            הבמה המרכזית: מופעים מותאמים אישית
+                        </h2>
+                        <p class="text-sm text-gray-300 dark:text-gray-300 light:text-gray-700 leading-relaxed">
+                            מנוע ההמלצות משלב ניתוח ז'אנרים ותגיות (Content-Based) יחד עם העדפות מנויים וציבור שוחר אמנות בעלי טעם דומה (Collaborative Filtering).
+                        </p>
+                    </div>
+
+                    <!-- Persona Switcher -->
+                    <div class="bg-gray-900/80 dark:bg-gray-900/80 light:bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-gold-600/20 dark:border-gold-600/20 light:border-amber-300 space-y-2 w-full md:w-auto shrink-0 shadow-sm">
+                        <span class="text-xs text-gold-400 dark:text-gold-400 light:text-amber-800 font-medium block">סימולציית פרופיל מנוי:</span>
+                        <select id="personaSelector" onchange="switchPersona(this.value)" class="w-full bg-gray-950 dark:bg-gray-950 light:bg-amber-50 text-gold-300 dark:text-gold-300 light:text-amber-900 border border-gold-600/40 dark:border-gold-600/40 light:border-amber-300 text-xs font-medium rounded-xl px-3 py-2.5 focus:outline-none focus:border-gold-500">
+                            <option value="ballet">חובב בלט קלאסי ואופרה</option>
+                            <option value="musicals">חובב מחזות זמר ובמות ברודוויי</option>
+                            <option value="drama">חובב תיאטרון דרמטי וקלאסיקות</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter & Sorting Controls -->
+            <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-gray-800 dark:border-gray-800 light:border-gray-200 pb-5">
+                
+                <!-- Category Tabs -->
+                <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0" id="categoryTabs">
+                    <button onclick="setCategory('all')" data-category="all" class="cat-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-gold-500 text-gray-950 shadow-lg shadow-gold-500/20">כל המופעים</button>
+                    <button onclick="setCategory('ballet')" data-category="ballet" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-gray-900 dark:bg-gray-900 light:bg-white text-gray-300 dark:text-gray-300 light:text-gray-700 hover:bg-gray-800 hover:text-gold-400 border border-gray-800 dark:border-gray-800 light:border-gray-200">בלט ומחול</button>
+                    <button onclick="setCategory('musical')" data-category="musical" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-gray-900 dark:bg-gray-900 light:bg-white text-gray-300 dark:text-gray-300 light:text-gray-700 hover:bg-gray-800 hover:text-gold-400 border border-gray-800 dark:border-gray-800 light:border-gray-200">מחזות זמר</button>
+                    <button onclick="setCategory('theater')" data-category="theater" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-gray-900 dark:bg-gray-900 light:bg-white text-gray-300 dark:text-gray-300 light:text-gray-700 hover:bg-gray-800 hover:text-gold-400 border border-gray-800 dark:border-gray-800 light:border-gray-200">תיאטרון ודרמה</button>
+                    <button onclick="setCategory('opera')" data-category="opera" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-gray-900 dark:bg-gray-900 light:bg-white text-gray-300 dark:text-gray-300 light:text-gray-700 hover:bg-gray-800 hover:text-gold-400 border border-gray-800 dark:border-gray-800 light:border-gray-200">אופרה</button>
+                </div>
+
+                <!-- Sort & Sub-Filters -->
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto text-xs sm:text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400 dark:text-gray-400 light:text-gray-600">מיון:</span>
+                        <select id="sortBy" onchange="setSort(this.value)" class="bg-gray-900 dark:bg-gray-900 light:bg-white border border-gray-800 dark:border-gray-800 light:border-gray-300 text-gray-200 dark:text-gray-200 light:text-gray-800 rounded-xl px-3 py-1.5 focus:outline-none focus:border-gold-500">
+                            <option value="recommendation">התאמה אישית (מנוע המלצות)</option>
+                            <option value="rating">דירוג הגבוה ביותר</option>
+                            <option value="year">שנת יציאה (מהחדש לישן)</option>
+                            <option value="popular">הכי פופולרי</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: Content-Based Recommendations -->
+            <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="tags" class="w-5 h-5 text-gold-500"></i>
+                            <h3 class="text-lg font-bold font-serif-title text-gold-200 dark:text-gold-200 light:text-amber-900">המלצות לפי העדפות הז'אנר שלך (Content-Based)</h3>
+                        </div>
+                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">מופעים בעלי תגיות וסגנונות התואמים את הפרופיל הנבחר שלך</p>
+                    </div>
+                </div>
+                <div id="contentBasedList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </section>
+
+            <!-- Section 2: Collaborative Filtering -->
+            <section class="space-y-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="users" class="w-5 h-5 text-gold-500"></i>
+                        <h3 class="text-lg font-bold font-serif-title text-gold-200 dark:text-gold-200 light:text-amber-900">מנויים עם טעם דומה צפו והמליצו (Collaborative Filtering)</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">חישוב דמיון בין משתמשים המבוסס על דירוגים הדדיים</p>
+                </div>
+                <div id="userBasedList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </section>
+
+            <!-- Section 3: Full Catalog -->
+            <section class="space-y-4 pt-6 border-t border-gray-800 dark:border-gray-800 light:border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold font-serif-title text-white dark:text-white light:text-gray-900">קטלוג המופעים הראשי</h3>
+                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">כל ההפקות, המחזות והבלטים הזמינים במערכת</p>
+                    </div>
+                </div>
+                <div id="fullCatalogList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </section>
+
+        </div>
+
+        <!-- VIEW 2: GLOBAL LIVE STREAMS & WORLDWIDE THEATERS -->
+        <div id="viewGlobalStreams" class="space-y-8 hidden">
+            <!-- Header Banner -->
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-gray-950 via-velvet-950 to-gray-900 border border-gold-600/30 p-6 sm:p-8 shadow-2xl">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                    <div class="space-y-2 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-gold-500/20 text-gold-300 border border-gold-500/30">
+                            <i data-lucide="radio" class="w-3.5 h-3.5 text-red-500 animate-pulse"></i>
+                            <span>שידורים חיים והקלטות מכל העולם</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-bold font-serif-title text-white">במות העולם אצלך בסלון</h2>
+                        <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                            צפה בשידורים חיים ובהפקות דגל מלאות מבתי האופרה, הבלט והתיאטראות המובילים בתבל: ניו יורק, לונדון, פריז, וינה ומילאנו.
+                        </p>
+                    </div>
+
+                    <!-- Country Filter -->
+                    <div class="bg-gray-950/80 backdrop-blur-md p-3.5 rounded-2xl border border-gold-600/30 flex items-center gap-2 text-xs w-full md:w-auto">
+                        <i data-lucide="globe" class="w-4 h-4 text-gold-400 shrink-0"></i>
+                        <span class="text-gray-400 shrink-0">סנן לפי מדינה:</span>
+                        <select id="globalCountryFilter" onchange="renderGlobalStreams()" class="bg-gray-900 text-gold-300 border border-gold-600/30 rounded-xl px-2.5 py-1.5 focus:outline-none text-xs w-full">
+                            <option value="all">כל המדינות</option>
+                            <option value="ארה״ב">ארה״ב (ניו יורק)</option>
+                            <option value="בריטניה">בריטניה (לונדון)</option>
+                            <option value="אוסטריה">אוסטריה (וינה)</option>
+                            <option value="צרפת">צרפת (פריז)</option>
+                            <option value="איטליה">איטליה (מילאנו)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Streams Grid -->
+            <div id="globalStreamsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Injected JS Global Streams -->
+            </div>
+        </div>
+
+        <!-- VIEW 3: LIVE EVENTS & TICKETS -->
+        <div id="viewEvents" class="space-y-8 hidden">
+            <!-- Header Banner -->
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-velvet-900 via-gray-900 to-amber-950 border border-gold-600/30 p-6 sm:p-8 shadow-2xl">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                    <div class="space-y-2 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-gold-500/20 text-gold-300 border border-gold-500/30">
+                            <i data-lucide="ticket" class="w-3.5 h-3.5 text-gold-400"></i>
+                            <span>רכישת כרטיסים רשמית</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-bold font-serif-title text-white">לוח הופעות בלט ואופרה קלאסיות</h2>
+                        <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                            הזמינו כרטיסים ישירות להפקות הבלט והאופרה המובילות באולמות התרבות הנחשבים בישראל: האופרה הישראלית, היכל התרבות, תיאטרון ירושלים ועוד.
+                        </p>
+                    </div>
+
+                    <!-- Location Filter -->
+                    <div class="bg-gray-950/80 backdrop-blur-md p-3.5 rounded-2xl border border-gold-600/30 flex items-center gap-2 text-xs w-full md:w-auto">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-gold-400 shrink-0"></i>
+                        <span class="text-gray-400 shrink-0">סנן לפי מיקום:</span>
+                        <select id="eventCityFilter" onchange="renderEvents()" class="bg-gray-900 text-gold-300 border border-gold-600/30 rounded-xl px-2.5 py-1.5 focus:outline-none text-xs w-full">
+                            <option value="all">כל הערים (תל אביב, ירושלים, חיפה)</option>
+                            <option value="תל אביב">תל אביב</option>
+                            <option value="ירושלים">ירושלים</option>
+                            <option value="חיפה">חיפה</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Grid -->
+            <div id="liveEventsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Injected JS Live Events -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL 1: Video Player & Show Details -->
+    <div id="itemModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="bg-gray-900 dark:bg-gray-900 light:bg-white border border-gold-600/30 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 relative space-y-6 text-gray-100 dark:text-gray-100 light:text-gray-900">
+            <button onclick="closeShowModal()" class="absolute left-4 top-4 text-gray-400 hover:text-gold-400 p-2 rounded-full hover:bg-gray-800 transition-all z-10">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Video Player Embed -->
+            <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-inner border border-gold-600/20" id="videoEmbedContainer">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Content Details -->
+            <div id="modalItemContent" class="space-y-4">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: User Hub Modal -->
+    <div id="hubModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="bg-gray-900 dark:bg-gray-900 light:bg-white border border-gold-600/30 rounded-3xl max-w-2xl w-full shadow-2xl p-6 relative space-y-6 text-gray-100 dark:text-gray-100 light:text-gray-900">
+            <button onclick="closeHubModal()" class="absolute left-4 top-4 text-gray-400 hover:text-gold-400 p-2 rounded-full hover:bg-gray-800 transition-all">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="flex items-center gap-3 border-b border-gray-800 dark:border-gray-800 light:border-gray-200 pb-4">
+                <div class="w-12 h-12 rounded-2xl bg-gold-500/20 flex items-center justify-center text-gold-400">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold font-serif-title">האזור האישי של המנוי</h3>
+                    <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">ניהול מועדפים, היסטוריית צפייה והגדרות</p>
+                </div>
+            </div>
+
+            <!-- Hub Nav Tabs -->
+            <div class="flex items-center gap-6 border-b border-gray-800 dark:border-gray-800 light:border-gray-200 text-xs">
+                <button id="hubTabFav" onclick="switchHubTab('fav')" class="pb-2 border-b-2 border-gold-500 font-semibold text-gold-400">
+                    מועדפים שלי (<span id="favCount">0</span>)
+                </button>
+                <button id="hubTabHistory" onclick="switchHubTab('history')" class="pb-2 border-b-2 border-transparent text-gray-400 hover:text-gray-200">
+                    היסטוריית צפייה (<span id="historyCount">0</span>)
+                </button>
+            </div>
+
+            <div id="hubTabContent" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Share Options Modal -->
+    <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-gray-900 dark:bg-gray-900 light:bg-white border border-gold-600/30 rounded-3xl max-w-md w-full shadow-2xl p-6 relative space-y-5 text-gray-100 dark:text-gray-100 light:text-gray-900">
+            <button onclick="closeShareModal()" class="absolute left-4 top-4 text-gray-400 hover:text-gold-400 p-2 rounded-full hover:bg-gray-800 transition-all">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="text-center space-y-1">
+                <div class="w-12 h-12 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mx-auto mb-2 border border-gold-500/20">
+                    <i data-lucide="share-2" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold font-serif-title text-gold-200 dark:text-gold-200 light:text-amber-900" id="shareModalTitle">שתף את המופע</h3>
+                <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 line-clamp-1" id="shareModalSub"></p>
+            </div>
+
+            <!-- Social Share Grid -->
+            <div class="grid grid-cols-4 gap-3 py-2">
+                <button onclick="shareToWhatsApp()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 transition-all">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    <span class="text-[10px] font-medium">וואטסאפ</span>
+                </button>
+                <button onclick="shareToTelegram()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-400 transition-all">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    <span class="text-[10px] font-medium">טלגרם</span>
+                </button>
+                <button onclick="shareToFacebook()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 transition-all">
+                    <i data-lucide="facebook" class="w-5 h-5"></i>
+                    <span class="text-[10px] font-medium">פייסבוק</span>
+                </button>
+                <button onclick="shareToEmail()" class="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 transition-all">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                    <span class="text-[10px] font-medium">מייל</span>
+                </button>
+            </div>
+
+            <!-- Copy Link Input -->
+            <div class="space-y-1.5">
+                <span class="text-[11px] text-gray-400 block font-medium">או העתק קישור ישיר:</span>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="shareUrlInput" readonly class="w-full bg-gray-950 dark:bg-gray-950 light:bg-gray-100 border border-gray-800 dark:border-gray-800 light:border-gray-300 rounded-xl px-3 py-2 text-xs text-gray-300 dark:text-gray-300 light:text-gray-800 focus:outline-none">
+                    <button onclick="copyShareUrl()" class="px-4 py-2 bg-gold-500 hover:bg-gold-400 text-gray-950 font-bold text-xs rounded-xl shrink-0 transition-all">
+                        העתק
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Ticket Booking & Seat Selection -->
+    <div id="ticketModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="bg-gray-900 dark:bg-gray-900 light:bg-white border border-gold-600/30 rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 relative space-y-6 text-gray-100 dark:text-gray-100 light:text-gray-900">
+            <button onclick="closeTicketModal()" class="absolute left-4 top-4 text-gray-400 hover:text-gold-400 p-2 rounded-full hover:bg-gray-800 transition-all">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div id="ticketModalContent">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Global Live Stream Performances
+        const GLOBAL_STREAMS = [
+            {
+                id: 'gs_met_turandot',
+                title: 'טורנדוט (Turandot) - מטאופרה ניו יורק',
+                theater: 'The Metropolitan Opera',
+                country: 'ארה״ב',
+                city: 'ניו יורק',
+                category: 'אופרה',
+                status: 'live', // 'live' or 'archived'
+                viewerCount: '14.2K',
+                videoUrl: 'https://www.youtube.com/embed/KJ_HHRJf0IY',
+                image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80',
+                description: 'הפקה גרנדיוזית בעיצוב פראנקו זפירלי ישירות מבמת המטרופוליטן אופרה במרכז לינקולן, ניו יורק.'
+            },
+            {
+                id: 'gs_roh_don_quixote',
+                title: 'דון קישוט (Don Quixote) - הבלט המלכותי',
+                theater: 'Royal Opera House',
+                country: 'בריטניה',
+                city: 'לונדון',
+                category: 'בלט קלאסי',
+                status: 'live',
+                viewerCount: '8.7K',
+                videoUrl: 'https://www.youtube.com/embed/9rJoB7y6Ncs',
+                image: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop&q=80',
+                description: 'שידור דרך התיאטרון המלכותי בקובנט גארדן. מחול וירטואוזי מלא אנרגיה ספרדית וקומדיה סוחפת.'
+            },
+            {
+                id: 'gs_vienna_die_fledermaus',
+                title: 'עטלף (Die Fledermaus) - אופרת וינה',
+                theater: 'Vienna State Opera',
+                country: 'אוסטריה',
+                city: 'וינה',
+                category: 'אופרטה / אופרה',
+                status: 'archived',
+                viewerCount: '22.1K',
+                videoUrl: 'https://www.youtube.com/embed/zV1qTLFJB9w',
+                image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800&auto=format&fit=crop&q=80',
+                description: 'הפנינה הוינאית של יוהאן שטראוס הבן מהבמה ההיסטורית בוינה. שירה מופלאה ואווירה חגיגית.'
+            },
+            {
+                id: 'gs_paris_giselle',
+                title: 'ז\'יזל (Giselle) - האופרה של פריז',
+                theater: 'Palais Garnier / Paris Opera',
+                country: 'צרפת',
+                city: 'פריז',
+                category: 'בלט קלאסי',
+                status: 'archived',
+                viewerCount: '19.5K',
+                videoUrl: 'https://www.youtube.com/embed/d3W4_D4T-O8',
+                image: 'https://images.unsplash.com/photo-1508807526345-15e9b5f4eaff?w=800&auto=format&fit=crop&q=80',
+                description: 'הבלט הלאומי של פריז בהיכל גרנייה המרהיב בביצוע המופת ליצירתו הרומנטית של אדולף אדם.'
+            },
+            {
+                id: 'gs_scala_aida',
+                title: 'אידה (Aida) - תיאטרון לה סקאלה',
+                theater: 'Teatro alla Scala',
+                country: 'איטליה',
+                city: 'מילאנו',
+                category: 'אופרה',
+                status: 'live',
+                viewerCount: '11.4K',
+                videoUrl: 'https://www.youtube.com/embed/77UmP73uaJg',
+                image: 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?w=800&auto=format&fit=crop&q=80',
+                description: 'יצירת המופת הדרמטית של ג\'וזפה ורדי מבית האופרה המפורסם בעולם במילאנו.'
+            },
+            {
+                id: 'gs_broadway_hamilton_stream',
+                title: 'המילטון - הופעה מיוחדת מברודוויי',
+                theater: 'Richard Rodgers Theatre',
+                country: 'ארה״ב',
+                city: 'ניו יורק',
+                category: 'מחזמר',
+                status: 'archived',
+                viewerCount: '45.8K',
+                videoUrl: 'https://www.youtube.com/embed/DSCKfXpAGHc',
+                image: 'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?w=800&auto=format&fit=crop&q=80',
+                description: 'תיעוד חי ומלא מבימת ברודוויי של תופעת המחזמר ששינתה את עולם התיאטרון בעשור האחרון.'
+            }
+        ];
+
+        const LIVE_EVENTS = [
+            {
+                id: 'ev_swan_lake',
+                title: 'אגם הברבורים - הבלט הישראלי',
+                category: 'בלט קלאסי',
+                composer: 'פיוטר איליץ\' צ\'ייקובסקי',
+                venue: 'בית האופרה - המשכן לאמנויות הבמה',
+                city: 'תל אביב',
+                date: '18 בנובמבר 2026, 20:00',
+                price: 280,
+                image: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop&q=80',
+                description: 'הפקה מרהיבה של הבלט הישראלי יחד עם סולנים אורחים מתיאטרון הבלט הלאומי. תזמורת סימפונית חיה על הבמה.',
+                availableSeats: 42
+            },
+            {
+                id: 'ev_carmen',
+                title: 'כרמן - האופרה הישראלית',
+                category: 'אופרה',
+                composer: 'ז\'ורז\' ביזה',
+                venue: 'המשכן לאמנויות הבמה',
+                city: 'תל אביב',
+                date: '25 בנובמבר 2026, 19:30',
+                price: 320,
+                image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80',
+                description: 'האופרה האהובה ביותר בכל הזמנים בבימוי בינלאומי חדש. השירים המפורסמים והתשוקה הספרדית המלהיבה.',
+                availableSeats: 18
+            },
+            {
+                id: 'ev_nutcracker',
+                title: 'מפצח האגוזים - בלט קלאסי',
+                category: 'בלט קלאסי',
+                composer: 'פיוטר איליץ\' צ\'ייקובסקי',
+                venue: 'תיאטרון ירושלים - אולם שרובר',
+                city: 'ירושלים',
+                date: '10 בדצמבר 2026, 18:00',
+                price: 220,
+                image: 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=800&auto=format&fit=crop&q=80',
+                description: 'מופע חגיגי לכל המשפחה! מסע קסום לארץ הסוכריות עם תפאורות ענק, תלבושות מרהיבות ועשרות רקדנים.',
+                availableSeats: 55
+            },
+            {
+                id: 'ev_la_traviata',
+                title: 'לה טראוויאטה (La Traviata)',
+                category: 'אופרה',
+                composer: 'ג\'וזפה ורדי',
+                venue: 'אולם אודיטוריום',
+                city: 'חיפה',
+                date: '02 בדצמבר 2026, 20:30',
+                price: 290,
+                image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800&auto=format&fit=crop&q=80',
+                description: 'סיפור האהבה המרגש והטרגי של ויולטה ואלפרדו. דרמה קולית עוצרת נשימה בביצוע סולנים בינלאומיים.',
+                availableSeats: 29
+            },
+            {
+                id: 'ev_giselle',
+                title: 'ז\'יזל - ערב מחול קלאסי',
+                category: 'בלט קלאסי',
+                composer: 'אדולף אדם',
+                venue: 'היכל התרבות תל אביב',
+                city: 'תל אביב',
+                date: '14 בדצמבר 2026, 20:30',
+                price: 250,
+                image: 'https://images.unsplash.com/photo-1508807526345-15e9b5f4eaff?w=800&auto=format&fit=crop&q=80',
+                description: 'יצירת המופת של הבלט הרומנטי. סיפור על אהבה, בגידה ומחול הלילה של רוחות הוויליות במערכה השנייה.',
+                availableSeats: 31
+            },
+            {
+                id: 'ev_magic_flute',
+                title: 'חליל הקסם - מוצרט',
+                category: 'אופרה',
+                composer: 'וולפגנג אמדאוס מוצרט',
+                venue: 'תיאטרון ירושלים',
+                city: 'ירושלים',
+                date: '20 בדצמבר 2026, 19:00',
+                price: 260,
+                image: 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?w=800&auto=format&fit=crop&q=80',
+                description: 'האופרה המכשפת של מוצרט בהפקה ססגונית ומלאת הומור. פמינו, טמינו ומלכת הלילה באריות המפורסמות.',
+                availableSeats: 20
+            }
+        ];
+
+        // Performing Arts Catalog
+        const DEFAULT_SHOWS = [
+            {
+                id: 'ballet_1',
+                title: 'אגם הברבורים (Swan Lake)',
+                category: 'ballet',
+                year: 2023,
+                tags: ['בלט קלאסי', 'צ\'ייקובסקי', 'רומנטיקה', 'להקת בלט'],
+                image: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop&q=80',
+                videoUrl: 'https://www.youtube.com/embed/9rJoB7y6Ncs',
+                description: 'יצירת המופת האלמותית של צ\'ייקובסקי במחול בלט קלאסי מרהיב, הסיפור הקסום על הנסיכה אודט שהופכה לברבור.',
+                ratings: { 'u1': 5, 'u2': 5, 'u3': 4 },
+                comments: [
+                    { id: 'c1', user: 'נעמי', text: 'ביצוע מרגש עד דמעות! המחול של הברבור הלבן מדהים.', date: '2026-01-15', likes: 7 }
+                ]
+            },
+            {
+                id: 'ballet_2',
+                title: 'מפצח האגוזים (The Nutcracker)',
+                category: 'ballet',
+                year: 2024,
+                tags: ['בלט קלאסי', 'פנטזיה', 'חג', 'צ\'ייקובסקי'],
+                image: 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=800&auto=format&fit=crop&q=80',
+                videoUrl: 'https://www.youtube.com/embed/zV1qTLFJB9w',
+                description: 'מופע המחול הבלתי נשכח לעונת החגים, הרפתקה פנטסטית של קלרה ומפצח האגוזים בממלכת המתוקים.',
+                ratings: { 'u1': 5, 'u3': 5, 'u4': 4 },
+                comments: []
+            },
+            {
+                id: 'musical_1',
+                title: 'עלובי החיים (Les Misérables)',
+                category: 'musical',
+                year: 2022,
+                tags: ['מחזמר', 'ברודוויי', 'דרמה', 'היסטורי'],
+                image: 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?w=800&auto=format&fit=crop&q=80',
+                videoUrl: 'https://www.youtube.com/embed/ek3LV1S_SHI',
+                description: 'האפוס המוזיקלי הענק המבוסס על ספרו של ויקטור הוגו. סיפורו של ז\'אן ולז\'אן בצרפת של המאה ה-19.',
+                ratings: { 'u2': 5, 'u3': 5, 'u4': 5 },
+                comments: [
+                    { id: 'c2', user: 'איתי', text: 'השירים נשארים בראש ימים שלמים. חוויה ענקית!', date: '2026-02-02', likes: 12 }
+                ]
+            },
+            {
+                id: 'musical_2',
+                title: 'פנטום האופרה (The Phantom of the Opera)',
+                category: 'musical',
+                year: 2021,
+                tags: ['מחזמר', 'אופרה', 'גותי', 'רומנטיקה'],
+                image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800&auto=format&fit=crop&q=80',
+                videoUrl: 'https://www.youtube.com/embed/77UmP73uaJg',
+                description: 'סיפור האהבה המסתורי והמכשף במעמקי בית האופרה של פריז, מאת אנדרו לויד ובר.',
+                ratings: { 'u1': 4, 'u2': 5, 'u4': 4 },
+                comments: []
+            },
+            {
+                id: 'theater_1',
+                title: 'המלט (Hamlet) - תיאטרון קלאסי',
+                category: 'theater',
+                year: 2023,
+                tags: ['דרמה', 'שייקספיר', 'תיאטרון קלאסי', 'טרגדיה'],
+                image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=800&auto=format&fit=crop&q=80',
+                videoUrl: 'https://www.youtube.com/embed/nCbfIbe8-00',
+                description: 'הדילמה האנושית הגדולה בהפקה מודרנית ומשחזת של נסיך דנמרק והחיפוש אחר הצדק.',
+                ratings: { 'u2': 4, 'u3': 5 },
+                comments: []
+            },
+            {
+                id: 'opera_1',
+                title: 'כרמן (Carmen) - אופרה במערכה',
+                category: 'opera',
+                year: 2024,
+                tags: ['אופרה', 'ביזה', 'תשוקה', 'דרמה'],
+                image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80',
+                videoUrl: 'https://www.youtube.com/embed/KJ_HHRJf0IY',
+                description: 'האופרה המפורסמת ביותר של ז\'ורז\' ביזה על הצוער דון חוסה והצועניה הסוחפת כרמן.',
+                ratings: { 'u1': 5, 'u2': 4, 'u3': 4 },
+                comments: []
+            },
+            {
+                id: 'ballet_3',
+                title: 'ז\'יזל (Giselle) - מחול רומנטי',
+                category: 'ballet',
+                year: 2022,
+                tags: ['בלט קלאסי', 'מחול רומנטי', 'פילוסופיה'],
+                image: 'https://images.unsplash.com/photo-1508807526345-15e9b5f4eaff?w=800&auto=format&fit=crop&q=80',
+                videoUrl: 'https://www.youtube.com/embed/d3W4_D4T-O8',
+                description: 'בלט רומנטי מכונן על נערת כפר תמימה, שבירת לב ורוחות הוויליות במחול לילי קסום.',
+                ratings: { 'u1': 5, 'u4': 5 },
+                comments: []
+            },
+            {
+                id: 'musical_3',
+                title: 'המילטון (Hamilton)',
+                category: 'musical',
+                year: 2023,
+                tags: ['מחזמר', 'היפ הופ', 'ברודוויי', 'היסטורי'],
+                image: 'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?w=800&auto=format&fit=crop&q=80',
+                videoUrl: 'https://www.youtube.com/embed/DSCKfXpAGHc',
+                description: 'מחזמר ששינה את פני ברודוויי מאת לין-מנואל מירנדה על אבי האומה האמריקאית אלכסנדר המילטון.',
+                ratings: { 'u2': 5, 'u3': 4, 'u4': 5 },
+                comments: []
+            }
+        ];
+
+        // Demo Personas
+        const PERSONAS = {
+            'ballet': {
+                name: 'חובב בלט קלאסי ואופרה',
+                tags: ['בלט קלאסי', 'צ\'ייקובסקי', 'אופרה', 'מחול רומנטי'],
+                ratings: { 'ballet_1': 5, 'ballet_2': 5, 'opera_1': 5 }
+            },
+            'musicals': {
+                name: 'חובב מחזות זמר ובמות ברודוויי',
+                tags: ['מחזמר', 'ברודוויי', 'היפ הופ', 'גותי'],
+                ratings: { 'musical_1': 5, 'musical_2': 5, 'musical_3': 5 }
+            },
+            'drama': {
+                name: 'חובב תיאטרון דרמטי וקלאסיקות',
+                tags: ['דרמה', 'שייקספיר', 'תיאטרון קלאסי', 'טרגדיה'],
+                ratings: { 'theater_1': 5, 'musical_1': 4 }
+            }
+        };
+
+        const OTHER_USERS = {
+            'u1': { ratings: { 'ballet_1': 5, 'ballet_2': 5, 'opera_1': 5, 'ballet_3': 5 } },
+            'u2': { ratings: { 'musical_1': 5, 'musical_2': 5, 'theater_1': 4, 'opera_1': 4, 'musical_3': 5 } },
+            'u3': { ratings: { 'ballet_1': 4, 'musical_1': 5, 'theater_1': 5, 'opera_1': 4, 'musical_3': 4 } },
+            'u4': { ratings: { 'ballet_2': 4, 'musical_1': 5, 'musical_2': 4, 'ballet_3': 5, 'musical_3': 5 } }
+        };
+
+        // Persistent State
+        let shows = JSON.parse(localStorage.getItem('gs_shows')) || DEFAULT_SHOWS;
+        let currentUserTags = JSON.parse(localStorage.getItem('gs_tags')) || PERSONAS['ballet'].tags;
+        let currentUserRatings = JSON.parse(localStorage.getItem('gs_ratings')) || PERSONAS['ballet'].ratings;
+        let userFavorites = JSON.parse(localStorage.getItem('gs_favs')) || ['ballet_1', 'musical_1'];
+        let watchHistory = JSON.parse(localStorage.getItem('gs_history')) || ['ballet_1'];
+        let currentTheme = localStorage.getItem('gs_theme') || 'dark';
+
+        let currentMainView = 'recommendations';
+        let currentCategory = 'all';
+        let currentSort = 'recommendation';
+        let searchQuery = '';
+        let activeTagFilter = '';
+        let activeHubTab = 'fav';
+        let activeModalShowId = null;
+        let activeBookingEvent = null;
+        let selectedTicketCount = 1;
+        let activeSharePayload = { url: window.location.href, title: 'GrandStage - תיאטרון ובלט' };
+
+        function saveState() {
+            localStorage.setItem('gs_shows', JSON.stringify(shows));
+            localStorage.setItem('gs_tags', JSON.stringify(currentUserTags));
+            localStorage.setItem('gs_ratings', JSON.stringify(currentUserRatings));
+            localStorage.setItem('gs_favs', JSON.stringify(userFavorites));
+            localStorage.setItem('gs_history', JSON.stringify(watchHistory));
+            localStorage.setItem('gs_theme', currentTheme);
+        }
+
+        function refreshIcons() {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'bg-gray-900/90 dark:bg-gray-900/90 light:bg-white text-gold-300 dark:text-gold-300 light:text-amber-900 border border-gold-500/40 dark:border-gold-500/40 light:border-amber-400 px-4 py-2.5 rounded-2xl shadow-2xl text-xs font-semibold backdrop-blur-md flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto';
+            toast.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-gold-400"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            refreshIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // --- NAVIGATION TABS ---
+        function switchMainTab(viewName) {
+            currentMainView = viewName;
+            const recsView = document.getElementById('viewRecommendations');
+            const eventsView = document.getElementById('viewEvents');
+            const globalView = document.getElementById('viewGlobalStreams');
+            
+            const recsBtn = document.getElementById('navRecsBtn');
+            const eventsBtn = document.getElementById('navEventsBtn');
+            const globalBtn = document.getElementById('navGlobalBtn');
+
+            // Hide all
+            recsView.classList.add('hidden');
+            eventsView.classList.add('hidden');
+            globalView.classList.add('hidden');
+
+            const inactiveClass = 'px-3 py-2 text-xs font-semibold rounded-xl transition-all border border-gold-500/20 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20';
+            const activeClass = 'px-3 py-2 text-xs font-semibold rounded-xl transition-all border border-gold-500/30 bg-gold-500/20 text-gold-300';
+
+            recsBtn.className = inactiveClass;
+            eventsBtn.className = inactiveClass;
+            globalBtn.className = inactiveClass;
+
+            if (viewName === 'events') {
+                eventsView.classList.remove('hidden');
+                eventsBtn.className = activeClass;
+                renderEvents();
+            } else if (viewName === 'globalStreams') {
+                globalView.classList.remove('hidden');
+                globalBtn.className = activeClass;
+                renderGlobalStreams();
+            } else {
+                recsView.classList.remove('hidden');
+                recsBtn.className = activeClass;
+                renderUI();
+            }
+        }
+
+        // --- GLOBAL STREAMS LOGIC ---
+        function renderGlobalStreams() {
+            const countryFilter = document.getElementById('globalCountryFilter').value;
+            let streams = [...GLOBAL_STREAMS];
+
+            if (countryFilter !== 'all') {
+                streams = streams.filter(s => s.country === countryFilter);
+            }
+
+            const grid = document.getElementById('globalStreamsGrid');
+            if (!grid) return;
+
+            grid.innerHTML = streams.map(st => `
+                <div class="bg-gray-900 dark:bg-gray-900 light:bg-white border border-gold-600/20 hover:border-gold-500/50 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group transition-all duration-300">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${st.image}" alt="${st.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-black/40"></div>
+                        
+                        <!-- Status Badge -->
+                        ${st.status === 'live' ? `
+                            <span class="absolute top-3 right-3 bg-red-600 text-white font-bold text-[10px] px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 animate-pulse">
+                                <span class="w-2 h-2 rounded-full bg-white"></span>
+                                LIVE בשידור חי
+                            </span>
+                        ` : `
+                            <span class="absolute top-3 right-3 bg-gray-800/90 text-gold-300 font-bold text-[10px] px-2.5 py-1 rounded-full shadow-md border border-gold-500/30 flex items-center gap-1">
+                                <i data-lucide="video" class="w-3 h-3 text-gold-400"></i>
+                                הקלטה מלאה
+                            </span>
+                        `}
+
+                        <span class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-gold-300 text-xs px-2.5 py-1 rounded-lg border border-gold-500/30 flex items-center gap-1">
+                            <i data-lucide="globe" class="w-3.5 h-3.5 text-gold-400"></i>
+                            <span>${st.city}, ${st.country}</span>
+                        </span>
+                    </div>
+
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between text-[11px] text-gold-400 font-semibold">
+                                <span>${st.theater}</span>
+                                <span><i data-lucide="users" class="w-3 h-3 inline ml-1"></i>${st.viewerCount} צופים</span>
+                            </div>
+                            <h3 class="font-bold font-serif-title text-lg text-white dark:text-white light:text-gray-900 group-hover:text-gold-300 transition-colors">${st.title}</h3>
+                            <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 line-clamp-2 leading-relaxed">${st.description}</p>
+                        </div>
+
+                        <div class="pt-3 border-t border-gray-800 dark:border-gray-800 light:border-gray-200 flex items-center justify-between">
+                            <span class="text-xs text-gray-400">${st.category}</span>
+                            <button onclick="openGlobalStreamModal('${st.id}')" class="px-4 py-2 bg-gradient-to-r from-gold-500 to-amber-600 hover:brightness-110 text-gray-950 font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5">
+                                <i data-lucide="play-circle" class="w-4 h-4"></i>
+                                <span>צפה בשידור</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            refreshIcons();
+        }
+
+        function openGlobalStreamModal(streamId) {
+            const st = GLOBAL_STREAMS.find(s => s.id === streamId);
+            if (!st) return;
+
+            document.getElementById('videoEmbedContainer').innerHTML = `
+                <iframe src="${st.videoUrl}?autoplay=1&enablejsapi=1" 
+                        title="${st.title}" 
+                        class="w-full h-full border-0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            `;
+
+            document.getElementById('modalItemContent').innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between text-xs text-gold-400 font-semibold">
+                        <span>${st.theater} (${st.city}, ${st.country})</span>
+                        ${st.status === 'live' ? '<span class="text-red-500 font-bold">● שידור חי מהאולם</span>' : '<span>הקלטה מהארכיון</span>'}
+                    </div>
+                    <h3 class="text-2xl font-bold font-serif-title text-white dark:text-white light:text-gray-900">${st.title}</h3>
+                    <p class="text-sm text-gray-300 dark:text-gray-300 light:text-gray-700 leading-relaxed">${st.description}</p>
+                </div>
+            `;
+
+            document.getElementById('itemModal').classList.remove('hidden');
+            refreshIcons();
+        }
+
+        // --- LIVE EVENTS LOGIC ---
+        function renderEvents() {
+            const cityFilter = document.getElementById('eventCityFilter').value;
+            let events = [...LIVE_EVENTS];
+
+            if (cityFilter !== 'all') {
+                events = events.filter(e => e.city === cityFilter);
+            }
+
+            const grid = document.getElementById('liveEventsGrid');
+            if (!grid) return;
+
+            grid.innerHTML = events.map(ev => `
+                <div class="bg-gray-900 dark:bg-gray-900 light:bg-white border border-gold-600/20 hover:border-gold-500/50 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group transition-all duration-300">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${ev.image}" alt="${ev.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-black/30"></div>
+                        <span class="absolute top-3 right-3 bg-gold-500 text-gray-950 font-bold text-xs px-2.5 py-1 rounded-full shadow-md">
+                            ${ev.category}
+                        </span>
+                        <span class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-gold-300 text-xs px-2.5 py-1 rounded-lg border border-gold-500/30 flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gold-400"></i>
+                            <span>${ev.city}</span>
+                        </span>
+                    </div>
+
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <h3 class="font-bold font-serif-title text-lg text-white dark:text-white light:text-gray-900 group-hover:text-gold-300 transition-colors">${ev.title}</h3>
+                            <p class="text-xs text-gold-400 font-medium">${ev.composer}</p>
+                            
+                            <div class="space-y-1 pt-1 text-xs text-gray-300 dark:text-gray-300 light:text-gray-700">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-gold-500 shrink-0"></i>
+                                    <span>${ev.date}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="building" class="w-3.5 h-3.5 text-gold-500 shrink-0"></i>
+                                    <span>${ev.venue}</span>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 line-clamp-2 pt-1 leading-relaxed">${ev.description}</p>
+                        </div>
+
+                        <div class="pt-3 border-t border-gray-800 dark:border-gray-800 light:border-gray-200 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-gray-400 block">מחיר כרטיס</span>
+                                <span class="text-base font-extrabold text-gold-300 dark:text-gold-300 light:text-amber-900">₪${ev.price}</span>
+                            </div>
+                            <button onclick="openTicketModal('${ev.id}')" class="px-4 py-2.5 bg-gradient-to-r from-gold-500 to-amber-600 hover:brightness-110 text-gray-950 font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5">
+                                <i data-lucide="ticket" class="w-4 h-4"></i>
+                                <span>הזמן כרטיסים</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            refreshIcons();
+        }
+
+        function openTicketModal(eventId) {
+            const ev = LIVE_EVENTS.find(e => e.id === eventId);
+            if (!ev) return;
+
+            activeBookingEvent = ev;
+            selectedTicketCount = 1;
+
+            const modalContent = document.getElementById('ticketModalContent');
+            modalContent.innerHTML = `
+                <div class="space-y-5">
+                    <div class="border-b border-gray-800 pb-3 space-y-1">
+                        <span class="text-xs text-gold-400 uppercase font-semibold">${ev.category} &bull; ${ev.city}</span>
+                        <h3 class="text-xl font-bold font-serif-title text-gold-200">${ev.title}</h3>
+                        <p class="text-xs text-gray-400">${ev.venue} | ${ev.date}</p>
+                    </div>
+
+                    <div class="bg-gray-950 p-4 rounded-2xl border border-gold-600/20 space-y-3">
+                        <span class="text-xs font-semibold text-gray-300 block">אודות המופע:</span>
+                        <p class="text-xs text-gray-300 leading-relaxed">${ev.description}</p>
+                    </div>
+
+                    <!-- Ticket Quantity Selector -->
+                    <div class="flex items-center justify-between bg-gray-950/80 p-3.5 rounded-2xl border border-gray-800">
+                        <span class="text-xs text-gray-300 font-medium">כמות כרטיסים:</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="updateTicketQty(-1)" class="w-8 h-8 rounded-lg bg-gray-800 text-gold-400 font-bold flex items-center justify-center hover:bg-gray-700">-</button>
+                            <span id="ticketQtyNum" class="text-sm font-bold text-gold-300">1</span>
+                            <button onclick="updateTicketQty(1)" class="w-8 h-8 rounded-lg bg-gray-800 text-gold-400 font-bold flex items-center justify-center hover:bg-gray-700">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Price summary -->
+                    <div class="bg-gold-500/10 border border-gold-500/30 p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gold-400 block">סה"כ לתשלום:</span>
+                            <span id="totalPriceDisplay" class="text-xl font-bold text-gold-300">₪${ev.price}</span>
+                        </div>
+                        <span class="text-[11px] text-gray-400">כולל דמי טיפול ומסים</span>
+                    </div>
+
+                    <!-- Form Inputs -->
+                    <div class="space-y-3">
+                        <input type="text" id="buyerName" placeholder="שם מלא" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500">
+                        <input type="email" id="buyerEmail" placeholder="כתובת דוא''ל לקבלת הכרטיסים" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500">
+                    </div>
+
+                    <button onclick="confirmTicketPurchase()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-gray-950 font-extrabold text-xs sm:text-sm rounded-xl hover:brightness-110 shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="credit-card" class="w-4 h-4"></i>
+                        <span>אישור והשלמת הזמנה</span>
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('ticketModal').classList.remove('hidden');
+            refreshIcons();
+        }
+
+        function updateTicketQty(delta) {
+            if (!activeBookingEvent) return;
+            selectedTicketCount = Math.max(1, Math.min(8, selectedTicketCount + delta));
+            document.getElementById('ticketQtyNum').innerText = selectedTicketCount;
+            document.getElementById('totalPriceDisplay').innerText = `₪${activeBookingEvent.price * selectedTicketCount}`;
+        }
+
+        function confirmTicketPurchase() {
+            const name = document.getElementById('buyerName').value.trim();
+            const email = document.getElementById('buyerEmail').value.trim();
+
+            if (!name || !email) {
+                showToast('אנא מלא שם וכתובת דוא"ל תקינה');
+                return;
+            }
+
+            closeTicketModal();
+            showToast(`הזמנתך הושלמה בהצלחה! הכרטיסים נשלחו ל-${email}`);
+        }
+
+        function closeTicketModal() {
+            document.getElementById('ticketModal').classList.add('hidden');
+            activeBookingEvent = null;
+        }
+
+        // --- THEME TOGGLE ---
+        function applyTheme(theme) {
+            currentTheme = theme;
+            const htmlEl = document.documentElement;
+            if (theme === 'light') {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+            } else {
+                htmlEl.classList.remove('light');
+                htmlEl.classList.add('dark');
+            }
+            saveState();
+            refreshIcons();
+        }
+
+        function toggleTheme() {
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+            showToast(newTheme === 'dark' ? 'עברת למצב לילה' : 'עברת למצב יום');
+        }
+
+        // --- RECOMMENDATION ALGORITHMS ---
+        function calculateContentScore(show) {
+            if (!currentUserTags || currentUserTags.length === 0) return 0;
+            const matches = show.tags.filter(t => currentUserTags.includes(t));
+            return matches.length / Math.sqrt(show.tags.length * currentUserTags.length);
+        }
+
+        function calculateCollaborativeScore(showId) {
+            let totalWeightedRating = 0;
+            let similaritySum = 0;
+
+            Object.keys(OTHER_USERS).forEach(uId => {
+                const other = OTHER_USERS[uId];
+                if (other.ratings[showId] !== undefined) {
+                    const sim = computeUserSimilarity(currentUserRatings, other.ratings);
+                    if (sim > 0) {
+                        totalWeightedRating += sim * other.ratings[showId];
+                        similaritySum += sim;
+                    }
+                }
+            });
+
+            return similaritySum === 0 ? 0 : totalWeightedRating / similaritySum;
+        }
+
+        function computeUserSimilarity(ratingsA, ratingsB) {
+            const commonKeys = Object.keys(ratingsA).filter(k => ratingsB[k] !== undefined);
+            if (commonKeys.length === 0) return 0;
+
+            let dotProduct = 0, normA = 0, normB = 0;
+            commonKeys.forEach(k => {
+                dotProduct += ratingsA[k] * ratingsB[k];
+                normA += ratingsA[k] * ratingsA[k];
+                normB += ratingsB[k] * ratingsB[k];
+            });
+
+            return (normA === 0 || normB === 0) ? 0 : dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+        }
+
+        function getAverageRating(show) {
+            const ratingsObj = { ...show.ratings };
+            if (currentUserRatings[show.id]) ratingsObj['me'] = currentUserRatings[show.id];
+            const values = Object.values(ratingsObj);
+            if (values.length === 0) return '0.0';
+            return (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1);
+        }
+
+        // --- RENDER CARD COMPONENT ---
+        function createShowCard(show, reasonText = '', matchPercentage = null) {
+            const avgRating = getAverageRating(show);
+            const myRating = currentUserRatings[show.id] || 0;
+            const isFav = userFavorites.includes(show.id);
+
+            return `
+                <div class="bg-gray-900 dark:bg-gray-900 light:bg-white border border-gray-800/80 dark:border-gray-800/80 light:border-gray-200 hover:border-gold-500/50 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between group transition-all duration-300">
+                    <div class="relative h-52 overflow-hidden bg-gray-950">
+                        <img src="${show.image}" alt="${show.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 dark:from-gray-900 light:from-white/90 via-transparent to-black/40"></div>
+                        
+                        <div class="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full text-gold-400 font-bold text-xs flex items-center gap-1 border border-gold-500/30">
+                            <i data-lucide="star" class="w-3.5 h-3.5 fill-gold-400 text-gold-400"></i>
+                            <span>${avgRating}</span>
+                        </div>
+
+                        <div class="absolute top-3 left-3 flex items-center gap-1.5">
+                            <button onclick="openShareModal('${show.id}', event)" title="שתף מופע זה" class="p-2 rounded-full bg-black/60 backdrop-blur-md text-gray-300 hover:text-gold-400 transition-all border border-white/10">
+                                <i data-lucide="share-2" class="w-4 h-4"></i>
+                            </button>
+
+                            <button onclick="toggleFavorite('${show.id}', event)" title="הוסף למועדפים" class="p-2 rounded-full bg-black/60 backdrop-blur-md text-gray-300 hover:text-red-500 transition-all border border-white/10">
+                                <i data-lucide="heart" class="w-4 h-4 ${isFav ? 'text-red-500 fill-red-500' : ''}"></i>
+                            </button>
+                        </div>
+
+                        ${matchPercentage !== null ? `
+                            <div class="absolute bottom-3 right-3 bg-gold-500 text-gray-950 font-extrabold text-[11px] px-2.5 py-0.5 rounded-full shadow-lg">
+                                ${matchPercentage}% התאמה
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-400 light:text-gray-500">
+                                <span class="uppercase tracking-wider font-semibold text-gold-400/90 dark:text-gold-400/90 light:text-amber-700">${show.category}</span>
+                                <span>${show.year}</span>
+                            </div>
+                            <h4 class="font-bold text-base font-serif-title line-clamp-1 group-hover:text-gold-300 dark:group-hover:text-gold-300 light:group-hover:text-amber-800 transition-colors text-white dark:text-white light:text-gray-900">${show.title}</h4>
+                            <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 line-clamp-2">${show.description}</p>
+                        </div>
+
+                        <div class="flex items-center justify-between bg-gray-950/60 dark:bg-gray-950/60 light:bg-amber-50/80 px-2.5 py-1.5 rounded-xl border border-gray-800/60 dark:border-gray-800/60 light:border-amber-200">
+                            <span class="text-[10px] text-gray-400 dark:text-gray-400 light:text-gray-600 font-medium">דירוגך:</span>
+                            <div class="flex items-center gap-0.5">
+                                ${[1, 2, 3, 4, 5].map(star => `
+                                    <button onclick="setUserRating('${show.id}', ${star}, event)" title="דרג ${star} כוכבים" class="p-0.5 text-gold-400 hover:scale-125 transition-transform">
+                                        <i data-lucide="star" class="w-3.5 h-3.5 ${star <= myRating ? 'fill-gold-400 text-gold-400' : 'text-gray-600 dark:text-gray-600 light:text-gray-300'}"></i>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        ${reasonText ? `
+                            <div class="text-[11px] bg-gold-500/10 border border-gold-500/20 text-gold-300 dark:text-gold-300 light:text-amber-800 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 shrink-0 text-gold-400"></i>
+                                <span class="truncate">${reasonText}</span>
+                            </div>
+                        ` : ''}
+
+                        <div class="flex flex-wrap gap-1">
+                            ${show.tags.map(t => `
+                                <button onclick="filterByTag('${t}', event)" class="text-[10px] bg-gray-950 dark:bg-gray-950 light:bg-gray-100 text-gray-400 dark:text-gray-400 light:text-gray-700 hover:text-gold-400 px-2 py-0.5 rounded-md border border-gray-800 dark:border-gray-800 light:border-gray-200 transition-colors">
+                                    ${t}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div class="pt-2 border-t border-gray-800/80 dark:border-gray-800/80 light:border-gray-200 flex items-center gap-2">
+                            <button onclick="openShowModal('${show.id}')" class="w-full py-2.5 bg-gradient-to-r from-gold-600 to-amber-700 hover:brightness-110 text-gray-950 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-md">
+                                <i data-lucide="play" class="w-4 h-4 fill-gray-950"></i>
+                                <span>צפה במופע / פרטים</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderUI() {
+            let filtered = shows.filter(s => currentCategory === 'all' || s.category === currentCategory);
+
+            if (activeTagFilter) {
+                filtered = filtered.filter(s => s.tags.includes(activeTagFilter));
+            }
+
+            if (searchQuery.trim() !== '') {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(s => 
+                    s.title.toLowerCase().includes(q) || 
+                    s.description.toLowerCase().includes(q) ||
+                    s.tags.some(t => t.toLowerCase().includes(q))
+                );
+            }
+
+            // Content-Based
+            const contentScored = filtered.map(show => ({ show, score: calculateContentScore(show) }))
+                .filter(x => x.score > 0)
+                .sort((a, b) => b.score - a.score);
+
+            const contentContainer = document.getElementById('contentBasedList');
+            if (contentScored.length === 0) {
+                contentContainer.innerHTML = `<div class="col-span-full py-6 text-center text-xs text-gray-500">אין התאמות לפי התגיות של הפרופיל כרגע.</div>`;
+            } else {
+                contentContainer.innerHTML = contentScored.slice(0, 4).map(x => {
+                    const matchPercent = Math.round(x.score * 100);
+                    return createShowCard(x.show, `תואם העדפות מחול/ז'אנר`, matchPercent);
+                }).join('');
+            }
+
+            // Collaborative
+            const collabScored = filtered.map(show => ({ show, estRating: calculateCollaborativeScore(show.id) }))
+                .filter(x => x.estRating >= 3.5)
+                .sort((a, b) => b.estRating - a.estRating);
+
+            const userContainer = document.getElementById('userBasedList');
+            if (collabScored.length === 0) {
+                userContainer.innerHTML = `<div class="col-span-full py-6 text-center text-xs text-gray-500">דרג מופעים נוספים כדי לקבל המלצות מבוססות חובבי תיאטרון דומים.</div>`;
+            } else {
+                userContainer.innerHTML = collabScored.slice(0, 4).map(x => {
+                    return createShowCard(x.show, `דירוג משוער מקהל דומה: ${x.estRating.toFixed(1)} ★`);
+                }).join('');
+            }
+
+            // Catalog Sorting
+            let sortedCatalog = [...filtered];
+            if (currentSort === 'rating') {
+                sortedCatalog.sort((a, b) => parseFloat(getAverageRating(b)) - parseFloat(getAverageRating(a)));
+            } else if (currentSort === 'year') {
+                sortedCatalog.sort((a, b) => b.year - a.year);
+            } else if (currentSort === 'popular') {
+                sortedCatalog.sort((a, b) => Object.keys(b.ratings).length - Object.keys(a.ratings).length);
+            } else {
+                sortedCatalog.sort((a, b) => {
+                    const scoreA = calculateContentScore(a) + (calculateCollaborativeScore(a.id) / 5);
+                    const scoreB = calculateContentScore(b) + (calculateCollaborativeScore(b.id) / 5);
+                    return scoreB - scoreA;
+                });
+            }
+
+            const catalogContainer = document.getElementById('fullCatalogList');
+            if (sortedCatalog.length === 0) {
+                catalogContainer.innerHTML = `<div class="col-span-full py-10 text-center text-gray-500 text-sm">לא נמצאו מופעים התואמים את החיפוש.</div>`;
+            } else {
+                catalogContainer.innerHTML = sortedCatalog.map(show => createShowCard(show)).join('');
+            }
+
+            refreshIcons();
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.dataset.category === cat) {
+                    btn.className = 'cat-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-gold-500 text-gray-950 shadow-lg shadow-gold-500/20';
+                } else {
+                    btn.className = 'cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-gray-900 dark:bg-gray-900 light:bg-white text-gray-300 dark:text-gray-300 light:text-gray-700 hover:bg-gray-800 hover:text-gold-400 border border-gray-800 dark:border-gray-800 light:border-gray-200';
+                }
+            });
+            renderUI();
+        }
+
+        function setSort(val) {
+            currentSort = val;
+            renderUI();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val;
+            renderUI();
+        }
+
+        function filterByTag(tagName, e) {
+            if (e) e.stopPropagation();
+            activeTagFilter = tagName;
+            document.getElementById('activeTagName').innerText = tagName;
+            document.getElementById('activeTagBanner').classList.remove('hidden');
+            document.getElementById('activeTagBanner').classList.add('flex');
+            renderUI();
+            showToast(`סונן לפי תגית: ${tagName}`);
+        }
+
+        function clearTagFilter() {
+            activeTagFilter = '';
+            document.getElementById('activeTagBanner').classList.add('hidden');
+            document.getElementById('activeTagBanner').classList.remove('flex');
+            renderUI();
+        }
+
+        function resetFilters() {
+            searchQuery = '';
+            activeTagFilter = '';
+            document.getElementById('globalSearch').value = '';
+            document.getElementById('mobileSearch').value = '';
+            document.getElementById('activeTagBanner').classList.add('hidden');
+            document.getElementById('activeTagBanner').classList.remove('flex');
+            setCategory('all');
+        }
+
+        function switchPersona(key) {
+            if (PERSONAS[key]) {
+                currentUserTags = PERSONAS[key].tags;
+                currentUserRatings = { ...PERSONAS[key].ratings };
+                document.getElementById('personaBadge').innerText = `פרופיל פעיל: ${PERSONAS[key].name}`;
+                saveState();
+                renderUI();
+                showToast(`פרופיל עודכן: ${PERSONAS[key].name}`);
+            }
+        }
+
+        function toggleFavorite(showId, e) {
+            if (e) e.stopPropagation();
+            if (userFavorites.includes(showId)) {
+                userFavorites = userFavorites.filter(id => id !== showId);
+                showToast('הוסר מהמועדפים');
+            } else {
+                userFavorites.push(showId);
+                showToast('נוסף למועדפים שלי');
+            }
+            saveState();
+            renderUI();
+            if (!document.getElementById('hubModal').classList.contains('hidden')) {
+                renderHubContent();
+            }
+        }
+
+        function openShowModal(showId) {
+            const show = shows.find(s => s.id === showId);
+            if (!show) return;
+
+            activeModalShowId = showId;
+
+            if (!watchHistory.includes(showId)) {
+                watchHistory.unshift(showId);
+            } else {
+                watchHistory = [showId, ...watchHistory.filter(id => id !== showId)];
+            }
+            saveState();
+
+            document.getElementById('videoEmbedContainer').innerHTML = `
+                <iframe src="${show.videoUrl}?autoplay=1&enablejsapi=1" 
+                        title="${show.title}" 
+                        class="w-full h-full border-0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            `;
+
+            const myRating = currentUserRatings[showId] || 0;
+            const avgRating = getAverageRating(show);
+
+            document.getElementById('modalItemContent').innerHTML = `
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-800 dark:border-gray-800 light:border-gray-200 pb-4">
+                    <div>
+                        <div class="flex items-center gap-2 text-xs text-gold-400 dark:text-gold-400 light:text-amber-800 font-semibold uppercase">
+                            <span>${show.category}</span> &bull; <span>${show.year}</span>
+                        </div>
+                        <h3 class="text-2xl font-bold font-serif-title text-white dark:text-white light:text-gray-900 mt-1">${show.title}</h3>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+                        <button onclick="openShareModal('${show.id}')" class="p-2.5 rounded-2xl bg-gold-500/10 border border-gold-500/20 text-gold-400 dark:text-gold-400 light:text-amber-800 hover:bg-gold-500/20 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                            <span>שתף</span>
+                        </button>
+
+                        <div class="bg-gray-950 dark:bg-gray-950 light:bg-amber-50 px-4 py-2.5 rounded-2xl border border-gold-600/30 dark:border-gold-600/30 light:border-amber-300 flex items-center gap-3 shrink-0">
+                            <span class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 font-medium">הדירוג שלך:</span>
+                            <div class="flex items-center gap-1" id="starRatingGroup">
+                                ${[1, 2, 3, 4, 5].map(star => `
+                                    <button onclick="setUserRating('${show.id}', ${star})" title="דרג ${star} כוכבים" class="text-gold-400 hover:scale-125 transition-transform">
+                                        <i data-lucide="star" class="w-5 h-5 ${star <= myRating ? 'fill-gold-400 text-gold-400' : 'text-gray-600 dark:text-gray-600 light:text-gray-300'}"></i>
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <span class="text-xs font-bold text-gold-300 dark:text-gold-300 light:text-amber-900">(${avgRating} ממוצע)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-sm text-gray-300 dark:text-gray-300 light:text-gray-700 leading-relaxed">${show.description}</p>
+
+                <div class="space-y-4 pt-4 border-t border-gray-800 dark:border-gray-800 light:border-gray-200">
+                    <h4 class="text-sm font-bold text-gold-300 dark:text-gold-300 light:text-amber-900 flex items-center gap-2">
+                        <i data-lucide="message-square" class="w-4 h-4"></i>
+                        <span>תגובות צופים וביקורות (${show.comments.length})</span>
+                    </h4>
+
+                    <div class="flex gap-2">
+                        <input type="text" id="newCommentInput" placeholder="כתוב ביקורת או חוות דעת על המופע..." 
+                               class="flex-1 bg-gray-950 dark:bg-gray-950 light:bg-gray-100 border border-gray-800 dark:border-gray-800 light:border-gray-300 rounded-xl px-4 py-2 text-xs text-white dark:text-white light:text-gray-900 placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                        <button onclick="addComment('${show.id}')" class="px-4 py-2 bg-gold-500 hover:bg-gold-400 text-gray-950 font-bold text-xs rounded-xl transition-all">
+                            פרסם
+                        </button>
+                    </div>
+
+                    <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        ${show.comments.length === 0 ? `
+                            <p class="text-xs text-gray-500 italic py-2">טרם נכתבו תגובות. היו הראשונים להגיב!</p>
+                        ` : show.comments.map(c => `
+                            <div class="bg-gray-950/70 dark:bg-gray-950/70 light:bg-amber-50/70 p-3 rounded-xl border border-gray-800 dark:border-gray-800 light:border-amber-200 text-xs flex justify-between items-start">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-gold-400 dark:text-gold-400 light:text-amber-800">${c.user}</span>
+                                        <span class="text-[10px] text-gray-500">${c.date}</span>
+                                    </div>
+                                    <p class="text-gray-300 dark:text-gray-300 light:text-gray-800">${c.text}</p>
+                                </div>
+                                <button onclick="likeComment('${show.id}', '${c.id}')" class="flex items-center gap-1 text-[11px] text-gray-400 hover:text-gold-400 transition-colors">
+                                    <i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i>
+                                    <span>${c.likes || 0}</span>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('itemModal').classList.remove('hidden');
+            refreshIcons();
+        }
+
+        function closeShowModal() {
+            document.getElementById('itemModal').classList.add('hidden');
+            document.getElementById('videoEmbedContainer').innerHTML = '';
+            activeModalShowId = null;
+        }
+
+        function setUserRating(showId, rating, e) {
+            if (e) e.stopPropagation();
+            currentUserRatings[showId] = rating;
+            const show = shows.find(s => s.id === showId);
+            if (show) {
+                show.ratings['me'] = rating;
+            }
+            saveState();
+            if (activeModalShowId === showId) {
+                openShowModal(showId);
+            }
+            renderUI();
+            showToast(`דירגת ${rating} כוכבים! המלצותיך עודכנו.`);
+        }
+
+        function addComment(showId) {
+            const input = document.getElementById('newCommentInput');
+            if (!input || !input.value.trim()) return;
+
+            const show = shows.find(s => s.id === showId);
+            if (show) {
+                show.comments.unshift({
+                    id: 'c_' + Date.now(),
+                    user: 'מנוי אורח',
+                    text: input.value.trim(),
+                    date: new Date().toISOString().split('T')[0],
+                    likes: 0
+                });
+                saveState();
+                openShowModal(showId);
+                showToast('תגובתך פורסמה בהצלחה');
+            }
+        }
+
+        function likeComment(showId, commentId) {
+            const show = shows.find(s => s.id === showId);
+            if (show) {
+                const comment = show.comments.find(c => c.id === commentId);
+                if (comment) {
+                    comment.likes = (comment.likes || 0) + 1;
+                    saveState();
+                    openShowModal(showId);
+                }
+            }
+        }
+
+        // --- SHARE SYSTEM ---
+        function openShareModal(showId = null, e) {
+            if (e) e.stopPropagation();
+
+            let shareTitle = "GrandStage - מנוע המלצות וצפייה בתיאטרון ובלט";
+            let shareText = "גיליתי את פלטפורמת המופעים GrandStage! כדאי לך לצפות";
+            let shareUrl = window.location.href;
+
+            if (showId) {
+                const show = shows.find(s => s.id === showId);
+                if (show) {
+                    shareTitle = `GrandStage: ${show.title}`;
+                    shareText = `מומלץ לצפות במופע: "${show.title}" (${show.category})`;
+                }
+            }
+
+            activeSharePayload = { title: shareTitle, text: shareText, url: shareUrl };
+
+            if (navigator.share && !showId) {
+                navigator.share({
+                    title: shareTitle,
+                    text: shareText,
+                    url: shareUrl
+                }).catch(() => {});
+            }
+
+            document.getElementById('shareModalTitle').innerText = showId ? 'שתף מופע זה' : 'שתף את GrandStage';
+            document.getElementById('shareModalSub').innerText = shareTitle;
+            document.getElementById('shareUrlInput').value = shareUrl;
+
+            document.getElementById('shareModal').classList.remove('hidden');
+            refreshIcons();
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        function copyShareUrl() {
+            const input = document.getElementById('shareUrlInput');
+            input.select();
+            document.execCommand('copy');
+            showToast('הקישור הועתק ללוח!');
+            closeShareModal();
+        }
+
+        function shareToWhatsApp() {
+            const text = encodeURIComponent(`${activeSharePayload.text}\n${activeSharePayload.url}`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+
+        function shareToTelegram() {
+            const url = encodeURIComponent(activeSharePayload.url);
+            const text = encodeURIComponent(activeSharePayload.text);
+            window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+        }
+
+        function shareToFacebook() {
+            const url = encodeURIComponent(activeSharePayload.url);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+
+        function shareToEmail() {
+            const subject = encodeURIComponent(activeSharePayload.title);
+            const body = encodeURIComponent(`${activeSharePayload.text}\n\n${activeSharePayload.url}`);
+            window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+        }
+
+        // --- HUB MODAL ---
+        function openHubModal() {
+            renderHubContent();
+            document.getElementById('hubModal').classList.remove('hidden');
+            refreshIcons();
+        }
+
+        function closeHubModal() {
+            document.getElementById('hubModal').classList.add('hidden');
+        }
+
+        function switchHubTab(tab) {
+            activeHubTab = tab;
+            const favBtn = document.getElementById('hubTabFav');
+            const historyBtn = document.getElementById('hubTabHistory');
+
+            if (tab === 'fav') {
+                favBtn.className = 'pb-2 border-b-2 border-gold-500 font-semibold text-gold-400 dark:text-gold-400 light:text-amber-700';
+                historyBtn.className = 'pb-2 border-b-2 border-transparent text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-gray-200';
+            } else {
+                historyBtn.className = 'pb-2 border-b-2 border-gold-500 font-semibold text-gold-400 dark:text-gold-400 light:text-amber-700';
+                favBtn.className = 'pb-2 border-b-2 border-transparent text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-gray-200';
+            }
+
+            renderHubContent();
+        }
+
+        function renderHubContent() {
+            document.getElementById('favCount').innerText = userFavorites.length;
+            document.getElementById('historyCount').innerText = watchHistory.length;
+
+            const container = document.getElementById('hubTabContent');
+            const idsList = activeHubTab === 'fav' ? userFavorites : watchHistory;
+
+            if (idsList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-10">אין כרגע פריטים ברשימה זו.</p>`;
+                return;
+            }
+
+            const items = idsList.map(id => shows.find(s => s.id === id)).filter(Boolean);
+
+            container.innerHTML = items.map(show => `
+                <div class="flex items-center justify-between p-3 rounded-2xl bg-gray-950 dark:bg-gray-950 light:bg-amber-50/80 border border-gray-800 dark:border-gray-800 light:border-amber-200 hover:border-gold-500/30 transition-all">
+                    <div class="flex items-center gap-3">
+                        <img src="${show.image}" class="w-14 h-14 object-cover rounded-xl">
+                        <div>
+                            <h5 class="text-sm font-bold text-white dark:text-white light:text-gray-900 font-serif-title">${show.title}</h5>
+                            <span class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">${show.category} &bull; ${show.year}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="closeHubModal(); openShowModal('${show.id}')" class="p-2 text-xs bg-gold-500 text-gray-950 rounded-xl font-bold hover:bg-gold-400">
+                            צפה
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            refreshIcons();
+        }
+
+        window.onload = function() {
+            applyTheme(currentTheme);
+            renderUI();
+        };
+    </script>
+</body>
+</html>

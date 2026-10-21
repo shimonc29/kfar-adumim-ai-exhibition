@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת תמלול שמע חכמה | Gemini Transcribe</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Heebo / Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-slate-950 text-slate-100 antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 left-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i data-lucide="mic" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
+                        TranscribeAI
+                    </h1>
+                    <p class="text-xs text-slate-400">תמלול קבצי שמע בעברית ובשלל שפות</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button id="btn-open-settings" class="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+                    <i data-lucide="key" class="w-4 h-4 text-amber-400"></i>
+                    <span>הגדרות מפתח API</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Side: Upload & Audio Player -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <!-- API Key Warning Banner if missing -->
+                <div id="api-key-warning" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-amber-300 text-sm flex items-start gap-3">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="font-semibold">נדרש מפתח API של Gemini</p>
+                        <p class="text-xs text-amber-300/80 mt-1">כדי לתמלל קבצים יש להזין מפתח API. המפתח נשמר בדפדפן שלך בלבד.</p>
+                        <button onclick="openSettingsModal()" class="mt-2 text-xs font-bold text-amber-400 hover:underline">לחץ כאן להגדרת מפתח</button>
+                    </div>
+                </div>
+
+                <!-- Upload Card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <h2 class="text-base font-semibold mb-4 flex items-center gap-2 text-slate-200">
+                        <i data-lucide="upload-cloud" class="w-5 h-5 text-blue-400"></i>
+                        העלאת קובץ שמע
+                    </h2>
+
+                    <!-- Drop Zone -->
+                    <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-blue-500/50 hover:bg-blue-500/5 rounded-xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center gap-3">
+                        <input type="file" id="audio-input" accept="audio/*" class="hidden">
+                        <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 border border-slate-700">
+                            <i data-lucide="music" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-200">לחץ לבחירת קובץ או גרור לכאן</p>
+                            <p class="text-xs text-slate-400 mt-1">תומך בפורמטים MP3, WAV, M4A, OGG, WebM</p>
+                        </div>
+                        <span class="px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-400 border border-slate-700">עד 25MB בקובץ</span>
+                    </div>
+
+                    <!-- File Preview & Player -->
+                    <div id="file-info" class="hidden mt-6 bg-slate-950/60 border border-slate-800 rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+                                    <i data-lucide="file-audio" class="w-5 h-5"></i>
+                                </div>
+                                <div class="truncate">
+                                    <p id="file-name" class="text-sm font-medium text-slate-200 truncate">audio.mp3</p>
+                                    <p id="file-size" class="text-xs text-slate-400">0 MB</p>
+                                </div>
+                            </div>
+                            <button id="btn-remove-file" class="text-slate-400 hover:text-red-400 p-1 rounded-lg hover:bg-slate-800 transition">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+
+                        <!-- Audio Player -->
+                        <audio id="audio-player" controls class="w-full h-10 rounded-lg outline-none"></audio>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button id="btn-transcribe" disabled class="mt-6 w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-xl shadow-lg shadow-blue-600/20 transition flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        <span>התחל תמלול AI</span>
+                    </button>
+                </div>
+
+                <!-- History List -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex-grow flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-base font-semibold flex items-center gap-2 text-slate-200">
+                            <i data-lucide="history" class="w-5 h-5 text-indigo-400"></i>
+                            היסטוריית תמלולים
+                        </h2>
+                        <button id="btn-clear-history" class="text-xs text-slate-400 hover:text-red-400 transition hidden">ניקוי הכל</button>
+                    </div>
+
+                    <div id="history-container" class="space-y-2 overflow-y-auto max-h-60 sm:max-h-80 pr-1 flex-grow">
+                        <div id="history-empty" class="text-center py-8 text-slate-500 text-sm">
+                            טרם בוצעו תמלולים שמורים.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Side: Transcription Result & Workspace -->
+            <div class="lg:col-span-7 flex flex-col">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex-grow flex flex-col min-h-[500px]">
+                    
+                    <!-- Header Actions -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-5 h-5 text-emerald-400"></i>
+                            <h2 class="text-base font-semibold text-slate-200">תוצאת התמלול</h2>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button id="btn-copy" disabled class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 transition flex items-center gap-1.5 border border-slate-700">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>העתק</span>
+                            </button>
+                            <button id="btn-download-txt" disabled class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 transition flex items-center gap-1.5 border border-slate-700">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                                <span>הורד TXT</span>
+                            </button>
+                            <button id="btn-download-json" disabled class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 transition flex items-center gap-1.5 border border-slate-700">
+                                <i data-lucide="file-json" class="w-4 h-4"></i>
+                                <span>הורד JSON</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search / Filter Bar -->
+                    <div id="search-bar-container" class="mt-4 relative hidden">
+                        <i data-lucide="search" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                        <input type="text" id="transcript-search" placeholder="חפש בתוך התמליל..." class="w-full pl-3 pr-9 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Main Output Area -->
+                    <div class="mt-4 flex-grow relative flex flex-col">
+                        <!-- Loading Overlay -->
+                        <div id="loading-overlay" class="hidden absolute inset-0 bg-slate-900/90 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-center p-6 rounded-xl">
+                            <div class="relative w-16 h-16 mb-4">
+                                <div class="absolute inset-0 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin"></div>
+                                <i data-lucide="cpu" class="w-6 h-6 text-blue-400 absolute inset-0 m-auto"></i>
+                            </div>
+                            <p class="font-medium text-slate-200 text-base" id="status-text">מעבד ומנתח את קובץ השמע...</p>
+                            <p class="text-xs text-slate-400 mt-2 max-w-xs">הבינה המלאכותית מפענחת את הדיבור ויוצרת תמליל נקי. תהליך זה עשוי לקחת מספר שניות.</p>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div id="output-empty" class="flex-grow flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-slate-800/80 rounded-xl my-auto">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-800/50 flex items-center justify-center text-slate-500 mb-4 border border-slate-800">
+                                <i data-lucide="file-audio" class="w-8 h-8"></i>
+                            </div>
+                            <p class="text-slate-300 font-medium">טרם נבחר קובץ לתמלול</p>
+                            <p class="text-xs text-slate-500 mt-1 max-w-sm">העלה קובץ שמע משמאל ולחץ על "התחל תמלול AI" לצפייה בתמליל המלא.</p>
+                        </div>
+
+                        <!-- Transcript Content -->
+                        <div id="transcript-content" class="hidden flex-grow overflow-y-auto max-h-[500px] p-4 bg-slate-950/60 border border-slate-800 rounded-xl text-slate-200 leading-relaxed text-sm whitespace-pre-wrap font-sans selection:bg-blue-500 selection:text-white"></div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900/50 py-4 text-center text-xs text-slate-500">
+        <p>מופעל על ידי Gemini API | נבנה עבור תמלול מדויק ומהיר בעברית</p>
+    </footer>
+
+    <!-- Settings / API Key Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button id="btn-close-modal" class="absolute top-4 left-4 text-slate-400 hover:text-slate-200">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                    <i data-lucide="key" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-100">הגדרת מפתח Gemini API</h3>
+                    <p class="text-xs text-slate-400">הזן מפתח API מבינה מלאכותית של Google</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">API Key</label>
+                    <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="text-xs text-slate-400 bg-slate-950/50 p-3 rounded-lg border border-slate-800/60 leading-normal">
+                    <p>ניתן להנפיק מפתח בחינם בשרת <a href="https://aistudio.google.com/" target="_blank" class="text-blue-400 underline hover:text-blue-300">Google AI Studio</a>.</p>
+                    <p class="mt-1 text-slate-500">המפתח נשמר אך ורק ב-LocalStorage בדפדפן המקומי שלך ולא מועבר לשרת שלישי.</p>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button id="btn-save-key" class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-xl transition">
+                        שמור מפתח
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // State
+        let selectedFile = null;
+        let currentTranscript = '';
+        let history = JSON.parse(localStorage.getItem('transcribe_history') || '[]');
+
+        // DOM Elements
+        const dropZone = document.getElementById('drop-zone');
+        const audioInput = document.getElementById('audio-input');
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        const audioPlayer = document.getElementById('audio-player');
+        const btnRemoveFile = document.getElementById('btn-remove-file');
+        const btnTranscribe = document.getElementById('btn-transcribe');
+        const apiKeyWarning = document.getElementById('api-key-warning');
+
+        const outputEmpty = document.getElementById('output-empty');
+        const transcriptContent = document.getElementById('transcript-content');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const statusText = document.getElementById('status-text');
+        const searchBarContainer = document.getElementById('search-bar-container');
+        const transcriptSearch = document.getElementById('transcript-search');
+
+        const btnCopy = document.getElementById('btn-copy');
+        const btnDownloadTxt = document.getElementById('btn-download-txt');
+        const btnDownloadJson = document.getElementById('btn-download-json');
+
+        const settingsModal = document.getElementById('settings-modal');
+        const btnOpenSettings = document.getElementById('btn-open-settings');
+        const btnCloseModal = document.getElementById('btn-close-modal');
+        const btnSaveKey = document.getElementById('btn-save-key');
+        const apiKeyInput = document.getElementById('api-key-input');
+
+        const historyContainer = document.getElementById('history-container');
+        const historyEmpty = document.getElementById('history-empty');
+        const btnClearHistory = document.getElementById('btn-clear-history');
+
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        // Check API Key on Load
+        function getApiKey() {
+            return localStorage.getItem('gemini_api_key') || '';
+        }
+
+        function checkApiKeyStatus() {
+            const key = getApiKey();
+            if (!key) {
+                apiKeyWarning.classList.remove('hidden');
+            } else {
+                apiKeyWarning.classList.add('hidden');
+            }
+        }
+
+        // Modal Controls
+        function openSettingsModal() {
+            apiKeyInput.value = getApiKey();
+            settingsModal.classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            settingsModal.classList.add('hidden');
+        }
+
+        btnOpenSettings.addEventListener('click', openSettingsModal);
+        btnCloseModal.addEventListener('click', closeSettingsModal);
+        btnSaveKey.addEventListener('click', () => {
+            const val = apiKeyInput.value.trim();
+            localStorage.setItem('gemini_api_key', val);
+            checkApiKeyStatus();
+            closeSettingsModal();
+            showToast('מפתח API נשמר בהצלחה', 'success');
+        });
+
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl text-xs font-medium transition-all duration-300 transform translate-y-2 opacity-0 flex items-center gap-2 text-white ${
+                type === 'error' ? 'bg-red-900/90 border-red-700' : 
+                type === 'success' ? 'bg-emerald-900/90 border-emerald-700' : 'bg-slate-800/90 border-slate-700'
+            }`;
+            
+            const icon = type === 'error' ? 'alert-circle' : type === 'success' ? 'check-circle' : 'info';
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // File Selection Logic
+        dropZone.addEventListener('click', () => audioInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-blue-500', 'bg-blue-500/5');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-blue-500', 'bg-blue-500/5');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500', 'bg-blue-500/5');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        audioInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('audio/')) {
+                showToast('אנא בחר קובץ שמע תקני', 'error');
+                return;
+            }
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+            const url = URL.createObjectURL(file);
+            audioPlayer.src = url;
+
+            fileInfo.classList.remove('hidden');
+            btnTranscribe.disabled = false;
+        }
+
+        btnRemoveFile.addEventListener('click', () => {
+            selectedFile = null;
+            audioInput.value = '';
+            fileInfo.classList.add('hidden');
+            audioPlayer.src = '';
+            btnTranscribe.disabled = true;
+        });
+
+        // Helper: File to Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Transcribe Action via Gemini API
+        btnTranscribe.addEventListener('click', async () => {
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                openSettingsModal();
+                showToast('יש להזין מפתח API כדי לתמלל', 'error');
+                return;
+            }
+
+            if (!selectedFile) return;
+
+            // UI Progress State
+            loadingOverlay.classList.remove('hidden');
+            statusText.textContent = "מכין קובץ לשליחה...";
+            btnTranscribe.disabled = true;
+
+            try {
+                statusText.textContent = "המרה ועיבוד קובץ השמע...";
+                const base64Audio = await fileToBase64(selectedFile);
+
+                statusText.textContent = "מבצע תמלול בעזרת הבינה המלאכותית...";
+
+                const prompt = "תמלל בבקשה את קובץ השמע הזה באופן מדויק ככל האפשר. אם ישנן חלוקות לדוברים או לפסקאות, סדר את התמליל בצורה קריאה וברורה בעברית. אל תוסיף פתיחים או סיכומים מעבר לתמלול עצמו.";
+
+                const payload = {
+                    contents: [
+                        {
+                            role: "user",
+                            parts: [
+                                { text: prompt },
+                                {
+                                    inlineData: {
+                                        mimeType: selectedFile.type || "audio/mp3",
+                                        data: base64Audio
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error?.message || `שגיאת שרת (${response.status})`);
+                }
+
+                const result = await response.json();
+                const textOutput = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!textOutput) {
+                    throw new Error("לא התקבל פלט תמליל מהדגם.");
+                }
+
+                // Render Transcript Result
+                displayTranscript(textOutput);
+                saveToHistory(selectedFile.name, textOutput);
+                showToast('התמלול הושלם בהצלחה!', 'success');
+
+            } catch (err) {
+                console.error(err);
+                showToast(`שגיאה בתמלול: ${err.message}`, 'error');
+            } finally {
+                loadingOverlay.classList.add('hidden');
+                btnTranscribe.disabled = false;
+            }
+        });
+
+        function displayTranscript(text) {
+            currentTranscript = text;
+            transcriptContent.textContent = text;
+            
+            outputEmpty.classList.add('hidden');
+            transcriptContent.classList.remove('hidden');
+            searchBarContainer.classList.remove('hidden');
+
+            btnCopy.disabled = false;
+            btnDownloadTxt.disabled = false;
+            btnDownloadJson.disabled = false;
+        }
+
+        // Live Search in Transcript
+        transcriptSearch.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            if (!currentTranscript) return;
+
+            if (!query) {
+                transcriptContent.textContent = currentTranscript;
+                return;
+            }
+
+            // Simple highlight using HTML spans
+            const escaped = currentTranscript.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const regex = new RegExp(`(${query})`, 'gi');
+            const highlighted = escaped.replace(regex, `<mark class="bg-amber-400 text-slate-900 font-bold px-1 rounded">$1</mark>`);
+            transcriptContent.innerHTML = highlighted;
+        });
+
+        // Copy & Download Options
+        btnCopy.addEventListener('click', () => {
+            if (!currentTranscript) return;
+            navigator.clipboard.writeText(currentTranscript).then(() => {
+                showToast('התמליל הועתק ללוח', 'success');
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = currentTranscript;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('התמליל הועתק ללוח', 'success');
+            });
+        });
+
+        btnDownloadTxt.addEventListener('click', () => {
+            if (!currentTranscript) return;
+            const blob = new Blob([currentTranscript], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `transcript_${Date.now()}.txt`;
+            a.click();
+            showToast('קובץ TXT הורד בהצלחה', 'success');
+        });
+
+        btnDownloadJson.addEventListener('click', () => {
+            if (!currentTranscript) return;
+            const data = {
+                timestamp: new Date().toISOString(),
+                fileName: selectedFile ? selectedFile.name : 'unknown',
+                transcript: currentTranscript
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `transcript_${Date.now()}.json`;
+            a.click();
+            showToast('קובץ JSON הורד בהצלחה', 'success');
+        });
+
+        // Local Storage History Management
+        function saveToHistory(name, text) {
+            const item = {
+                id: Date.now(),
+                fileName: name,
+                date: new Date().toLocaleDateString('he-IL', { hour: '2-digit', minute: '2-digit' }),
+                text: text
+            };
+            history.unshift(item);
+            if (history.length > 20) history.pop(); // limit to 20 items
+            localStorage.setItem('transcribe_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyContainer.innerHTML = '';
+            if (history.length === 0) {
+                historyEmpty.classList.remove('hidden');
+                btnClearHistory.classList.add('hidden');
+                return;
+            }
+
+            historyEmpty.classList.add('hidden');
+            btnClearHistory.classList.remove('hidden');
+
+            history.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-3 bg-slate-950/40 border border-slate-800/80 hover:border-slate-700 rounded-xl cursor-pointer transition flex items-center justify-between group";
+                card.innerHTML = `
+                    <div class="truncate pl-2">
+                        <p class="text-xs font-medium text-slate-200 truncate group-hover:text-blue-400 transition">${item.fileName}</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">${item.date}</p>
+                    </div>
+                    <button class="btn-delete-history p-1 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition" data-id="${item.id}">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                `;
+
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.btn-delete-history')) return;
+                    displayTranscript(item.text);
+                    showToast(`נטען תמליל נשמר עבור: ${item.fileName}`, 'info');
+                });
+
+                historyContainer.appendChild(card);
+            });
+
+            // Add delete event listener
+            document.querySelectorAll('.btn-delete-history').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    history = history.filter(h => h.id !== id);
+                    localStorage.setItem('transcribe_history', JSON.stringify(history));
+                    renderHistory();
+                });
+            });
+
+            lucide.createIcons();
+        }
+
+        btnClearHistory.addEventListener('click', () => {
+            if (confirm('האם למחוק את כל היסטוריית התמלולים?')) {
+                history = [];
+                localStorage.removeItem('transcribe_history');
+                renderHistory();
+                showToast('ההיסטוריה נוקתה', 'info');
+            }
+        });
+
+        // Initialize on page load
+        checkApiKeyStatus();
+        renderHistory();
+    </script>
+</body>
+</html>

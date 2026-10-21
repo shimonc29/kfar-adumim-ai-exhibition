@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitPulse Israel | פיטפולס - מרכז הכושר, השיעורים והקהילה</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Heebo & Rubik -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800;900&family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                        rubik: ['Rubik', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            900: '#0b0f17',
+                            800: '#131924',
+                            700: '#1e2638',
+                            600: '#2a344d'
+                        },
+                        neon: {
+                            green: '#10b981',
+                            emerald: '#059669',
+                            purple: '#a855f7',
+                            cyan: '#06b6d4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #0b0f17;
+            color: #f3f4f6;
+        }
+        /* Glow effects */
+        .glow-green {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+        }
+        .glow-purple {
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.25);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
+        }
+        .text-gradient-neon {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-gradient-purple {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e2638;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 bg-dark-900/90 backdrop-blur-md border-b border-dark-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="scrollToSection('hero')">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-neon-green to-neon-cyan flex items-center justify-center text-dark-900 font-black text-2xl shadow-lg glow-green">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black tracking-tight text-white font-rubik leading-none block">FITPULSE</span>
+                        <span class="text-[10px] font-bold text-neon-green tracking-wider uppercase">ישראל • כושר וקהילה</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav Links -->
+                <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-300">
+                    <a href="#classes" class="hover:text-neon-green transition flex items-center gap-1.5"><i class="fa-solid fa-dumbbell text-neon-green"></i> שיעורים וסדנאות</a>
+                    <a href="#store" class="hover:text-neon-cyan transition flex items-center gap-1.5"><i class="fa-solid fa-cart-shopping text-neon-cyan"></i> מוצרי כושר</a>
+                    <a href="#groups" class="hover:text-neon-purple transition flex items-center gap-1.5"><i class="fa-solid fa-users text-neon-purple"></i> קבוצות כושר</a>
+                    <a href="#calculator" class="hover:text-amber-400 transition flex items-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> מחשבון התאמה</a>
+                </nav>
+
+                <!-- Actions & Cart -->
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleCartModal()" class="relative p-2.5 rounded-xl bg-dark-800 border border-dark-700 hover:border-neon-green transition group">
+                        <i class="fa-solid fa-bag-shopping text-xl text-gray-300 group-hover:text-neon-green transition"></i>
+                        <span id="cartBadge" class="absolute -top-1 -right-1 bg-neon-green text-dark-900 font-black text-xs rounded-full h-5 w-5 flex items-center justify-center hidden shadow-md">0</span>
+                    </button>
+
+                    <button onclick="openQuizModal()" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-neon-green to-emerald-600 text-dark-900 font-extrabold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 transition shadow-lg glow-green">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>שיעור ניסיון מתנה</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative py-20 lg:py-28 overflow-hidden bg-dark-900 border-b border-dark-700">
+        <!-- Background Orbs -->
+        <div class="absolute top-1/4 -right-20 w-96 h-96 bg-neon-green/10 rounded-full filter blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 -left-20 w-96 h-96 bg-neon-purple/10 rounded-full filter blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-7 text-center lg:text-right space-y-6">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-dark-800 border border-neon-green/30 text-neon-green text-xs font-bold">
+                        <span class="w-2 h-2 rounded-full bg-neon-green animate-ping"></span>
+                        <span>הפלטפורמה המובילה לכושר ואימונים בישראל</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+                        הדרך שלך לכושר שיא <br>
+                        <span class="text-gradient-neon">מתחילה ממש כאן.</span>
+                    </h1>
+
+                    <p class="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        שיעורים מקצועיים ביוגה, פילאטיס, כושר קרבי וקליסטניקס בתשלום מותאם, חנות ציוד פרימיום וחיבור ישיר לקבוצות כושר בשכונה שלך!
+                    </p>
+
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="#classes" class="bg-gradient-to-r from-neon-green to-emerald-600 text-dark-900 font-extrabold px-8 py-4 rounded-xl text-base hover:scale-105 transition shadow-lg glow-green flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i>
+                            <span>גלה שיעורים וסדנאות</span>
+                        </a>
+                        <a href="#groups" class="bg-dark-800 border border-dark-600 hover:border-neon-purple text-white font-bold px-8 py-4 rounded-xl text-base hover:bg-dark-700 transition flex items-center gap-2">
+                            <i class="fa-solid fa-users text-neon-purple"></i>
+                            <span>מצא קבוצה באזורך</span>
+                        </a>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-dark-800 max-w-lg mx-auto lg:mx-0">
+                        <div>
+                            <span class="block text-2xl font-black text-white">40+</span>
+                            <span class="text-xs text-gray-400">שיעורים שבועיים</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl font-black text-neon-cyan">15</span>
+                            <span class="text-xs text-gray-400">קבוצות שטח וקהילה</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl font-black text-neon-purple">4.9★</span>
+                            <span class="text-xs text-gray-400">דירוג מתאמנים</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Visual Banner -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative mx-auto max-w-md lg:max-w-none">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-neon-green to-neon-purple rounded-3xl opacity-20 filter blur-xl"></div>
+                        <img src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80" alt="כושר ואימונים" class="rounded-3xl border border-dark-600 shadow-2xl relative z-10 w-full h-[420px] object-cover">
+                        
+                        <!-- Floating Card -->
+                        <div class="absolute -bottom-6 -right-6 z-20 bg-dark-800/90 backdrop-blur-md border border-dark-600 p-4 rounded-2xl shadow-2xl hidden sm:flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-neon-purple/20 text-neon-purple flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-fire"></i>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-gray-400">אימון מומלץ היום</span>
+                                <span class="block text-sm font-black text-white">קליסטניקס למתקדמים • פארק הירקון</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Class Categories & Schedule Section -->
+    <section id="classes" class="py-20 bg-dark-900 border-b border-dark-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-bold uppercase tracking-wider text-neon-green bg-neon-green/10 px-3 py-1 rounded-full">שיעורי פרימיום</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">שיעורים וסדנאות מקצועיות בתשלום</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-2">בחר את התחום שמוביל אותך לקצה: יוגה מרגיעה, פילאטיס מחטב, כושר קרבי מאתגר או קליסטניקס עוצמתי.</p>
+            </div>
+
+            <!-- Class Filters -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-10" id="classCategoryFilters">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Classes Grid -->
+            <div id="classesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Fitness Products Store Section -->
+    <section id="store" class="py-20 bg-dark-800 border-b border-dark-700 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-neon-cyan bg-neon-cyan/10 px-3 py-1 rounded-full">ציוד היקפי</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">חנות ציוד ותוספי כושר</h2>
+                    <p class="text-gray-400 text-sm mt-1">מוצרים איכותיים שנבחרו במיוחד כדי למקסם את הביצועים שלך בכל אימון.</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <select id="productFilterSelect" onchange="filterProducts()" class="bg-dark-900 text-white border border-dark-600 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-neon-cyan">
+                        <option value="all">כל המוצרים</option>
+                        <option value="gear">ציוד ואביזרים</option>
+                        <option value="supplements">תוספי תזונה וחלבון</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Store Grid -->
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Community & Local Fitness Groups Section -->
+    <section id="groups" class="py-20 bg-dark-900 border-b border-dark-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-bold uppercase tracking-wider text-neon-purple bg-neon-purple/10 px-3 py-1 rounded-full">קהילה ואימוני קבוצה</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">קבוצות כושר ואימונים באזורך</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-2">אל תתאמן לבד! הצטרף לקבוצות כושר בשטח, בפארקים או באונליין יחד עם מתאמנים כמוך.</p>
+            </div>
+
+            <!-- Region Filter -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-10" id="regionFilters">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Groups Grid -->
+            <div id="groupsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Personalized Fitness Calculator / Quiz Section -->
+    <section id="calculator" class="py-20 bg-gradient-to-b from-dark-800 to-dark-900 border-b border-dark-700 relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="bg-dark-800 rounded-3xl p-6 sm:p-10 border border-dark-600 shadow-2xl relative overflow-hidden">
+                <div class="absolute -top-10 -left-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl"></div>
+
+                <div class="text-center mb-8">
+                    <div class="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white">מחשבון התאמה אישית לכושר</h2>
+                    <p class="text-gray-400 text-xs sm:text-sm mt-1">ענה על 3 שאלות קצרות ונסדר לך תוכנית מותאמת אישית של שיעורים, מוצרים וקבוצת כושר!</p>
+                </div>
+
+                <form id="calculatorForm" onsubmit="handleCalculatorSubmit(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- Goal -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-300 uppercase mb-2">1. מה המטרה העיקרית שלך?</label>
+                            <select id="calcGoal" class="w-full bg-dark-900 text-white border border-dark-600 rounded-xl p-3 text-sm focus:border-amber-400 focus:outline-none">
+                                <option value="calisthenics">בניית כוח ומשקל גוף (קליסטניקס)</option>
+                                <option value="combat">הכנה לצבא וכושר קרבי</option>
+                                <option value="pilates">חיטוב, ליבה ויציבה (פילאטיס)</option>
+                                <option value="yoga">גמישות, הרפיה ואיזון (יוגה)</option>
+                            </select>
+                        </div>
+
+                        <!-- Level -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-300 uppercase mb-2">2. מה רמת הכושר הנוכחית?</label>
+                            <select id="calcLevel" class="w-full bg-dark-900 text-white border border-dark-600 rounded-xl p-3 text-sm focus:border-amber-400 focus:outline-none">
+                                <option value="beginner">מתחיל (עד חצי שנה אימונים)</option>
+                                <option value="intermediate">בינוני (אימונים סדירים)</option>
+                                <option value="advanced">מתקדם (כושר גבוה מאוד)</option>
+                            </select>
+                        </div>
+
+                        <!-- Location -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-300 uppercase mb-2">3. מאיפה אתה בארץ?</label>
+                            <select id="calcRegion" class="w-full bg-dark-900 text-white border border-dark-600 rounded-xl p-3 text-sm focus:border-amber-400 focus:outline-none">
+                                <option value="מרכז">אזור המרכז ות"א</option>
+                                <option value="ירושלים">ירושלים והסביבה</option>
+                                <option value="צפון">אזור הצפון והחיפה</option>
+                                <option value="דרום">אזור הדרום וב"ש</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-dark-900 font-extrabold py-3.5 rounded-xl transition shadow-lg hover:opacity-90 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>חשב התאמה אישית והצג המלצות!</span>
+                    </button>
+                </form>
+
+                <!-- Recommendation Output -->
+                <div id="calcResult" class="mt-8 pt-8 border-t border-dark-700 hidden">
+                    <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>תוכנית האימונים המומלצת עבורך:</span>
+                    </h3>
+                    <div id="calcResultContent" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Modals -->
+
+    <!-- Class Detail Modal -->
+    <div id="classModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-800 rounded-3xl max-w-xl w-full p-6 sm:p-8 border border-dark-600 relative text-white max-h-[90vh] overflow-y-auto">
+            <button onclick="closeClassModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white w-8 h-8 rounded-full bg-dark-700 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="classModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Group Join Modal -->
+    <div id="groupModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-800 rounded-3xl max-w-md w-full p-6 border border-dark-600 relative text-white">
+            <button onclick="closeGroupModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white w-8 h-8 rounded-full bg-dark-700 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="groupModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Cart Modal / Drawer -->
+    <div id="cartModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-end hidden">
+        <div class="bg-dark-800 w-full max-w-md h-full border-r border-dark-700 flex flex-col justify-between p-6 text-white">
+            
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-dark-700 mb-4">
+                    <h3 class="text-xl font-extrabold flex items-center gap-2">
+                        <i class="fa-solid fa-bag-shopping text-neon-green"></i>
+                        <span>עגלת קניות והרשמות</span>
+                    </h3>
+                    <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <div id="cartItems" class="space-y-4 max-h-[55vh] overflow-y-auto pr-1">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Cart Summary & Promo -->
+            <div class="pt-4 border-t border-dark-700 space-y-4">
+                <div class="flex items-center gap-2">
+                    <input type="text" id="promoInput" placeholder="קוד קופון (נסה FIT10)" class="bg-dark-900 border border-dark-600 rounded-xl px-3 py-2 text-xs flex-1 uppercase">
+                    <button onclick="applyPromo()" class="bg-dark-700 hover:bg-dark-600 text-xs px-3 py-2 rounded-xl font-bold">החל</button>
+                </div>
+
+                <div class="space-y-1 text-sm">
+                    <div class="flex justify-between text-gray-400">
+                        <span>סכום ביניים:</span>
+                        <span id="cartSubtotal">₪0</span>
+                    </div>
+                    <div id="discountRow" class="flex justify-between text-neon-green hidden">
+                        <span>הנחת קופון (10%):</span>
+                        <span id="cartDiscount">-₪0</span>
+                    </div>
+                    <div class="flex justify-between text-base font-extrabold text-white pt-2 border-t border-dark-700">
+                        <span>סה"כ לתשלום:</span>
+                        <span id="cartTotal" class="text-neon-green text-xl">₪0</span>
+                    </div>
+                </div>
+
+                <button onclick="processCheckout()" class="w-full bg-gradient-to-r from-neon-green to-emerald-600 text-dark-900 font-extrabold py-3.5 rounded-xl shadow-lg glow-green transition">
+                    אישור הרשמה ותשלום
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Success Ticket Modal -->
+    <div id="ticketModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-800 rounded-3xl max-w-md w-full p-6 border border-neon-green shadow-2xl text-center text-white relative">
+            <div class="w-16 h-16 bg-neon-green/20 text-neon-green rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-2xl font-black mb-2">אישור הרשמה נקלט!</h3>
+            <p class="text-xs text-gray-400 mb-6">פרטי השיעורים והמוצרים שנרכשו נשלחו אלייך במייל ובאישור הדיגיטלי להלן:</p>
+
+            <div class="bg-dark-900 p-4 rounded-2xl text-right text-xs space-y-2 border border-dark-700 mb-6 font-mono">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">מספר אישור:</span>
+                    <span class="text-neon-green">#FP-99418</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">סה"כ פריטים:</span>
+                    <span id="ticketItemCount">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">סכום שולם:</span>
+                    <span id="ticketTotal">₪0</span>
+                </div>
+            </div>
+
+            <button onclick="closeTicketModal()" class="w-full bg-neon-green text-dark-900 font-extrabold py-3 rounded-xl">
+                חזרה לדף הבית
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-dark-800 border border-dark-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-3 transition-transform duration-300 translate-y-24 opacity-0">
+        <i class="fa-solid fa-circle-check text-neon-green"></i>
+        <span id="toastMsg" class="text-sm font-medium">הפריט נוסף לסל!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark-900 border-t border-dark-700 text-gray-400 py-12 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-3">
+                <div class="flex items-center gap-2 text-white font-rubik font-black text-xl">
+                    <i class="fa-solid fa-bolt text-neon-green"></i>
+                    <span>FITPULSE ISRAEL</span>
+                </div>
+                <p class="text-xs leading-relaxed text-gray-500">
+                    רשת הכושר והאורח חיים המובילה. שיעורים פרימיום ביוגה, פילאטיס, כושר קרבי וקליסטניקס, ציוד מקצועי וקהילה חמה.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-3">שיעורים מובילים</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="#classes" onclick="filterClasses('יוגה')" class="hover:text-neon-green">יוגה פאוור וגמישות</a></li>
+                    <li><a href="#classes" onclick="filterClasses('פילאטיס')" class="hover:text-neon-green">פילאטיס מכשירים ומזרן</a></li>
+                    <li><a href="#classes" onclick="filterClasses('כושר קרבי')" class="hover:text-neon-green">הכנה לצה"ל וגיבושים</a></li>
+                    <li><a href="#classes" onclick="filterClasses('קליסטניקס')" class="hover:text-neon-green">קליסטניקס ואימוני משקל גוף</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-3">ניווט מהיר</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="#store" class="hover:text-neon-cyan">חנות ציוד היקפי</a></li>
+                    <li><a href="#groups" class="hover:text-neon-purple">קבוצות כושר לפי אזור</a></li>
+                    <li><a href="#calculator" class="hover:text-amber-400">מחשבון התאמה אישית</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-3">צור קשר</h4>
+                <p class="text-xs">סניף מרכזי: פארק הירקון / מתחם הלוחמים</p>
+                <p class="text-xs mt-1">טלפון: 03-555-8899</p>
+                <p class="text-xs mt-1">אימייל: info@fitpulse.co.il</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 mt-8 pt-6 border-t border-dark-800 text-center text-xs text-gray-600">
+            © 2026 FitPulse Israel. כל הזכויות שמורות.
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // Data Stores
+
+        // 1. Paid Classes & Workshops Data
+        const classesData = [
+            {
+                id: 'c1',
+                title: "Vinyasa Flow & Power Yoga",
+                category: "יוגה",
+                price: 60,
+                monthlyPrice: 220,
+                difficulty: "לכולם",
+                instructor: "שירה כהן (מורה מוסמכת 500h)",
+                duration: "60 דקות",
+                schedule: "ימים א', ג', ה' ב-08:00",
+                location: "סטודיו תל אביב / זום חי",
+                image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=600&q=80",
+                description: "אימון יוגה דינמי המשפר גמישות, יציבה ונשימה. מתאים לשחרור מתחים ובניית כוח פנימי."
+            },
+            {
+                id: 'c2',
+                title: "פילאטיס מכשירים ומזרן - חיטוב וליבה",
+                category: "פילאטיס",
+                price: 75,
+                monthlyPrice: 270,
+                difficulty: "מתחילים ובינוניים",
+                instructor: "מאיה לוי",
+                duration: "50 דקות",
+                schedule: "ימים ב', ד' ב-18:00",
+                location: "סטודיו פילאטיס הרצליה",
+                image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80",
+                description: "דגש על חיזוק שרירי הליבה, רצפת האגן, ייצוב עמוד השדרה ועיצוב שרירים ארוכים וחזקים."
+            },
+            {
+                id: 'c3',
+                title: "סיירת כושר קרבי - הכנה לצה\"ל וגיבושים",
+                category: "כושר קרבי",
+                price: 80,
+                monthlyPrice: 290,
+                difficulty: "מתקדמים",
+                instructor: "סרן (מיל') אלון רז",
+                duration: "90 דקות",
+                schedule: "ימים א', ד' ב-17:00",
+                location: "דיונות ראשון לציון / פארק הירקון",
+                image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80",
+                description: "סימולציות גיבושים, מסעות אלונקות, זחלנים, ריצות ניווט ובניית חוסן מנטלי חזק לקראת השירות הצבאי."
+            },
+            {
+                id: 'c4',
+                title: "קליסטניקס - אימוני משקל גוף ומתח",
+                category: "קליסטניקס",
+                price: 70,
+                monthlyPrice: 250,
+                difficulty: "מתקדמים",
+                instructor: "דניאל 'StreetKing' גבאי",
+                duration: "75 דקות",
+                schedule: "ימים ג', ו' ב-16:30",
+                location: "מתחם הקליסטניקס ספורטק ת\"א",
+                image: "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?auto=format&fit=crop&w=600&q=80",
+                description: "למד לבצע Muscle-Ups, עליות מתח קורעות, מקבילים, עמידות ידיים ודגל אנושי בטכניקה בטוחה ומדויקת."
+            }
+        ];
+
+        // 2. Fitness Products Data
+        const productsData = [
+            {
+                id: 'p1',
+                name: "ווסט משקל טקטי 10 ק\"ג לכושר קרבי",
+                type: "gear",
+                price: 340,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=600&q=80",
+                desc: "ווסט מתכוונן מרופד מיועד לספרינטים, עליות מתח ואימוני סיבולת קשים."
+            },
+            {
+                id: 'p2',
+                name: "טבעות אולימפיות מעץ + גיר קליסטניקס",
+                type: "gear",
+                price: 180,
+                rating: 4.8,
+                image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80",
+                desc: "סט טבעות עץ איכותיות עם רצועות שחרור מהיר לתרגילי קליסטניקס וכתפיים."
+            },
+            {
+                id: 'p3',
+                name: "מזרן פילאטיס ויוגה TPE מונע החלקה 8 מ\"מ",
+                type: "gear",
+                price: 130,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?auto=format&fit=crop&w=600&q=80",
+                desc: "מזרן אורתופדי עבה עם אחיזה מושלמת למניעת החלקה בזמן תרגול אינטנסיבי."
+            },
+            {
+                id: 'p4',
+                name: "אבקת חלבון WHEY ISO 100 (1 ק\"ג) + שייקר",
+                type: "supplements",
+                price: 210,
+                rating: 4.7,
+                image: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=600&q=80",
+                desc: "ספיישל ספורטאים - 26 גרם חלבון טהור למנה להתאוששות שריר מהירה."
+            },
+            {
+                id: 'p5',
+                name: "סט גומיות התנגדות (5 רמות) + תיק נשיאה",
+                type: "gear",
+                price: 90,
+                rating: 4.8,
+                image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=600&q=80",
+                desc: "מעולה לחימום מפרקים, פילאטיס, וסיוע בעליות מתח ומתחילים בקליסטניקס."
+            },
+            {
+                id: 'p6',
+                name: "גליל עיסוי Foam Roller לשחרור שרירים",
+                type: "gear",
+                price: 85,
+                rating: 4.6,
+                image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80",
+                desc: "גליל טקסטורה עמוק להזרמת דם ושחרור חומצת חלב לאחר אימון מפרך."
+            }
+        ];
+
+        // 3. Fitness Community Groups Data
+        const groupsData = [
+            {
+                id: 'g1',
+                title: "קבוצת קליסטניקס ורחוב - ספורטק תל אביב",
+                region: "מרכז",
+                membersCount: 142,
+                meetingTime: "ימי שני וחמישי ב-19:00",
+                coach: "תומר שרעבי",
+                whatsappLink: "https://chat.whatsapp.com/demo",
+                image: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 'g2',
+                title: "סיירת כושר קרבי וריצות - ירושלים (גן סאקר)",
+                region: "ירושלים",
+                membersCount: 89,
+                meetingTime: "ימי ראשון ורביעי ב-18:00",
+                coach: "יונתן אדרי",
+                whatsappLink: "https://chat.whatsapp.com/demo",
+                image: "https://images.unsplash.com/photo-1486218119243-13883505764c?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 'g3',
+                title: "יוגה בשקיעה מול הים - חוף דדו חיפה",
+                region: "צפון",
+                membersCount: 110,
+                meetingTime: "ימי שישי ב-17:00",
+                coach: "רוני נתן",
+                whatsappLink: "https://chat.whatsapp.com/demo",
+                image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: 'g4',
+                title: "קבוצת פילאטיס ואימוני פונקציונלי - באר שבע",
+                region: "דרום",
+                membersCount: 65,
+                meetingTime: "ימי שלישי ב-18:30",
+                coach: "נועה כץ",
+                whatsappLink: "https://chat.whatsapp.com/demo",
+                image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80"
+            }
+        ];
+
+        // Cart State
+        let cart = [];
+        let selectedClassCategory = "הכל";
+        let selectedRegion = "הכל";
+        let hasDiscount = false;
+
+        // On Load Init
+        document.addEventListener('DOMContentLoaded', () => {
+            renderClassFilters();
+            renderClasses();
+            renderProducts();
+            renderRegionFilters();
+            renderGroups();
+        });
+
+        // --- CLASSES RENDER & FILTER ---
+        function renderClassFilters() {
+            const categories = ["הכל", "יוגה", "פילאטיס", "כושר קרבי", "קליסטניקס"];
+            const container = document.getElementById('classCategoryFilters');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterClasses('${cat}')" 
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition border ${selectedClassCategory === cat ? 'bg-neon-green text-dark-900 border-neon-green shadow-md' : 'bg-dark-800 text-gray-300 border-dark-600 hover:border-gray-400'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filterClasses(cat) {
+            selectedClassCategory = cat;
+            renderClassFilters();
+            renderClasses();
+        }
+
+        function renderClasses() {
+            const container = document.getElementById('classesGrid');
+            const filtered = selectedClassCategory === "הכל" 
+                ? classesData 
+                : classesData.filter(c => c.category === selectedClassCategory);
+
+            container.innerHTML = filtered.map(c => `
+                <div class="bg-dark-800 border border-dark-700 rounded-2xl overflow-hidden hover:border-neon-green transition duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${c.image}" alt="${c.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 right-3 bg-dark-900/80 backdrop-blur-md text-neon-green text-[10px] font-black px-2.5 py-1 rounded-full border border-neon-green/30">
+                                ${c.category}
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
+                                <span><i class="fa-solid fa-clock text-neon-green ml-1"></i>${c.duration}</span>
+                                <span><i class="fa-solid fa-layer-group text-neon-cyan ml-1"></i>${c.difficulty}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white leading-snug hover:text-neon-green transition cursor-pointer" onclick="openClassModal('${c.id}')">${c.title}</h3>
+                            <p class="text-xs text-gray-400 mt-2 line-clamp-2">${c.description}</p>
+                        </div>
+                    </div>
+
+                    <div class="p-5 pt-0 border-t border-dark-700/50 mt-4 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-gray-400 block">שיעור בודד</span>
+                            <span class="text-xl font-black text-neon-green">₪${c.price}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openClassModal('${c.id}')" class="p-2 text-gray-400 hover:text-white">
+                                <i class="fa-solid fa-circle-info text-lg"></i>
+                            </button>
+                            <button onclick="addToCart('${c.id}', 'class')" class="bg-neon-green hover:bg-emerald-500 text-dark-900 font-extrabold text-xs px-3.5 py-2 rounded-xl transition shadow-md">
+                                הירשם לשיעור
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- PRODUCTS RENDER & FILTER ---
+        function renderProducts() {
+            const container = document.getElementById('productsGrid');
+            const typeFilter = document.getElementById('productFilterSelect').value;
+
+            const filtered = typeFilter === "all" 
+                ? productsData 
+                : productsData.filter(p => p.type === typeFilter);
+
+            container.innerHTML = filtered.map(p => `
+                <div class="bg-dark-900 border border-dark-700 rounded-2xl p-4 hover:border-neon-cyan transition duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="h-44 rounded-xl overflow-hidden mb-3 bg-dark-800">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <div class="flex items-center gap-1 text-amber-400 text-xs mb-1">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="font-bold text-white">${p.rating}</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white">${p.name}</h4>
+                        <p class="text-xs text-gray-400 mt-1 line-clamp-2">${p.desc}</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-dark-800 flex items-center justify-between">
+                        <span class="text-lg font-black text-neon-cyan">₪${p.price}</span>
+                        <button onclick="addToCart('${p.id}', 'product')" class="bg-dark-800 hover:bg-neon-cyan hover:text-dark-900 text-neon-cyan border border-neon-cyan/40 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                            <i class="fa-solid fa-cart-plus"></i> הוסף לסל
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterProducts() {
+            renderProducts();
+        }
+
+        // --- GROUPS RENDER & FILTER ---
+        function renderRegionFilters() {
+            const regions = ["הכל", "מרכז", "ירושלים", "צפון", "דרום"];
+            const container = document.getElementById('regionFilters');
+            container.innerHTML = regions.map(reg => `
+                <button onclick="filterGroups('${reg}')" 
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition border ${selectedRegion === reg ? 'bg-neon-purple text-white border-neon-purple shadow-md' : 'bg-dark-800 text-gray-300 border-dark-600 hover:border-gray-400'}">
+                    ${reg}
+                </button>
+            `).join('');
+        }
+
+        function filterGroups(reg) {
+            selectedRegion = reg;
+            renderRegionFilters();
+            renderGroups();
+        }
+
+        function renderGroups() {
+            const container = document.getElementById('groupsGrid');
+            const filtered = selectedRegion === "הכל" 
+                ? groupsData 
+                : groupsData.filter(g => g.region === selectedRegion);
+
+            container.innerHTML = filtered.map(g => `
+                <div class="bg-dark-800 border border-dark-700 rounded-2xl overflow-hidden hover:border-neon-purple transition duration-300">
+                    <div class="relative h-36">
+                        <img src="${g.image}" alt="${g.title}" class="w-full h-full object-cover">
+                        <span class="absolute top-3 right-3 bg-dark-900/90 text-neon-purple text-[10px] font-bold px-2.5 py-1 rounded-full border border-neon-purple/30">
+                            אזור ${g.region}
+                        </span>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-base font-bold text-white mb-2">${g.title}</h4>
+                        <div class="space-y-1.5 text-xs text-gray-400 mb-4">
+                            <p><i class="fa-solid fa-users text-neon-purple ml-1.5"></i> ${g.membersCount} חברים בקבוצה</p>
+                            <p><i class="fa-solid fa-calendar-days text-neon-purple ml-1.5"></i> ${g.meetingTime}</p>
+                            <p><i class="fa-solid fa-user-ninja text-neon-purple ml-1.5"></i> מאמן: ${g.coach}</p>
+                        </div>
+                        <button onclick="openGroupModal('${g.id}')" class="w-full bg-neon-purple/20 hover:bg-neon-purple text-neon-purple hover:text-white border border-neon-purple/40 py-2.5 rounded-xl text-xs font-extrabold transition">
+                            הצטרף לקבוצת הקהילה
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- CALCULATOR QUIZ LOGIC ---
+        function handleCalculatorSubmit(e) {
+            e.preventDefault();
+            const goal = document.getElementById('calcGoal').value;
+            const level = document.getElementById('calcLevel').value;
+            const region = document.getElementById('calcRegion').value;
+
+            // Pick recommended class
+            let recClass = classesData.find(c => c.id === (goal === 'calisthenics' ? 'c4' : goal === 'combat' ? 'c3' : goal === 'pilates' ? 'c2' : 'c1'));
+            let recProduct = productsData.find(p => p.id === (goal === 'calisthenics' ? 'p2' : goal === 'combat' ? 'p1' : goal === 'pilates' ? 'p3' : 'p5'));
+            let recGroup = groupsData.find(g => g.region === region) || groupsData[0];
+
+            const resultContainer = document.getElementById('calcResult');
+            const resultContent = document.getElementById('calcResultContent');
+
+            resultContent.innerHTML = `
+                <!-- Class Rec -->
+                <div class="bg-dark-900 p-4 rounded-xl border border-neon-green/40">
+                    <span class="text-[10px] text-neon-green font-bold block mb-1">שיעור מומלץ</span>
+                    <h4 class="text-sm font-bold text-white">${recClass.title}</h4>
+                    <p class="text-xs text-gray-400 mt-1">₪${recClass.price} לשיעור</p>
+                    <button onclick="addToCart('${recClass.id}', 'class')" class="mt-3 bg-neon-green text-dark-900 text-xs font-bold px-3 py-1.5 rounded-lg w-full">הוסף שיעור לסל</button>
+                </div>
+
+                <!-- Product Rec -->
+                <div class="bg-dark-900 p-4 rounded-xl border border-neon-cyan/40">
+                    <span class="text-[10px] text-neon-cyan font-bold block mb-1">ציוד משלים מומלץ</span>
+                    <h4 class="text-sm font-bold text-white">${recProduct.name}</h4>
+                    <p class="text-xs text-gray-400 mt-1">₪${recProduct.price}</p>
+                    <button onclick="addToCart('${recProduct.id}', 'product')" class="mt-3 bg-neon-cyan text-dark-900 text-xs font-bold px-3 py-1.5 rounded-lg w-full">הוסף ציוד לסל</button>
+                </div>
+
+                <!-- Group Rec -->
+                <div class="bg-dark-900 p-4 rounded-xl border border-neon-purple/40">
+                    <span class="text-[10px] text-neon-purple font-bold block mb-1">קבוצת כושר קרובה</span>
+                    <h4 class="text-sm font-bold text-white">${recGroup.title}</h4>
+                    <p class="text-xs text-gray-400 mt-1">${recGroup.meetingTime}</p>
+                    <button onclick="openGroupModal('${recGroup.id}')" class="mt-3 bg-neon-purple text-white text-xs font-bold px-3 py-1.5 rounded-lg w-full">הצטרף לקבוצה</button>
+                </div>
+            `;
+
+            resultContainer.classList.remove('hidden');
+        }
+
+        // --- MODALS HANDLERS ---
+        function openClassModal(classId) {
+            const item = classesData.find(c => c.id === classId);
+            if (!item) return;
+
+            const modal = document.getElementById('classModal');
+            const body = document.getElementById('classModalBody');
+
+            body.innerHTML = `
+                <img src="${item.image}" class="w-full h-52 object-cover rounded-2xl mb-4">
+                <span class="text-xs font-bold text-neon-green">${item.category} • ${item.difficulty}</span>
+                <h3 class="text-2xl font-black mt-1">${item.title}</h3>
+                <p class="text-xs text-gray-300 mt-2 leading-relaxed">${item.description}</p>
+
+                <div class="bg-dark-900 p-4 rounded-xl my-4 space-y-2 text-xs text-gray-300 border border-dark-700">
+                    <p><strong class="text-white">מדריך:</strong> ${item.instructor}</p>
+                    <p><strong class="text-white">זמני אימון:</strong> ${item.schedule}</p>
+                    <p><strong class="text-white">מיקום:</strong> ${item.location}</p>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                    <div>
+                        <span class="text-xs text-gray-400 block">מחיר שיעור / מנוי</span>
+                        <span class="text-xl font-black text-neon-green">₪${item.price} <span class="text-xs text-gray-400 font-normal">(₪${item.monthlyPrice} חודשי)</span></span>
+                    </div>
+                    <button onclick="addToCart('${item.id}', 'class'); closeClassModal();" class="bg-neon-green text-dark-900 font-extrabold px-6 py-3 rounded-xl text-xs">
+                        הרשם לשיעור זה
+                    </button>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeClassModal() {
+            document.getElementById('classModal').classList.add('hidden');
+        }
+
+        function openGroupModal(groupId) {
+            const g = groupsData.find(group => group.id === groupId);
+            if (!g) return;
+
+            const modal = document.getElementById('groupModal');
+            const body = document.getElementById('groupModalBody');
+
+            body.innerHTML = `
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-neon-purple/20 text-neon-purple rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-1">${g.title}</h3>
+                    <p class="text-xs text-gray-400 mb-4">אזור ${g.region} • ${g.membersCount} חברים רשומים</p>
+                    
+                    <p class="text-xs text-gray-300 bg-dark-900 p-3 rounded-xl mb-6">
+                        להצטרפות לקבוצת ה-WhatsApp/Telegram הקהילתית ולקבלת עדכונים על מועדי המפגשים, לחץ על הכפתור למטה.
+                    </p>
+
+                    <a href="${g.whatsappLink}" target="_blank" onclick="closeGroupModal(); showToast('מעביר אותך לקבוצת הקהילה...');" class="block w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl text-xs">
+                        <i class="fa-brands fa-whatsapp text-base ml-1"></i> הצטרף לקבוצת ה-WhatsApp
+                    </a>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeGroupModal() {
+            document.getElementById('groupModal').classList.add('hidden');
+        }
+
+        function openQuizModal() {
+            scrollToSection('calculator');
+        }
+
+        // --- CART SYSTEM ---
+        function addToCart(id, kind) {
+            let item;
+            if (kind === 'class') {
+                const c = classesData.find(x => x.id === id);
+                item = { id: c.id, name: c.title, price: c.price, type: 'שיעור' };
+            } else {
+                const p = productsData.find(x => x.id === id);
+                item = { id: p.id, name: p.name, price: p.price, type: 'מוצר' };
+            }
+
+            const existing = cart.find(x => x.id === item.id);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+
+            updateCartUI();
+            showToast(`"${item.name}" נוסף לסל!`);
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cartBadge');
+            const totalCount = cart.reduce((sum, i) => sum + i.qty, 0);
+
+            if (totalCount > 0) {
+                badge.textContent = totalCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            renderCartItems();
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cartItems');
+            const subtotalEl = document.getElementById('cartSubtotal');
+            const totalEl = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-500">
+                        <i class="fa-solid fa-basket-shopping text-3xl mb-2"></i>
+                        <p class="text-xs">העגלה שלך ריקה כעת</p>
+                    </div>
+                `;
+                subtotalEl.textContent = '₪0';
+                totalEl.textContent = '₪0';
+                return;
+            }
+
+            let subtotal = 0;
+            container.innerHTML = cart.map((item, idx) => {
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+
+                return `
+                    <div class="bg-dark-900 p-3 rounded-xl flex items-center justify-between border border-dark-700">
+                        <div>
+                            <span class="text-[10px] text-neon-green font-bold block">${item.type}</span>
+                            <h5 class="text-xs font-bold text-white">${item.name}</h5>
+                            <span class="text-xs text-gray-400">₪${item.price} × ${item.qty}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-black text-white">₪${itemTotal}</span>
+                            <button onclick="removeFromCart(${idx})" class="text-xs text-red-400 hover:text-red-300">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            let total = subtotal;
+            if (hasDiscount) {
+                total = Math.round(subtotal * 0.9);
+                document.getElementById('discountRow').classList.remove('hidden');
+                document.getElementById('cartDiscount').textContent = `-₪${subtotal - total}`;
+            }
+
+            subtotalEl.textContent = `₪${subtotal}`;
+            totalEl.textContent = `₪${total}`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCartModal() {
+            const modal = document.getElementById('cartModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function applyPromo() {
+            const val = document.getElementById('promoInput').value.trim().toUpperCase();
+            if (val === 'FIT10') {
+                hasDiscount = true;
+                renderCartItems();
+                showToast('קוד קופון FIT10 הוחל בהצלחה! (10% הנחה)');
+            } else {
+                showToast('קוד קופון לא תקין');
+            }
+        }
+
+        function processCheckout() {
+            if (cart.length === 0) {
+                showToast('העגלה ריקה!');
+                return;
+            }
+
+            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            const finalTotal = hasDiscount ? Math.round(total * 0.9) : total;
+
+            document.getElementById('ticketItemCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
+            document.getElementById('ticketTotal').textContent = `₪${finalTotal}`;
+
+            cart = [];
+            hasDiscount = false;
+            updateCartUI();
+
+            toggleCartModal();
+            document.getElementById('ticketModal').classList.remove('hidden');
+        }
+
+        function closeTicketModal() {
+            document.getElementById('ticketModal').classList.add('hidden');
+        }
+
+        // --- UTILS ---
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

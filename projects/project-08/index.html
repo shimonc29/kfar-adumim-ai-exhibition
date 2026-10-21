@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>שביל ושטח - ציוד מחנאות, טיולים וגאדג'טים</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Assistant -->
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Assistant', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f4f7f5',
+                            100: '#e3ebd9',
+                            500: '#2d6a4f',
+                            600: '#1b4332',
+                            700: '#081c15',
+                            accent: '#e76f51',
+                            amber: '#f4a261',
+                            purple: '#6b21a8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Custom scrollbar for cart and modals */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="resetFilters()">
+                    <div class="w-12 h-12 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-compass text-2xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-extrabold text-brand-700 tracking-tight block leading-none">שביל ושטח</span>
+                        <span class="text-xs font-semibold text-brand-500 tracking-wider">ציוד טיולים, קמפינג וגאדג'טים</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Search Bar -->
+                <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="חפש ציוד קמפינג, פנסים, תרמילים..." 
+                           class="w-full pr-10 pl-4 py-2.5 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition">
+                    <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <!-- Quiz CTA Button -->
+                    <button onclick="openQuizModal()" class="flex items-center gap-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 px-3.5 py-2 rounded-full font-bold text-xs transition shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i>
+                        <span class="hidden sm:inline">שאלון התאמה אישית</span>
+                        <span class="sm:hidden">התאמה אישית</span>
+                    </button>
+
+                    <!-- Cart Counter Button -->
+                    <button onclick="toggleCartModal()" class="relative p-2.5 text-gray-700 hover:text-brand-500 hover:bg-gray-100 rounded-full transition flex items-center justify-center">
+                        <i class="fa-solid fa-cart-shopping text-xl"></i>
+                        <span id="cartBadge" class="absolute -top-1 -right-1 bg-brand-accent text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white hidden">0</span>
+                    </button>
+
+                    <button onclick="openCheckoutModal()" class="hidden sm:flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-full font-bold text-sm shadow-sm transition">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span>לקופה</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="pb-4 md:hidden">
+                <div class="relative w-full">
+                    <input type="text" id="searchInputMobile" oninput="handleSearchMobile()" placeholder="חפש מוצר..." 
+                           class="w-full pr-10 pl-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm bg-gray-50">
+                    <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner / Hero Section -->
+    <section class="bg-gradient-to-r from-brand-600 via-brand-500 to-emerald-700 text-white py-10 px-4 shadow-inner relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-7xl mx-auto text-center relative z-10">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3">יוצאים לטבע עם הציוד האיכותי ביותר</h1>
+            <p class="text-base sm:text-lg text-brand-100 max-w-2xl mx-auto mb-6">
+                סקירות מקצועיות, המלצות חכמות ומותאמות אישית ומחירים משתלמים לציוד קמפינג, גאדג'טים לשטח וביגוד איכותי.
+            </p>
+            
+            <div class="inline-flex flex-wrap items-center justify-center gap-3 bg-white/10 backdrop-blur-md p-2 px-4 rounded-2xl border border-white/20 shadow-lg">
+                <span class="text-xs sm:text-sm font-semibold flex items-center gap-1.5"><i class="fa-solid fa-robot text-brand-amber"></i> מנוע המלצות חכם פעיל</span>
+                <span class="text-white/40">|</span>
+                <button onclick="openQuizModal()" class="text-xs sm:text-sm font-bold text-amber-300 hover:text-white underline transition">
+                    ענה על שאלון 30 שניות להתאמת ציוד מדויקת!
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dynamic Personalized Recommendations Banner (Real-Time Updated) -->
+    <section id="personalizedSection" class="bg-gradient-to-b from-purple-50/70 to-fuchsia-50/30 border-b border-purple-100 py-8 px-4 hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-purple-600 animate-pulse"></span>
+                        <h2 class="text-xl font-extrabold text-gray-900 flex items-center gap-2">
+                            <i class="fa-solid fa-sparkles text-purple-600"></i>
+                            <span id="personalizedTitle">מומלצים במיוחד עבורך</span>
+                        </h2>
+                    </div>
+                    <p id="personalizedSubtitle" class="text-xs text-gray-500 mt-1">מבוסס על העדפות הטיול והתנהגות הצפייה שלך באתר</p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="openQuizModal()" class="text-xs font-bold text-purple-700 hover:underline flex items-center gap-1 bg-white px-3 py-1.5 rounded-lg border border-purple-200 shadow-sm">
+                        <i class="fa-solid fa-sliders"></i> עדכן העדפות
+                    </button>
+                </div>
+            </div>
+
+            <!-- Personalized Carousel/Grid -->
+            <div id="personalizedGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Sidebar Filters -->
+            <aside class="w-full lg:w-64 flex-shrink-0">
+                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm sticky top-28 space-y-6">
+                    <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+                        <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-brand-500"></i> סינון מוצרים
+                        </h3>
+                        <button onclick="resetFilters()" class="text-xs text-brand-500 hover:text-brand-600 font-semibold underline">איפוס</button>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">קטגוריות</label>
+                        <div class="space-y-1.5" id="categoryFilters">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Price Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">מחיר מקסימלי: <span id="priceValue" class="text-brand-500 font-bold">1500 ₪</span></label>
+                        <input type="range" id="priceRange" min="50" max="1500" step="10" value="1500" oninput="handlePriceChange(this.value)" class="w-full accent-brand-500 cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>50 ₪</span>
+                            <span>1,500 ₪</span>
+                        </div>
+                    </div>
+
+                    <!-- Sort Option -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">מיון לפי</label>
+                        <select id="sortSelect" onchange="handleSort()" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="popular">הפופולריים ביותר</option>
+                            <option value="match">התאמה אישית גבוהה</option>
+                            <option value="rating">דירוג גבוה לכל מה שמומלץ</option>
+                            <option value="price-low">מחיר: מהזול ליקר</option>
+                            <option value="price-high">מחיר: מהיקר לזול</option>
+                        </select>
+                    </div>
+
+                    <!-- User Interest Status Box -->
+                    <div id="interestWidget" class="bg-gray-50 p-3.5 rounded-xl border border-gray-100 text-xs space-y-1">
+                        <span class="font-bold text-gray-700 block">פרופיל העניין שלך:</span>
+                        <div id="interestBadges" class="flex flex-wrap gap-1 mt-1">
+                            <span class="text-gray-400 italic">טרם נצפו מוצרים</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Products Grid Section -->
+            <section class="flex-1">
+                <!-- Status bar / count -->
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-sm text-gray-500 font-medium">מציג <span id="productCount" class="font-bold text-gray-800">0</span> מוצרים בקטלוג</p>
+                    <div class="flex items-center gap-2" id="activeCategoryBadge">
+                        <!-- Active filters badges -->
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Products injected via JS -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300">
+                    <i class="fa-solid fa-compass-drafting text-5xl text-gray-300 mb-3"></i>
+                    <h3 class="text-lg font-bold text-gray-700">לא נמצאו מוצרים תואמים</h3>
+                    <p class="text-gray-500 text-sm mt-1">נסה לשנות את הסינון או חפש מילה אחרת.</p>
+                    <button onclick="resetFilters()" class="mt-4 bg-brand-500 text-white text-xs px-4 py-2 rounded-full font-bold hover:bg-brand-600 transition">נקה את כל המסננים</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Quiz Modal for Personalized Matching -->
+    <div id="quizModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100">
+            <button onclick="closeQuizModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <h3 class="text-xl font-extrabold text-gray-900">שאלון התאמה אישית מהיר</h3>
+                <p class="text-xs text-gray-500 mt-1">ענה על 3 שאלות קצרות וקבל המלצות ציוד מדויקות לצרכים שלך</p>
+            </div>
+
+            <form id="quizForm" onsubmit="handleQuizSubmit(event)" class="space-y-5">
+                <!-- Question 1 -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">1. מהו סגנון הטיול/הפעילות העיקרי שלך?</label>
+                    <select id="quizStyle" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="family">קמפינג משפחתי ונופש בטבע</option>
+                        <option value="trek">טרקים קשים, מסעות רגליים ובשביל ישראל</option>
+                        <option value="gadgets">גאדג'טים, תאורה וציוד טכנולוגי לשטח</option>
+                    </select>
+                </div>
+
+                <!-- Question 2 -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">2. מהו משך הטיול האופייני שלך?</label>
+                    <select id="quizDuration" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="short">טיול יומי / לילה אחד</option>
+                        <option value="long">מסע של מספר ימים מחוץ לבית</option>
+                    </select>
+                </div>
+
+                <!-- Question 3 -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">3. מהי מסגרת התקציב שלך למוצר?</label>
+                    <select id="quizBudget" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="low">עד 300 ₪ (ציוד נגיש ובסיסי)</option>
+                        <option value="mid">300 ₪ - 600 ₪ (תמורה מעולה למחיר)</option>
+                        <option value="high">מעל 600 ₪ (ציוד מקצועי ואיכות פרימיום)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>הצג את המוצרים המומלצים עבורי!</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Recommendation Detail Modal -->
+    <div id="productModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border border-gray-100">
+            <!-- Close Button -->
+            <button onclick="closeProductModal()" class="absolute top-4 left-4 z-10 bg-gray-100 hover:bg-gray-200 text-gray-600 w-10 h-10 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div id="modalContent" class="p-6 sm:p-8">
+                <!-- Modal dynamic HTML injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer/Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between transform transition-transform duration-300 translate-x-full" id="cartDrawer">
+            <!-- Header -->
+            <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-brand-50">
+                <div class="flex items-center gap-2 text-brand-700 font-bold text-lg">
+                    <i class="fa-solid fa-cart-shopping text-brand-500"></i>
+                    <span>סל הקניות שלך</span>
+                </div>
+                <button onclick="toggleCartModal()" class="text-gray-400 hover:text-gray-600 p-2 rounded-lg">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Items List -->
+            <div id="cartItemsContainer" class="p-5 overflow-y-auto flex-1 space-y-4">
+                <!-- Cart items JS injected -->
+            </div>
+
+            <!-- Smart Upsell / Frequently Bought Together -->
+            <div id="cartUpsellContainer" class="px-5 py-3 bg-amber-50/70 border-t border-b border-amber-100 hidden">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-amber-900 mb-2">
+                    <i class="fa-solid fa-lightbulb text-amber-600"></i>
+                    <span>מומלץ ומשלים לסל שלך:</span>
+                </div>
+                <div id="cartUpsellContent" class="flex items-center justify-between gap-2 bg-white p-2.5 rounded-xl border border-amber-200 shadow-sm">
+                    <!-- Dynamic upsell item -->
+                </div>
+            </div>
+
+            <!-- Summary Footer -->
+            <div class="p-5 border-t border-gray-100 bg-gray-50 space-y-4">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-500">סכום ביניים:</span>
+                    <span id="cartSubtotal" class="font-bold text-gray-800">0 ₪</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-500">משלוח:</span>
+                    <span id="shippingCost" class="font-semibold text-brand-500">חינם!</span>
+                </div>
+                <div class="border-t border-gray-200 pt-3 flex justify-between items-center text-base font-extrabold text-gray-900">
+                    <span>סה"כ לתשלום:</span>
+                    <span id="cartTotal" class="text-xl text-brand-600">0 ₪</span>
+                </div>
+                
+                <button onclick="openCheckoutModal()" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-bold text-center flex items-center justify-center gap-2 shadow-md transition">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>המשך לתשלום מאובטח</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Checkout / Success Modal -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl relative">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-800 mb-2">תודה על התעניינותך!</h3>
+            <p class="text-gray-600 text-sm mb-6">זוהי חנות מדמה לציוד שטח וקמפינג. ההזמנה שלך התקבלה במערכת הניסיון.</p>
+
+            <div class="bg-gray-50 p-4 rounded-xl text-right text-xs space-y-2 mb-6 border border-gray-100">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">מספר הזמנה:</span>
+                    <span class="font-bold">#TRK-88291</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">סה"כ פריטים:</span>
+                    <span id="checkoutItemCount" class="font-bold">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">סה"כ לתשלום:</span>
+                    <span id="checkoutTotal" class="font-bold text-brand-600">0 ₪</span>
+                </div>
+            </div>
+
+            <button onclick="clearCartAndClose()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2.5 rounded-xl transition">
+                חזרה לקטלוג
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-3 transition-transform duration-300 translate-y-24 opacity-0">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toastMessage" class="text-sm font-medium">המוצר נוסף לסל!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-brand-700 text-gray-300 border-t border-brand-600 mt-16 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-3">
+                <div class="flex items-center space-x-2 space-x-reverse text-white">
+                    <i class="fa-solid fa-compass text-2xl text-brand-amber"></i>
+                    <span class="text-xl font-bold">שביל ושטח</span>
+                </div>
+                <p class="text-gray-400 text-xs leading-relaxed">
+                    הבית של חובבי הטיולים, הקמפינג והטבע בישראל. ציוד שטח נבחר, מומלץ ואיכותי שנבחן בתנאים אמיתיים.
+                </p>
+            </div>
+            
+            <div>
+                <h4 class="text-white font-bold mb-3 border-b border-brand-600 pb-2">קטגוריות מובילות</h4>
+                <ul class="space-y-2 text-xs text-gray-400">
+                    <li><a href="#" onclick="filterByCategory('קמפינג ומחנאות')" class="hover:text-white transition">ציוד קמפינג ומחנאות</a></li>
+                    <li><a href="#" onclick="filterByCategory('ציוד טיולים')" class="hover:text-white transition">ציוד טיולים ומבשלות</a></li>
+                    <li><a href="#" onclick="filterByCategory('ביגוד טקטי/שטח')" class="hover:text-white transition">ביגוד והנעלה לשטח</a></li>
+                    <li><a href="#" onclick="filterByCategory('גאדגטים ואביזרים')" class="hover:text-white transition">גאדג'טים ותאורת שטח</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-3 border-b border-brand-600 pb-2">למה לקנות אצלנו?</h4>
+                <ul class="space-y-2 text-xs text-gray-400">
+                    <li><i class="fa-solid fa-check text-brand-amber ml-2"></i> מנוע המלצות התאמה אישית מתקדם</li>
+                    <li><i class="fa-solid fa-check text-brand-amber ml-2"></i> ללא כלי נשק - ציוד ספורט ושטח בלבד</li>
+                    <li><i class="fa-solid fa-check text-brand-amber ml-2"></i> סקירות והמלצות מפורטות לכל מוצר</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-3 border-b border-brand-600 pb-2">צור קשר ומוקד שירות</h4>
+                <div class="space-y-2 text-xs text-gray-400">
+                    <p><i class="fa-solid fa-phone text-brand-amber ml-2"></i> 1-800-000-777</p>
+                    <p><i class="fa-solid fa-envelope text-brand-amber ml-2"></i> info@shvil-veshetach.co.il</p>
+                    <p><i class="fa-solid fa-location-dot text-brand-amber ml-2"></i> שדרות הטבע 12, אזה"ת צפון</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-brand-600 py-4 text-center text-xs text-gray-400 border-t border-brand-500">
+            © 2026 שביל ושטח - קטלוג ומערכת המלצות אישית לציוד שטח. כל הזכויות שמורות.
+        </div>
+    </footer>
+
+    <!-- JavaScript Data & Personalization Engine Logic -->
+    <script>
+        // Products Database (Strictly Camping, Hiking, Outdoor Gear, Gadgets - NO WEAPONS)
+        const products = [
+            {
+                id: 1,
+                name: "אוהל בן רגע ל-4 אנשים Coleman Instant",
+                category: "קמפינג ומחנאות",
+                price: 749,
+                rating: 4.9,
+                reviewsCount: 88,
+                badge: "הנמכר ביותר",
+                image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "אוהל פתיחה מהירה תוך 60 שניות בלבד, עמיד לגשם ורוחות חזקות.",
+                complementaryIds: [4, 5], // Frequently bought together with Headlamp & Sleeping Bag
+                quizTags: { style: "family", duration: "short", budget: "high" },
+                recommendation: {
+                    whyBuy: "זהו האוהל הידידותי ביותר למשפחות ומטיילים שרוצים להקים מחנה ללא מאמץ. מנגנון המוטות הטלסקופיים המחוברים מראש מונע טעויות והקמה נמשכת דקה בלבד.",
+                    pros: [
+                        "הקמה ופירוק תוך דקה אחת בלבד",
+                        "בד עמיד למים בטכנולוגיית WeatherTec",
+                        "חלונות אוורור רחבים עם רשתות נגד יתושים"
+                    ],
+                    bestFor: "טיולי משפחות, מחנאות בסוף שבוע וסדנאות שטח."
+                }
+            },
+            {
+                id: 2,
+                name: "תרמיל גב טקטי 45 ליטר - עמיד במים",
+                category: "ביגוד טקטי/שטח",
+                price: 320,
+                rating: 4.8,
+                reviewsCount: 112,
+                badge: "מומלץ הצוות",
+                image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "תרמיל גב קשוח העשוי קורדורה 1000D עם מערכת גב אגרונומית וחיבורי MOLLE.",
+                complementaryIds: [3, 8],
+                quizTags: { style: "trek", duration: "long", budget: "mid" },
+                recommendation: {
+                    whyBuy: "תיק מעולה המשלב את עמידות הציוד הטקטי ללא צורך בכלי נשק. נפח של 45 ליטר מתאים באופן מדויק לטיולים של 2-3 ימים בשטח.",
+                    pros: [
+                        "בד קורדורה 1000D עמיד בפני שחיקה וקריעה",
+                        "חלוקה פנימית תאי אכסון חכמים עם רוכסני YKK",
+                        "תואם לשלוקר (שקית שתייה) עד 3 ליטר"
+                    ],
+                    bestFor: "מסעות שטח, טרקים קשים, ותרמילאים המחפשים עמידות מקסימלית."
+                }
+            },
+            {
+                id: 3,
+                name: "ערכת בישול שטח קומפקטית ואלפינית",
+                category: "ציוד טיולים",
+                price: 189,
+                rating: 4.7,
+                reviewsCount: 64,
+                badge: "מבצע",
+                image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "ערכת סירים קלים מבוססת אלומיניום מושחר + כף קומפקטית ומבער גז עוצמתי.",
+                complementaryIds: [8, 6],
+                quizTags: { style: "trek", duration: "long", budget: "low" },
+                recommendation: {
+                    whyBuy: "אם אתם אוהבים קפה איכותי וארוחה חמה בטבע, זו הערכה הקלה והחזקה ביותר. נכנסת כולה בתוך סיר אחד קטן לשמירה על מקום בתרמיל.",
+                    pros: [
+                        "משקל כולל של כ-420 גרם בלבד",
+                        "ציפוי אנודייז המונע הידבקות מזון",
+                        "כולל שקית רשת לאוורור ונשיאה"
+                    ],
+                    bestFor: "מטיילים בודדים או בזוג, טרקרים בבשביל ישראל ושבילים בעולם."
+                }
+            },
+            {
+                id: 4,
+                name: "פנס ראש טקטי עוצמתי Nitecore 1800 Lumens",
+                category: "גאדגטים ואביזרים",
+                price: 280,
+                rating: 4.9,
+                reviewsCount: 140,
+                badge: "איכות פרימיום",
+                image: "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "פנס ראש נטען עוצמתי במיוחד, עמיד למים ולנפילות עם זווית תאורה רחבה.",
+                complementaryIds: [6, 1],
+                quizTags: { style: "gadgets", duration: "short", budget: "low" },
+                recommendation: {
+                    whyBuy: "תאורת שטח מנצחת. פנס הראש הזה מציע עוצמת תאורה יוצאת דופן שמכסה מרחק של עד 160 מטרים, ללא צורך להחזיק ביד.",
+                    pros: [
+                        "עוצמה של 1800 לומן עם 5 מצבי תאורה",
+                        "סוללה נטענת דרך USB-C בעלת אורך חיים ממושך",
+                        "עמידות למים בתקן IPX8"
+                    ],
+                    bestFor: "הליכות לילה, ניווטים, תיקוני שטח, ומצבי חירום."
+                }
+            },
+            {
+                id: 5,
+                name: "שק שינה אקסטרים (-5°C) קל משקל",
+                category: "קמפינג ומחנאות",
+                price: 450,
+                rating: 4.6,
+                reviewsCount: 52,
+                badge: "",
+                image: "https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "שק שינה גזרה מומיה מבודד חום בצורה מושלמת לתנאי קור בהרים.",
+                complementaryIds: [1, 4],
+                quizTags: { style: "family", duration: "long", budget: "mid" },
+                recommendation: {
+                    whyBuy: "בידוד תרמי מעולה במשקל מזערי. שק השינה שומר על חום הגוף גם בלילות הקרים ביותר במדבר או בהרים.",
+                    pros: [
+                        "מילוי סיבי מיקרופייבר סינתטי המתייבש במהירות",
+                        "עיצוב מומיה המונע בריחת חום גוף",
+                        "כולל שק דחיסה שמפחית את נפחו"
+                    ],
+                    bestFor: "קמפינג בחורף, טיולים במדבר יהודה, הר הנגב ואירופה."
+                }
+            },
+            {
+                id: 6,
+                name: "מטען סולארי נייד + פנס שטח 20,000mAh",
+                category: "גאדגטים ואביזרים",
+                price: 210,
+                rating: 4.8,
+                reviewsCount: 95,
+                badge: "גאדג'ט השנה",
+                image: "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "סוללת גיבוי עוצמתית הנטענת מהשמש, עמידה לנפילות ומים.",
+                complementaryIds: [4, 3],
+                quizTags: { style: "gadgets", duration: "long", budget: "low" },
+                recommendation: {
+                    whyBuy: "שומר על המכשירים שלכם טעונים בכל מקום בטבע. לוח סולארי מובנה מספק טעינת חירום כשאין שום שקע חשמלי בסביבה.",
+                    pros: [
+                        "קיבולת ענקית של 20,000mAh",
+                        "טעינה מהירה לשני מכשירים במקביל",
+                        "תאורת LED חירום חזקה במיוחד"
+                    ],
+                    bestFor: "מסעות ארוכים בשטח, טרקים מנותקים מחשמל וערכות חירום."
+                }
+            },
+            {
+                id: 7,
+                name: "נעלי טיולים ושטח אטומות למים Salomon Quest",
+                category: "ביגוד טקטי/שטח",
+                price: 690,
+                rating: 4.9,
+                reviewsCount: 160,
+                badge: "בחירת המטיילים",
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "נעלי הליכה גבוהות עם קרום Gore-Tex להגנה מושלמת ממים ואחיזת שטח קשוחה.",
+                complementaryIds: [2, 8],
+                quizTags: { style: "trek", duration: "long", budget: "high" },
+                recommendation: {
+                    whyBuy: "הנעליים המובילות בעולם לטרקים מאתגרים. מעניקות תמיכה יוצאת דופן לקרסול עם סוליית Contagrip המונעת החלקה.",
+                    pros: [
+                        "קרום Gore-Tex אוורירי ואטום לחלוטין למים",
+                        "בלימת זעזועים מעולה להפחתת עומס מהברכיים",
+                        "אחיזת שטח קשוחה בבוץ, סלעים וחול"
+                    ],
+                    bestFor: "טרקים קשים, מסלולים סלעיים והליכה עם משקלים כבדים."
+                }
+            },
+            {
+                id: 8,
+                name: "מסנן מים אישי Lifestraw לחירום ושטח",
+                category: "ציוד טיולים",
+                price: 115,
+                rating: 4.9,
+                reviewsCount: 210,
+                badge: "חובה בכל תיק",
+                image: "https://images.unsplash.com/photo-1516214104703-d870798883c5?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "קשית סינון מים קומפקטית שמסננת 99.9999% מהבקטריות והטפילים במים.",
+                complementaryIds: [3, 2],
+                quizTags: { style: "trek", duration: "short", budget: "low" },
+                recommendation: {
+                    whyBuy: "מוצר מציל חיים המאפשר לשתות מים בבטחה מכל נחל, מעיין או מקור מים פתוח בשטח ללא צורך בהרתחה.",
+                    pros: [
+                        "מסנן עד 4,000 ליטרים של מים נקיים",
+                        "מזערי וקל משקל - כ-46 גרם בלבד",
+                        "לא דורש סוללות או חלקים נעים"
+                    ],
+                    bestFor: "ערכות הישרדות וחירום, מטיילים קלי משקל ומסעות ארוכים."
+                }
+            }
+        ];
+
+        // State & Personalization Engine Stores
+        let cart = [];
+        let selectedCategory = "הכל";
+        let maxPrice = 1500;
+        let searchQuery = "";
+        let currentSort = "popular";
+
+        // Personalization Engine Data
+        let userProfile = {
+            viewedIds: [],
+            categoryInterest: {}, // { "קמפינג ומחנאות": 3, "ציוד טיולים": 1 }
+            quizResult: null // { style, duration, budget }
+        };
+
+        const categories = [
+            "הכל",
+            "קמפינג ומחנאות",
+            "ציוד טיולים",
+            "ביגוד טקטי/שטח",
+            "גאדגטים ואביזרים"
+        ];
+
+        // Init App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderProducts();
+            updateCartBadge();
+            updatePersonalizedSection();
+        });
+
+        // Track user interaction with product
+        function trackProductView(product) {
+            if (!userProfile.viewedIds.includes(product.id)) {
+                userProfile.viewedIds.push(product.id);
+            }
+
+            // increment category score
+            userProfile.categoryInterest[product.category] = (userProfile.categoryInterest[product.category] || 0) + 1;
+
+            updateInterestWidget();
+            updatePersonalizedSection();
+        }
+
+        // Calculate Personal Match Score (0 to 100%)
+        function calculateMatchScore(product) {
+            let score = 50; // base score
+
+            // 1. Quiz alignment
+            if (userProfile.quizResult) {
+                const q = userProfile.quizResult;
+                if (product.quizTags.style === q.style) score += 25;
+                if (product.quizTags.duration === q.duration) score += 15;
+                
+                // budget alignment
+                if (q.budget === "low" && product.price <= 300) score += 10;
+                else if (q.budget === "mid" && product.price > 300 && product.price <= 600) score += 10;
+                else if (q.budget === "high" && product.price > 600) score += 10;
+            }
+
+            // 2. Category interest based on browsing
+            const catInterest = userProfile.categoryInterest[product.category] || 0;
+            score += Math.min(catInterest * 8, 20);
+
+            // 3. Complementary to items in cart
+            const cartIds = cart.map(i => i.id);
+            const isComplementary = cart.some(item => item.complementaryIds && item.complementaryIds.includes(product.id));
+            if (isComplementary) score += 15;
+
+            return Math.min(score, 99);
+        }
+
+        // Render Personalized Top Section
+        function updatePersonalizedSection() {
+            const section = document.getElementById('personalizedSection');
+            const grid = document.getElementById('personalizedGrid');
+            const title = document.getElementById('personalizedTitle');
+            const subtitle = document.getElementById('personalizedSubtitle');
+
+            // Find top recommended products
+            let scored = products.map(p => ({
+                product: p,
+                score: calculateMatchScore(p),
+                isViewed: userProfile.viewedIds.includes(p.id),
+                isComplementary: cart.some(c => c.complementaryIds && c.complementaryIds.includes(p.id))
+            }));
+
+            // Filter out items already in cart
+            const cartIds = cart.map(c => c.id);
+            scored = scored.filter(item => !cartIds.includes(item.product.id));
+
+            // Sort by match score
+            scored.sort((a, b) => b.score - a.score);
+
+            const topRecommendations = scored.slice(0, 4);
+
+            if (topRecommendations.length === 0 || (userProfile.viewedIds.length === 0 && !userProfile.quizResult && cart.length === 0)) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+
+            if (userProfile.quizResult) {
+                title.textContent = "תוצאות ההתאמה האישית שלך";
+                subtitle.textContent = "מוצרים שנבחרו במיוחד עבור העדפות הטיול והתקציב שלך";
+            } else if (cart.length > 0) {
+                title.textContent = "מוצרים משלימים לסל שלך";
+                subtitle.textContent = "מבוסס על פריטים שהוספת לסל הקניות";
+            } else {
+                title.textContent = "מומלצים במיוחד בשבילך";
+                subtitle.textContent = "מבוסס על היסטוריית הצפייה והעניין שלך בקטגוריות השונות";
+            }
+
+            grid.innerHTML = topRecommendations.map(item => {
+                const p = item.product;
+                let badgeText = `${item.score}% התאמה`;
+                let badgeBg = "bg-purple-600";
+
+                if (item.isComplementary) {
+                    badgeText = "משלים לסל שלך";
+                    badgeBg = "bg-amber-600";
+                } else if (item.isViewed) {
+                    badgeText = "נצפה לאחרונה";
+                    badgeBg = "bg-blue-600";
+                }
+
+                return `
+                    <div class="bg-white rounded-2xl border border-purple-100 p-3 shadow-sm hover:shadow-md transition flex flex-col justify-between relative group">
+                        <span class="absolute top-2 right-2 ${badgeBg} text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm">
+                            ${badgeText}
+                        </span>
+                        
+                        <div class="cursor-pointer" onclick="openProductModal(${p.id})">
+                            <div class="h-32 rounded-xl overflow-hidden mb-2 bg-gray-50">
+                                <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            </div>
+                            <h4 class="text-xs font-bold text-gray-800 line-clamp-1 hover:text-purple-700">${p.name}</h4>
+                            <p class="text-[11px] text-gray-500 mt-1 line-clamp-1">${p.shortDesc}</p>
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between">
+                            <span class="text-sm font-extrabold text-brand-700">${p.price} ₪</span>
+                            <button onclick="addToCart(${p.id})" class="bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <span>הוסף</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Widget showing current interest tags
+        function updateInterestWidget() {
+            const container = document.getElementById('interestBadges');
+            const entries = Object.entries(userProfile.categoryInterest);
+
+            if (entries.length === 0 && !userProfile.quizResult) {
+                container.innerHTML = `<span class="text-gray-400 italic">טרם נצפו מוצרים</span>`;
+                return;
+            }
+
+            let html = '';
+            if (userProfile.quizResult) {
+                html += `<span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-check ml-1"></i>שאלון התאמה</span>`;
+            }
+
+            entries.sort((a, b) => b[1] - a[1]).slice(0, 2).forEach(([cat]) => {
+                html += `<span class="bg-brand-50 text-brand-700 border border-brand-100 px-2 py-0.5 rounded-md">${cat}</span>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Quiz Handling
+        function openQuizModal() {
+            const modal = document.getElementById('quizModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeQuizModal() {
+            const modal = document.getElementById('quizModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function handleQuizSubmit(e) {
+            e.preventDefault();
+            userProfile.quizResult = {
+                style: document.getElementById('quizStyle').value,
+                duration: document.getElementById('quizDuration').value,
+                budget: document.getElementById('quizBudget').value
+            };
+
+            closeQuizModal();
+            updateInterestWidget();
+            updatePersonalizedSection();
+            
+            // Switch sort to match automatically
+            currentSort = "match";
+            document.getElementById('sortSelect').value = "match";
+            renderProducts();
+
+            showToast("השאלון עובד בהצלחה! הותאמו עבורך מוצרים אישיים.");
+            
+            // Scroll to personalized section
+            document.getElementById('personalizedSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Render Categories Filters
+        function renderCategories() {
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterByCategory('${cat}')" 
+                        class="w-full text-right px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center justify-between ${selectedCategory === cat ? 'bg-brand-500 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'}">
+                    <span>${cat}</span>
+                    ${selectedCategory === cat ? '<i class="fa-solid fa-chevron-left text-xs"></i>' : ''}
+                </button>
+            `).join('');
+        }
+
+        // Filter and Sort Logic
+        function getFilteredProducts() {
+            return products.filter(product => {
+                const matchesCategory = selectedCategory === "הכל" || product.category === selectedCategory;
+                const matchesPrice = product.price <= maxPrice;
+                const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      product.shortDesc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      product.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesPrice && matchesSearch;
+            }).sort((a, b) => {
+                if (currentSort === 'match') return calculateMatchScore(b) - calculateMatchScore(a);
+                if (currentSort === 'price-low') return a.price - b.price;
+                if (currentSort === 'price-high') return b.price - a.price;
+                if (currentSort === 'rating') return b.rating - a.rating;
+                return b.reviewsCount - a.reviewsCount; // popular
+            });
+        }
+
+        // Render Main Products Cards Grid
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const countEl = document.getElementById('productCount');
+            const filtered = getFilteredProducts();
+
+            countEl.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            grid.innerHTML = filtered.map(product => {
+                const matchScore = calculateMatchScore(product);
+                const isTopMatch = matchScore >= 75;
+
+                return `
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group relative">
+                    <!-- Image Area -->
+                    <div class="relative h-48 sm:h-52 overflow-hidden bg-gray-100 cursor-pointer" onclick="openProductModal(${product.id})">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+                        
+                        <div class="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+                            ${product.badge ? `<span class="bg-brand-accent text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">${product.badge}</span>` : ''}
+                            ${isTopMatch ? `<span class="bg-purple-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1"><i class="fa-solid fa-sparkles text-amber-300"></i> ${matchScore}% התאמה</span>` : ''}
+                        </div>
+
+                        <span class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-lg font-medium">
+                            <i class="fa-solid fa-star text-amber-400 ml-1"></i>${product.rating} (${product.reviewsCount})
+                        </span>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">${product.category}</span>
+                            <h3 onclick="openProductModal(${product.id})" class="text-lg font-bold text-gray-800 mt-1 hover:text-brand-500 cursor-pointer transition line-clamp-1">${product.name}</h3>
+                            <p class="text-gray-500 text-xs mt-2 line-clamp-2 leading-relaxed">${product.shortDesc}</p>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-gray-400 block leading-none">מחיר</span>
+                                <span class="text-xl font-extrabold text-brand-700">${product.price} ₪</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="openProductModal(${product.id})" class="p-2 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-xl transition" title="חוות דעת והמלצות">
+                                    <i class="fa-solid fa-circle-info text-lg"></i>
+                                </button>
+                                <button onclick="addToCart(${product.id})" class="bg-brand-500 hover:bg-brand-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>הוסף לסל</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+
+            updateActiveBadges();
+        }
+
+        // Active Category Badges Display
+        function updateActiveBadges() {
+            const container = document.getElementById('activeCategoryBadge');
+            if (selectedCategory !== "הכל") {
+                container.innerHTML = `
+                    <span class="inline-flex items-center gap-1.5 bg-brand-50 text-brand-600 border border-brand-100 px-3 py-1 rounded-full text-xs font-semibold">
+                        ${selectedCategory}
+                        <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="filterByCategory('הכל')"></i>
+                    </span>
+                `;
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
+        // Filter Handlers
+        function filterByCategory(cat) {
+            selectedCategory = cat;
+            renderCategories();
+            renderProducts();
+        }
+
+        function handlePriceChange(val) {
+            maxPrice = parseInt(val);
+            document.getElementById('priceValue').textContent = `${maxPrice} ₪`;
+            renderProducts();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value;
+            renderProducts();
+        }
+
+        function handleSearchMobile() {
+            searchQuery = document.getElementById('searchInputMobile').value;
+            renderProducts();
+        }
+
+        function handleSort() {
+            currentSort = document.getElementById('sortSelect').value;
+            renderProducts();
+        }
+
+        function resetFilters() {
+            selectedCategory = "הכל";
+            maxPrice = 1500;
+            searchQuery = "";
+            currentSort = "popular";
+            document.getElementById('priceRange').value = 1500;
+            document.getElementById('priceValue').textContent = "1500 ₪";
+            document.getElementById('searchInput').value = "";
+            document.getElementById('searchInputMobile').value = "";
+            document.getElementById('sortSelect').value = "popular";
+            renderCategories();
+            renderProducts();
+        }
+
+        // Modal for Detailed Product Recommendation & Reviews
+        function openProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            // Track view in personalization engine
+            trackProductView(product);
+
+            const modal = document.getElementById('productModal');
+            const content = document.getElementById('modalContent');
+            const matchScore = calculateMatchScore(product);
+
+            content.innerHTML = `
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Image -->
+                    <div class="w-full md:w-1/2">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-64 sm:h-72 object-cover rounded-2xl shadow-inner">
+                        <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                            <span>מק"ט: TRK-${product.id * 1042}</span>
+                            <span class="text-green-600 font-semibold"><i class="fa-solid fa-check ml-1"></i>במלאי למשלוח מיידי</span>
+                        </div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="w-full md:w-1/2 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">${product.category}</span>
+                                <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-sparkles text-purple-500 ml-1"></i>${matchScore}% התאמה אישית</span>
+                            </div>
+                            <h2 class="text-2xl font-extrabold text-gray-900 mt-1">${product.name}</h2>
+                            
+                            <div class="flex items-center gap-2 mt-2">
+                                <div class="flex text-amber-400 text-sm">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-700">${product.rating}</span>
+                                <span class="text-xs text-gray-400">(${product.reviewsCount} חוות דעת מרוכשים)</span>
+                            </div>
+
+                            <p class="text-gray-600 text-sm mt-3 leading-relaxed">${product.shortDesc}</p>
+
+                            <div class="mt-4 p-3 bg-brand-50 rounded-xl border border-brand-100">
+                                <div class="text-xs font-bold text-brand-700 mb-1">מחיר מומלץ לצרכן</div>
+                                <div class="text-3xl font-black text-brand-600">${product.price} ₪</div>
+                            </div>
+                        </div>
+
+                        <button onclick="addToCart(${product.id}); closeProductModal();" class="mt-6 w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-bold text-center flex items-center justify-center gap-2 shadow-md transition">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            <span>הוסף מוצר זה לסל הקניות</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Detailed Recommendation Section -->
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-award text-brand-amber"></i> סקירה מפורטת והמלצת המומחים
+                    </h3>
+                    <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4">
+                        ${product.recommendation.whyBuy}
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                        <div class="bg-green-50/50 border border-green-100 p-4 rounded-xl">
+                            <h4 class="text-xs font-bold text-green-800 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                <i class="fa-solid fa-thumbs-up"></i> יתרונות בולטים
+                            </h4>
+                            <ul class="space-y-1.5 text-xs text-gray-700">
+                                ${product.recommendation.pros.map(pro => `<li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-green-600 mt-0.5"></i> <span>${pro}</span></li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="bg-amber-50/50 border border-amber-100 p-4 rounded-xl">
+                            <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                <i class="fa-solid fa-bullseye"></i> שימושים מומלצים
+                            </h4>
+                            <p class="text-xs text-gray-700 leading-relaxed">
+                                ${product.recommendation.bestFor}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('productModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // Cart Actions
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingIndex = cart.findIndex(item => item.id === productId);
+            if (existingIndex > -1) {
+                cart[existingIndex].quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartBadge();
+            renderCartItems();
+            updatePersonalizedSection();
+            showToast(`"${product.name}" נוסף לסל הקניות!`);
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartBadge();
+            renderCartItems();
+            updatePersonalizedSection();
+        }
+
+        function updateQuantity(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                removeFromCart(productId);
+            } else {
+                updateCartBadge();
+                renderCartItems();
+            }
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            if (totalCount > 0) {
+                badge.textContent = totalCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Render Cart & Smart Upsell Recommendations ("Bought Together")
+        function renderCartItems() {
+            const container = document.getElementById('cartItemsContainer');
+            const subtotalEl = document.getElementById('cartSubtotal');
+            const totalEl = document.getElementById('cartTotal');
+            const upsellContainer = document.getElementById('cartUpsellContainer');
+            const upsellContent = document.getElementById('cartUpsellContent');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fa-solid fa-basket-shopping text-4xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500 font-medium text-sm">סל הקניות שלך ריק</p>
+                        <p class="text-xs text-gray-400 mt-1">בחר מוצרים מומלצים מהקטלוג והוסף אותם להזמנה.</p>
+                    </div>
+                `;
+                subtotalEl.textContent = "0 ₪";
+                totalEl.textContent = "0 ₪";
+                upsellContainer.classList.add('hidden');
+                return;
+            }
+
+            let subtotal = 0;
+            container.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                return `
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg flex-shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold text-gray-800 truncate">${item.name}</h4>
+                            <span class="text-xs text-brand-600 font-extrabold block mt-0.5">${item.price} ₪</span>
+                            
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 rounded-md bg-white border border-gray-300 flex items-center justify-center text-xs font-bold text-gray-600 hover:bg-gray-100">-</button>
+                                <span class="text-xs font-bold px-1">${item.quantity}</span>
+                                <button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 rounded-md bg-white border border-gray-300 flex items-center justify-center text-xs font-bold text-gray-600 hover:bg-gray-100">+</button>
+                            </div>
+                        </div>
+                        <div class="text-left">
+                            <span class="text-xs font-bold text-gray-700 block">${itemTotal} ₪</span>
+                            <button onclick="removeFromCart(${item.id})" class="text-xs text-red-400 hover:text-red-600 mt-2">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            subtotalEl.textContent = `${subtotal} ₪`;
+            totalEl.textContent = `${subtotal} ₪`;
+
+            // Smart Upsell Logic: Find complementary item not yet in cart
+            const cartIds = cart.map(c => c.id);
+            let suggestedProduct = null;
+
+            for (let item of cart) {
+                if (item.complementaryIds) {
+                    const compId = item.complementaryIds.find(id => !cartIds.includes(id));
+                    if (compId) {
+                        suggestedProduct = products.find(p => p.id === compId);
+                        if (suggestedProduct) break;
+                    }
+                }
+            }
+
+            if (suggestedProduct) {
+                upsellContainer.classList.remove('hidden');
+                upsellContent.innerHTML = `
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <img src="${suggestedProduct.image}" class="w-10 h-10 object-cover rounded-lg">
+                        <div class="truncate">
+                            <h5 class="text-xs font-bold text-gray-800 truncate">${suggestedProduct.name}</h5>
+                            <span class="text-xs font-extrabold text-brand-600">${suggestedProduct.price} ₪</span>
+                        </div>
+                    </div>
+                    <button onclick="addToCart(${suggestedProduct.id})" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex-shrink-0 transition">
+                        + הוסף לסל
+                    </button>
+                `;
+            } else {
+                upsellContainer.classList.add('hidden');
+            }
+        }
+
+        // Drawer Toggle
+        function toggleCartModal() {
+            const modal = document.getElementById('cartModal');
+            const drawer = document.getElementById('cartDrawer');
+
+            if (modal.classList.contains('hidden')) {
+                renderCartItems();
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    drawer.classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                drawer.classList.add('translate-x-full');
+                modal.classList.add('opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Checkout Modal Logic
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                showToast("סל הקניות שלך ריק!");
+                return;
+            }
+
+            const modal = document.getElementById('checkoutModal');
+            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            document.getElementById('checkoutItemCount').textContent = itemCount;
+            document.getElementById('checkoutTotal').textContent = `${subtotal} ₪`;
+
+            const cartModal = document.getElementById('cartModal');
+            if (!cartModal.classList.contains('hidden')) {
+                toggleCartModal();
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function clearCartAndClose() {
+            cart = [];
+            updateCartBadge();
+            closeCheckoutModal();
+            updatePersonalizedSection();
+            showToast("תודה רבה! ההזמנה נקלטה בהצלחה.");
+        }
+
+        // Toast Notification
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.textContent = msg;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

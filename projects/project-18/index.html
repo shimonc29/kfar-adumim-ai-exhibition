@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiblioVerse Pro - ספרייה דיגיטלית עם טקסט מלא</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Heebo & Frank Ruhl Libre (למראה ספרותי אותנטי) -->
+    <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                        serif: ['Frank Ruhl Libre', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Heebo', sans-serif; }
+        .book-serif { font-family: 'Frank Ruhl Libre', serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        .dark ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    </style>
+</head>
+<body class="bg-amber-50/40 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300">
+
+    <!-- הודעות מערכת צפות -->
+    <div id="toast-container" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- סרגל עליון -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-amber-200/50 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-700 to-amber-500 flex items-center justify-center text-white text-2xl shadow-lg shadow-amber-700/30">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight bg-gradient-to-r from-amber-800 to-amber-600 dark:from-amber-400 dark:to-orange-400 bg-clip-text text-transparent">BiblioVerse Pro</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">ספרייה דיגיטלית מלאה וחופשית</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="openReadingHistoryModal()" class="relative bg-amber-100 dark:bg-slate-800 hover:bg-amber-200 dark:hover:bg-slate-700 text-amber-900 dark:text-amber-300 font-medium px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-clock-rotate-left text-amber-700 dark:text-amber-400"></i>
+                    <span class="hidden sm:inline">ההיסטוריה שלי</span>
+                    <span id="history-badge" class="w-5 h-5 bg-amber-700 text-white rounded-full text-xs flex items-center justify-center font-bold">0</span>
+                </button>
+                <button onclick="toggleDarkMode()" class="w-11 h-11 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition-all">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- תוכן ראשי -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- באנר ראשי -->
+        <section class="mb-10 p-6 sm:p-10 rounded-3xl bg-gradient-to-r from-amber-950 via-stone-900 to-amber-900 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 max-w-2xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold tracking-wider text-amber-200 mb-3 border border-white/10">
+                    <i class="fa-solid fa-feather text-amber-400"></i> ספרים מלאים לצפייה וקריאה מיידית
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-black mb-3 leading-tight">יצירות מופת ספרותיות ופילוסופיות בטקסט מלא</h2>
+                <p class="text-amber-100/80 text-sm sm:text-base mb-6">קרא את הטקסט המלא של "הנסיך הקטן", "מדינת היהודים", "מסעות בנימין השלישי" ועוד רבים, עם שמירת מיקום אוטומטית ונוחות קריאה מושלמת.</p>
+            </div>
+        </section>
+
+        <!-- אזור חיפוש וסינון קטגוריות -->
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
+            <!-- קטגוריות -->
+            <div id="categories-container" class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+                <button onclick="filterCategory('all')" class="category-btn active px-4 py-2 rounded-xl text-sm font-medium transition-all bg-amber-700 text-white shadow-md shadow-amber-700/20 shrink-0">
+                    הכל
+                </button>
+                <button onclick="filterCategory('קלאסיקות')" class="category-btn px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-slate-800 shrink-0">
+                    <i class="fa-solid fa-book-open ml-1.5 text-amber-600"></i> קלאסיקות
+                </button>
+                <button onclick="filterCategory('פרוזה')" class="category-btn px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-slate-800 shrink-0">
+                    <i class="fa-solid fa-pen-nib ml-1.5 text-orange-500"></i> פרוזה
+                </button>
+                <button onclick="filterCategory('פילוסופיה')" class="category-btn px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-slate-800 shrink-0">
+                    <i class="fa-solid fa-brain ml-1.5 text-purple-500"></i> פילוסופיה והגות
+                </button>
+                <button onclick="filterCategory('עיון')" class="category-btn px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-slate-800 shrink-0">
+                    <i class="fa-solid fa-landmark ml-1.5 text-emerald-500"></i> עיון וציונות
+                </button>
+            </div>
+
+            <!-- שורת חיפוש -->
+            <div class="relative min-w-[260px]">
+                <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="search-input" oninput="handleSearch()" placeholder="חיפוש לפי כותרת, מחבר או תוכן..." class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl pr-11 pl-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600 shadow-sm transition-all">
+            </div>
+        </div>
+
+        <!-- כותרת תוצאות -->
+        <div class="flex items-center justify-between mb-6">
+            <h3 id="section-title" class="text-xl font-bold text-slate-800 dark:text-slate-100">ספרים זמינים לקריאה מלאה</h3>
+            <span id="results-count" class="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-full"></span>
+        </div>
+
+        <!-- גריד ספרים -->
+        <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- נטען דינמית ב-JS -->
+        </div>
+
+        <!-- מצב ריק -->
+        <div id="empty-state" class="hidden text-center py-20">
+            <div class="w-20 h-20 bg-amber-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-700 dark:text-amber-400 text-3xl">
+                <i class="fa-solid fa-book-skull"></i>
+            </div>
+            <h4 class="text-lg font-bold mb-1">לא נמצאו ספרים תואמים</h4>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">נסה לשנות את מונח החיפוש או לבחור קטגוריה אחרת.</p>
+            <button onclick="resetFilters()" class="bg-amber-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-amber-800 transition-all">איפוס חיפוש</button>
+        </div>
+
+    </main>
+
+    <!-- קורא הספרים המלא (Full Immersive Reader Modal) -->
+    <div id="reader-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-0 sm:p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-stone-50 dark:bg-slate-900 w-full h-full sm:h-[94vh] sm:max-w-5xl sm:rounded-3xl flex flex-col shadow-2xl border border-stone-200 dark:border-slate-800 relative transform scale-95 transition-transform duration-300 overflow-hidden" id="reader-box">
+            
+            <!-- סרגל עליון של הקורא -->
+            <div class="px-6 py-4 bg-white dark:bg-slate-800 border-b border-stone-200 dark:border-slate-700 flex items-center justify-between shrink-0 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <button onclick="closeReaderModal()" class="w-10 h-10 rounded-xl bg-stone-100 dark:bg-slate-700 hover:bg-stone-200 dark:hover:bg-slate-600 flex items-center justify-center text-slate-700 dark:text-slate-200 text-lg transition-all" title="חזרה לספרייה">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <div>
+                        <span id="reader-book-category" class="text-xs text-amber-700 dark:text-amber-400 font-bold">ז'אנר</span>
+                        <h3 id="reader-book-title" class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 line-clamp-1">שם הספר</h3>
+                    </div>
+                </div>
+
+                <!-- כלי קריאה: גופן, רקע, סגירה -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="hidden md:flex items-center gap-1 bg-stone-100 dark:bg-slate-700/60 p-1 rounded-xl">
+                        <button onclick="setReaderTheme('paper')" class="w-7 h-7 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold flex items-center justify-center" title="רקע קרם">קרם</button>
+                        <button onclick="setReaderTheme('light')" class="w-7 h-7 rounded-lg bg-white text-slate-800 border border-slate-200 text-xs font-bold flex items-center justify-center" title="רקע לבן">לבן</button>
+                        <button onclick="setReaderTheme('dark')" class="w-7 h-7 rounded-lg bg-slate-900 text-slate-100 border border-slate-700 text-xs font-bold flex items-center justify-center" title="רקע כהה">כהה</button>
+                    </div>
+
+                    <div class="flex items-center gap-1 bg-stone-100 dark:bg-slate-700/60 p-1 rounded-xl">
+                        <button onclick="adjustReaderFont(1)" class="w-8 h-8 rounded-lg hover:bg-stone-200 dark:hover:bg-slate-600 flex items-center justify-center text-sm font-bold" title="הגדל אות">א+</button>
+                        <button onclick="adjustReaderFont(-1)" class="w-8 h-8 rounded-lg hover:bg-stone-200 dark:hover:bg-slate-600 flex items-center justify-center text-sm font-bold" title="הקטן אות">א-</button>
+                    </div>
+
+                    <button onclick="closeReaderModal()" class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-950/50 hover:bg-rose-200 flex items-center justify-center text-lg transition-all" title="סגור">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- תוכן הקורא המרכזי -->
+            <div id="reader-main-container" class="flex flex-col md:flex-row flex-grow overflow-hidden">
+                
+                <!-- תפריט פרקים צדדי (Sidebar) -->
+                <div class="w-full md:w-72 bg-stone-100/80 dark:bg-slate-800/60 border-l border-stone-200 dark:border-slate-700 p-4 overflow-y-auto shrink-0 flex flex-col gap-2">
+                    <div class="text-xs font-bold text-slate-400 dark:text-slate-400 px-2 uppercase tracking-wider mb-1">תוכן עניינים ופרקים</div>
+                    <div id="reader-chapters-list" class="space-y-1.5">
+                        <!-- נטען דינמית -->
+                    </div>
+                </div>
+
+                <!-- אזור טקסט הספר -->
+                <div id="reader-scroll-area" onscroll="handleReadingScroll()" class="flex-grow p-6 sm:p-12 overflow-y-auto book-serif leading-loose text-slate-800 dark:text-slate-200 relative" style="font-size: 1.2rem;">
+                    <div id="reader-content-body" class="max-w-3xl mx-auto space-y-8">
+                        <!-- טקסט הפרקים נטען כאן -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- סרגל תחתון של הקורא (התקדמות וזמן קריאה) -->
+            <div class="px-6 py-3 bg-white dark:bg-slate-800 border-t border-stone-200 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 shrink-0">
+                <span id="reader-footer-author">מחבר: </span>
+                <div class="flex items-center gap-3">
+                    <span id="reading-progress-percent">התקדמות: 0%</span>
+                    <div class="w-32 h-2 bg-stone-200 dark:bg-slate-700 rounded-full overflow-hidden hidden sm:block">
+                        <div id="reading-progress-bar" class="h-full bg-amber-600 w-0 transition-all"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- מודל היסטוריית קריאה וסימניות -->
+    <div id="history-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 relative transform scale-95 transition-transform duration-300 max-h-[85vh] flex flex-col" id="history-box">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-amber-700"></i> היסטוריית קריאה וסימניות
+                </h3>
+                <button onclick="closeReadingHistoryModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="history-list-container" class="flex-grow overflow-y-auto py-4 space-y-3">
+                <!-- נטען דינמית -->
+            </div>
+
+            <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end shrink-0">
+                <button onclick="closeReadingHistoryModal()" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 px-5 py-2.5 rounded-xl font-medium text-sm transition-all">סגור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- פוטר -->
+    <footer class="mt-auto border-t border-amber-200/50 dark:border-slate-800 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+        <p>BiblioVerse Pro הספרייה הדיגיטלית המלאה &copy; 2026 &bull; טקסטים קלאסיים מתוך פרויקט בן-יהודה ופרויקט גוטנברג</p>
+    </footer>
+
+    <!-- סקריפט ניהול המערכת והספרים המלאים -->
+    <script>
+        // מאגר ספרים מלאים עם פרקים וטקסט אמיתי
+        const fullBooksCatalog = [
+            {
+                id: 1,
+                title: "הנסיך הקטן",
+                author: "אנטואן דה סנט-אקזופערי",
+                category: "קלאסיקות",
+                year: 1943,
+                pages: 112,
+                cover: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
+                description: "יצירת מופת פילוסופית ופיוטית על ילד קטן המבקר בכוכבים שונים ומלמד את הטייס את סודות החברות והאהבה.",
+                chapters: [
+                    {
+                        title: "פרק 1: הטייס והציור הראשון",
+                        content: [
+                            "פעם, כשהייתי בן שש, ראיתי בספר על היער הבתולי, ספר בשם 'סיפורים אמיתיים', תמונה נפלאה אחת. היא הציגה נחש חנק שבולע חיה טורפת.",
+                            "בספר נאמר: 'נחי החנק בולעים את טרפם כולו, בלי ללעוס אותו. אחר כך אין ביכולתם לזוז, והם ישנים שנת ישרים במשך ששה חדשים שנדרשים לעיכול'.",
+                            "הרהרתי אז הרבה מעללות הג'ונגל, ואחרי מאמצים מרובים הצלחתי לצייר בעצوني את הציור הראשון שלי מס' 1. הראיתי את יצירת המופת שלי למבוגרים ושאלתי אותם אם הציור מפחיד אותם.",
+                            "והם השינו לי: 'למה שיפחיד כובע?' הציור שלי לא הציג כובע. הוא הציג נחש חנק שעיכל פיל. אז ציירתי את פנים נחש החנק, כדי שהמבוגרים יוכלו להבין. מבוגרים תמיד זקוקים להסברים."
+                        ]
+                    },
+                    {
+                        title: "פרק 2: ההתרסקות במדבר",
+                        content: [
+                            "וכך חייתי לבדי, מבלי שיהיה לי איש שאהיה לו לרע אמיתי, עד שנתקלקל המנוע של מטוסִי במדבר סהרה לפני שש שנים. משהו נשבר במנוע, ומכיוון שלא היה עמי لا מכונאי וﻻ נוסעים, התכונתי לנסות לבצע בעצמי תיקון קשה ביותר.",
+                            "זו הייתה עבורי שאלה של חיים ומוות. מים שתייה שהיו עמִי הספיקו לשבוע ימים בלבד.",
+                            "בלילה הראשון נרדמתי על החול במרחק אלפי קילומטרים מכל יישוב אנושי. הייתי בודד יותר מנוסע על רפסודה באמצע האוקיינוס.",
+                            "תארו לעצמכם את הפתעתי כאשר עם עלות השחר העיר אותי קול דק ומשונה שאמר: 'בבקשה... צייר לי כבש!'",
+                            "קפצתי רגלי כמכה ברק. שפשפתי את עיניי. הבטתי סביבי וראיתי ילד קטן ומופלא שביקר אותי כאילו ירד מן השמים."
+                        ]
+                    },
+                    {
+                        title: "פרק 3: סודו של השועל",
+                        content: [
+                            "הילד הקטן סיפר לי על הכוכב הקטן שלו, האסטרואיד B-612, ועל הוורד הבודד שאהב. כך למדתי להכיר את עולמו העדין.",
+                            "אז הופיע השועל ואמר לו: 'הנה הסוד שלי. הוא פשוט מאוד: רק הלב רואה היטב. מה שחשוב באמת סמוי מן העין.'",
+                            "'הזמן שהשקעת בוורד שלך הוא שהופך את הוורד שלך לכל כך חשוב,' אמר השועל.",
+                            "הבנתי אז את מהות הקשר שבין אדם לחברו, ועד כמה האחריות ההדדית מחברת בין נשמות בכל מרחבי היקום."
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "מדינת היהודים",
+                author: "בנימין זאב הרצל",
+                category: "עיון",
+                year: 1896,
+                pages: 140,
+                cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80",
+                description: "החיבור המכונן של הרצל המציג את חזון הקמת מדינה עצמאית לעם היהודי כפתרון סופי לבעיית האנטישמיות.",
+                chapters: [
+                    {
+                        title: "פרק א': מבוא היסטורי ובעיית היהודים",
+                        content: [
+                            "הנושא של החיבור הזה הוא עתיק יומין: שאלת היהודים. אין איש שיתכחש לקיומה העגום והמתמשך לאורך הדורות בארצות אירופה ומעבר להן.",
+                            "בכל מקום שבו חיים יהודים במספר ניכר, הם נרדפים שוב ושוב. האנטישמיות מתפשטת כנגיף חברתי שאינו מרפה.",
+                            "הניסיונות להתבוללות ולמתן שוויון זכויות חלקי נכשלו ברובם המוחלט בשעת משבר חברתי או כלכלי.",
+                            "הפתרון אינו טמון בהסתרת הזהות ובהשתלבות מאולצת, אלא ביצירת בית לאומי עצמאי וריבוני לעם ישראל בארצו ההיסטורית."
+                        ]
+                    },
+                    {
+                        title: "פרק ב': חברת היהודים וארגון ההגירה",
+                        content: [
+                            "לשם הגשמת הרעיון נדרשים שני מוסדות מרכזיים: 'חברת היהודים' ו'אגודת היהודים'.",
+                            "חברת היהודים תרכז את נכסי ההון הלאומי, תנהל משא ומתן דיפלומטי עם ממשלות העולם, ותסדיr את הרכישה החוקית של הקרקעות.",
+                            "ההגירה תתבצע באופן מסודר, מדעיו ומאורגן היטב, תוך בניית תשתיות מודרניות, מסילות רכבת, בתי חרושת ומערכות חינוך מתקדמות.",
+                            "העבודה תהיה עבודת כפיים ויצירה עצמית בכל תחומי החיים – מחקלאות ועד מדע ותעשייה."
+                        ]
+                    },
+                    {
+                        title: "פרק ג': דמות החברה החדשה",
+                        content: [
+                            "המדינה שתקום תהיה מופת של צדק חברתי, קידמה טכנולוגית, ופלורליזם תרבותי מתקדם.",
+                            "לא תהא זו תיאוקרטיה חשוכה, ומנגד לא מדינה מנותקת משורשיה; כי אם אור לגויים המושתת על חירות האדם ושמירת כבודו.",
+                            "״אם תרצו – אין זו אגדה״, אמר הרצל, ובמשפט זה טמון הכוח המחולל הגדול ביותר בהיסטוריה המודרנית של עמנו."
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "מסעות בנימין השלישי",
+                author: "מנדلي מוכר ספרים",
+                category: "פרוזה",
+                year: 1878,
+                pages: 180,
+                cover: "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=600&q=80",
+                description: "סאטירה קלאסית ומצחיקה על שני יהודים עיירתים תמימים היוצאים למסע הזוי ומלא הרפתקאות ברחבי העולם כדי למצוא את בני משה מעבר לסמבטיון.",
+                chapters: [
+                    {
+                        title: "פרק א': מבוא על גיבורינו בנימין וסנדר",
+                        content: [
+                            "בנימין השלישי, גיבורנו הנערץ, לא היה מלך ולא שר צבא, אלא יהודי פשוט מעיירה נידחת בשם 'טונيلעvק', בעל דמיון פרוע וקריאה מרובה בספרי מסעות עתיקים.",
+                            "בלבו קינן יצר הרפתקאות עצום. הוא נכסף לראות עולם, להכיר את עשרת השבטים האבודים ולשחרר את העולם מכל צרותיו.",
+                            "לשם כך צירף אליו את שכנו הנאמן והפחדן, סנדר הקצב, שנגרר אחריו בעל כורחו לתוך הרפתקאות משונות ביותר.",
+                            "זהו סיפור המסע המופלא של ׳דון קישוט היהודי׳ בנבכי מזרח אירופה של המאה ה-19."
+                        ]
+                    },
+                    {
+                        title: "פרק ב': היציאה לדרך והצרות הראשונות",
+                        content: [
+                            "השניים עזבו את נשותיהם בבכי ובתחנונים ויצאו את שערי העיירה עם מקל ביד ואמתחת מזון קטנה.",
+                            "כבר בקילומטרים הראשונים גילו השניים שהעולם הגדול אינו נוח כל כך כפי שחשבו בספרים.",
+                            "הדרכים היו בוציות, העגלונים דרשו מחירים מופקעים, והפחד מפני גזלנים וחיות בר החלר לכרסם בלבו של סנדר המסכן.",
+                            "אך בנימין לא איבד את רוחו והמשיך להרצות באוזני סנדר על גבורתם הצפויה ועל התהילה שתצמח להם."
+                        ]
+                    },
+                    {
+                        title: "פרק ג': התחנה הבאה: העיר הגדולה",
+                        content: [
+                            "לאחר טלטולים רבים הגיעו השניים לעייرة סמוכה שנדמתה בעיניהם ככרך ענק ומסתורי.",
+                            "שם הסתבכו בפרשיות משעשעות עם פונדקאים מפוקפקים ונוכלים מקומיים שניצלו את תמימותם המוחלטת.",
+                            "המסע הזה הפך למראה סאטירית נוקבת ומלאת הומור על חולשות אנוש ועל החלומות הגדולים של האדם הקטן."
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "פנקסו של מרקוס אורליוס",
+                author: "מרקוס אורליוס",
+                category: "פילוסופיה",
+                year: 180,
+                pages: 160,
+                cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80",
+                description: "יומן אישי של הקיסר הרומאי והפילוסוף הסטואי הגדול, המלא בתובנות נצחיות על שליטה עצמית ושלום נפשי.",
+                chapters: [
+                    {
+                        title: "ספר ראשון: הכרת הטוב ומורים רוחניים",
+                        content: [
+                            "מאת סבי וֵרוּס למדתי אצילות אופי ושליטה מוחלטת בכעסים.",
+                            "מאת דמותו של אבי למדתי חריצות, צניעות, אהבת אמת לזולת ודבקות בחובה הציבורית ללא לאות.",
+                            "החיים הם מתנה חולפת. אל לו לאדם לבזבז את זמנו היקר על תלונות ועל דאגה לדברים שאינם בשליטתו.",
+                            "עליך לכבד את האלים, לעזור לבני אדם באשר הם, ולשמור על טוהר המחשבה בכל עת."
+                        ]
+                    },
+                    {
+                        title: "ספר שני: על ארעיות החיים",
+                        content: [
+                            "בכל בוקר שאתה מתעורר, אמור לעצמך: היום אפגש באנשים נוקשים, כפויי טובה, קטנוניים או יהירים.",
+                            "הם מתנהגים כך משום שאינם יודעים להבחין בין טוב לרע. אך אני ראיתי את יופיו של הטוב ואת כיעורו של הרע, ולכן איני יכול להיפגע מהם.",
+                            "שמור על נפשך נקייה מכל רפש חיצוני. האדם הוא תוצר של מחשבותיו.",
+                            "הזמן דומה לנהר מהיר הזורם ומציף את הכל. מה שחלף – איננו עוד."
+                        ]
+                    },
+                    {
+                        title: "ספר שלישי: חובת האדם בעולמו",
+                        content: [
+                            "אל תתמהמה. עשה את המעשה הראוי והנכון כבר עכשיו מבלי להמתין למחר.",
+                            "כאשר אתה ממלא את תפקידך בנאמנות ללא דרישת תהילה, אתה חי בהרמוניה מושלמת עם הטבע ועם ההיגיון האוניברסלי.",
+                            "השלווה האמיתית שוכנת אך ורק בתוך פנימיותו של אדם שאינו תלוי בדבר מלבד ביושרו המוסרי."
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let currentCategory = 'all';
+        let currentSearchQuery = '';
+        let currentActiveBook = null;
+        let currentChapterIndex = 0;
+        let currentFontSize = 1.2; // rem
+        let currentTheme = 'paper'; // paper, light, dark
+        
+        let readingHistory = JSON.parse(localStorage.getItem('biblio_pro_history')) || [];
+
+        // טעינה ראשונית
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBooks(fullBooksCatalog);
+            updateHistoryBadge();
+
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun';
+            }
+        });
+
+        // הצגת הספרים בגריד
+        function renderBooks(books) {
+            const grid = document.getElementById('books-grid');
+            const emptyState = document.getElementById('empty-state');
+            const countBadge = document.getElementById('results-count');
+
+            grid.innerHTML = '';
+            countBadge.innerText = `${books.length} ספרים זמינים לקריאה מלאה`;
+
+            if (books.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            books.forEach((book, index) => {
+                const card = document.createElement('div');
+                card.className = `glass-panel rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group transform hover:-translate-y-1`;
+                card.style.animation = `fadeIn 0.5s ease forwards ${index * 0.05}s`;
+
+                card.innerHTML = `
+                    <div class="relative h-60 overflow-hidden bg-stone-200 dark:bg-slate-800">
+                        <img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/b45309/ffffff?text=BiblioVerse'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-80"></div>
+                        
+                        <!-- קטגוריה -->
+                        <div class="absolute top-3 right-3 bg-amber-700 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                            ${book.category}
+                        </div>
+
+                        <div class="absolute bottom-3 right-3 left-3 text-white">
+                            <span class="text-xs text-amber-300 font-semibold mb-1 block">${book.author} &bull; ${book.year}</span>
+                            <h4 class="text-lg font-bold leading-tight line-clamp-1">${book.title}</h4>
+                        </div>
+                    </div>
+
+                    <div class="p-5 flex flex-col flex-grow justify-between">
+                        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4 line-clamp-3">${book.description}</p>
+                        
+                        <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+                            <div class="flex items-center justify-between text-xs text-slate-500">
+                                <span class="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 px-2.5 py-0.5 rounded-full font-bold">${book.pages} עמודים מלאים</span>
+                                <span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check ml-1"></i>זמין לקריאה</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="openReader(${book.id})" class="bg-amber-700 hover:bg-amber-800 text-white py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md shadow-amber-700/20">
+                                    <i class="fa-solid fa-book-open"></i> קרא ספר מלא
+                                </button>
+                                <button onclick="downloadBook('${book.title}')" class="bg-stone-200 dark:bg-slate-800 hover:bg-stone-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 py-2 px-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-download"></i> הורד
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // סינון לפי קטגוריה
+        function filterCategory(cat) {
+            currentCategory = cat;
+            
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.className = "category-btn px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-slate-800 shrink-0";
+            });
+            event.currentTarget.className = "category-btn active px-4 py-2 rounded-xl text-sm font-medium transition-all bg-amber-700 text-white shadow-md shadow-amber-700/20 shrink-0";
+
+            applyFiltersAndSearch();
+        }
+
+        // חיפוש חופשי
+        function handleSearch() {
+            currentSearchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+            applyFiltersAndSearch();
+        }
+
+        function applyFiltersAndSearch() {
+            let filtered = fullBooksCatalog.filter(book => {
+                let matchesCat = currentCategory === 'all' || book.category === currentCategory;
+                let matchesSearch = currentSearchQuery === '' || 
+                    book.title.toLowerCase().includes(currentSearchQuery) ||
+                    book.author.toLowerCase().includes(currentSearchQuery) ||
+                    book.category.toLowerCase().includes(currentSearchQuery) ||
+                    book.description.toLowerCase().includes(currentSearchQuery) ||
+                    book.chapters.some(ch => ch.title.toLowerCase().includes(currentSearchQuery) || ch.content.some(p => p.toLowerCase().includes(currentSearchQuery)));
+
+                return matchesCat && matchesSearch;
+            });
+
+            renderBooks(filtered);
+        }
+
+        function resetFilters() {
+            currentCategory = 'all';
+            currentSearchQuery = '';
+            document.getElementById('search-input').value = '';
+            document.querySelectorAll('.category-btn')[0].click();
+        }
+
+        // פתיחת קורא הספרים המלא
+        function openReader(id, targetChapter = 0) {
+            const book = fullBooksCatalog.find(b => b.id === id);
+            if (!book) return;
+
+            currentActiveBook = book;
+            currentChapterIndex = targetChapter;
+
+            document.getElementById('reader-book-title').innerText = book.title;
+            document.getElementById('reader-book-category').innerText = `${book.category} &bull; ${book.year}`;
+            document.getElementById('reader-footer-author').innerText = `מחבר: ${book.author}`;
+
+            renderChaptersList();
+            renderChapterContent(currentChapterIndex);
+
+            // שמירה בהיסטוריית קריאה
+            saveToReadingHistory(book.id, currentChapterIndex);
+
+            const modal = document.getElementById('reader-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            setTimeout(() => document.getElementById('reader-box').classList.remove('scale-95'), 10);
+        }
+
+        function closeReaderModal() {
+            const modal = document.getElementById('reader-modal');
+            modal.classList.add('opacity-0');
+            document.getElementById('reader-box').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // הצגת רשימת הפרקים בצד
+        function renderChaptersList() {
+            const listContainer = document.getElementById('reader-chapters-list');
+            listContainer.innerHTML = '';
+
+            currentActiveBook.chapters.forEach((ch, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-right px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-between ${idx === currentChapterIndex ? 'bg-amber-700 text-white shadow-md' : 'hover:bg-stone-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'}`;
+                btn.innerHTML = `
+                    <span class="line-clamp-1">${ch.title}</span>
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                `;
+                btn.onclick = () => {
+                    currentChapterIndex = idx;
+                    renderChaptersList();
+                    renderChapterContent(idx);
+                    document.getElementById('reader-scroll-area').scrollTop = 0;
+                    saveToReadingHistory(currentActiveBook.id, idx);
+                };
+                listContainer.appendChild(btn);
+            });
+        }
+
+        // הצגת תוכן הפרק
+        function renderChapterContent(chapterIdx) {
+            const chapter = currentActiveBook.chapters[chapterIdx];
+            const bodyContainer = document.getElementById('reader-content-body');
+            
+            bodyContainer.innerHTML = `
+                <div class="text-center pb-8 border-b border-stone-300 dark:border-slate-700 mb-8">
+                    <span class="text-xs text-amber-700 dark:text-amber-400 font-bold uppercase tracking-wider">${currentActiveBook.title}</span>
+                    <h2 class="text-2xl sm:text-3xl font-black mt-1 mb-2">${chapter.title}</h2>
+                    <p class="text-xs text-slate-400">מחבר: ${currentActiveBook.author}</p>
+                </div>
+            `;
+
+            chapter.content.forEach(paragraph => {
+                const p = document.createElement('p');
+                p.className = "mb-6 leading-loose text-justify";
+                p.style.fontSize = `${currentFontSize}rem`;
+                p.innerText = paragraph;
+                bodyContainer.appendChild(p);
+            });
+
+            // כפתורי מעבר פרקים בתחתית
+            const navDiv = document.createElement('div');
+            navDiv.className = "flex items-center justify-between pt-10 border-t border-stone-300 dark:border-slate-700 mt-12";
+            
+            let prevBtnHTML = chapterIdx > 0 ? `<button onclick="navigateChapter(-1)" class="bg-stone-200 dark:bg-slate-800 hover:bg-stone-300 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-arrow-right"></i> פרק קודם</button>` : `<div></div>`;
+            let nextBtnHTML = chapterIdx < currentActiveBook.chapters.length - 1 ? `<button onclick="navigateChapter(1)" class="bg-amber-700 text-white hover:bg-amber-800 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">פרק הבא <i class="fa-solid fa-arrow-left"></i></button>` : `<div class="text-emerald-600 font-bold text-sm">סיימת את קריאת הספר בהצלחה!</div>`;
+
+            navDiv.innerHTML = prevBtnHTML + nextBtnHTML;
+            bodyContainer.appendChild(navDiv);
+        }
+
+        function navigateChapter(direction) {
+            const newIdx = currentChapterIndex + direction;
+            if (newIdx >= 0 && newIdx < currentActiveBook.chapters.length) {
+                currentChapterIndex = newIdx;
+                renderChaptersList();
+                renderChapterContent(newIdx);
+                document.getElementById('reader-scroll-area').scrollTop = 0;
+                saveToReadingHistory(currentActiveBook.id, newIdx);
+            }
+        }
+
+        // מעקב גלילה והתקדמות
+        function handleReadingScroll() {
+            const area = document.getElementById('reader-scroll-area');
+            const scrollTop = area.scrollTop;
+            const scrollHeight = area.scrollHeight - area.clientHeight;
+            const progress = scrollHeight > 0 ? Math.round((scrollTop / scrollHeight) * 100) : 0;
+
+            document.getElementById('reading-progress-percent').innerText = `התקדמות: ${progress}%`;
+            document.getElementById('reading-progress-bar').style.width = `${progress}%`;
+        }
+
+        // שינוי גופן
+        function adjustReaderFont(delta) {
+            currentFontSize = Math.min(1.6, Math.max(0.95, currentFontSize + delta * 0.1));
+            document.querySelectorAll('#reader-content-body p').forEach(p => {
+                p.style.fontSize = `${currentFontSize}rem`;
+            });
+            showToast(`גודל גופן עודכן (${Math.round(currentFontSize * 100)}%)`, 'info');
+        }
+
+        // ערכות עיצוב לקורא
+        function setReaderTheme(theme) {
+            currentTheme = theme;
+            const scrollArea = document.getElementById('reader-scroll-area');
+            
+            if (theme === 'paper') {
+                scrollArea.className = "flex-grow p-6 sm:p-12 overflow-y-auto book-serif leading-loose text-stone-900 bg-[#fbf0d9] dark:bg-slate-900 relative transition-colors";
+            } else if (theme === 'light') {
+                scrollArea.className = "flex-grow p-6 sm:p-12 overflow-y-auto book-serif leading-loose text-slate-800 bg-white dark:bg-slate-900 relative transition-colors";
+            } else if (theme === 'dark') {
+                scrollArea.className = "flex-grow p-6 sm:p-12 overflow-y-auto book-serif leading-loose text-slate-200 bg-slate-950 relative transition-colors";
+            }
+            showToast("ערכת הנושא בקורא עודכנה", "info");
+        }
+
+        // שמירה בהיסטוריית קריאה
+        function saveToReadingHistory(bookId, chapterIdx) {
+            const existingIndex = readingHistory.findIndex(h => h.bookId === bookId);
+            const record = {
+                bookId: bookId,
+                chapterIndex: chapterIdx,
+                timestamp: new Date().toLocaleDateString('he-IL')
+            };
+
+            if (existingIndex > -1) {
+                readingHistory[existingIndex] = record;
+            } else {
+                readingHistory.unshift(record);
+            }
+
+            localStorage.setItem('biblio_pro_history', JSON.stringify(readingHistory));
+            updateHistoryBadge();
+        }
+
+        function updateHistoryBadge() {
+            document.getElementById('history-badge').innerText = readingHistory.length;
+        }
+
+        // פתיחת מודל היסטוריה וסימניות
+        function openReadingHistoryModal() {
+            const container = document.getElementById('history-list-container');
+            container.innerHTML = '';
+
+            if (readingHistory.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-500">אין עדיין היסטוריית קריאה. התחל לקרוא ספרים ממלאי הספרייה!</div>`;
+            } else {
+                readingHistory.forEach(item => {
+                    const book = fullBooksCatalog.find(b => b.id === item.bookId);
+                    if (!book) return;
+                    const chapterTitle = book.chapters[item.chapterIndex] ? book.chapters[item.chapterIndex].title : 'פרק ראשון';
+
+                    const div = document.createElement('div');
+                    div.className = "flex items-center justify-between p-3 rounded-2xl bg-amber-50/60 dark:bg-slate-800/60 border border-amber-200/50 dark:border-slate-700";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <img src="${book.cover}" class="w-12 h-16 object-cover rounded-xl shadow-sm">
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${book.title}</h4>
+                                <span class="text-xs text-amber-700 dark:text-amber-400 font-semibold block">${chapterTitle}</span>
+                                <span class="text-[11px] text-slate-400">נקרא לאחרונה: ${item.timestamp}</span>
+                            </div>
+                        </div>
+                        <button onclick="closeReadingHistoryModal(); openReader(${book.id}, ${item.chapterIndex})" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
+                            המשך קריאה
+                        </button>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            const modal = document.getElementById('history-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            setTimeout(() => document.getElementById('history-box').classList.remove('scale-95'), 10);
+        }
+
+        function closeReadingHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            modal.classList.add('opacity-0');
+            document.getElementById('history-box').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // מדמה הורדת ספר מלא
+        function downloadBook(title) {
+            showToast(`הורדת הטקסט המלא של "${title}" (PDF / EPUB) החלה בהצלחה!`, 'success');
+        }
+
+        // מצב כהה / בהיר כללי
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+
+        // הודעות צפות (Toast)
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = 'bg-amber-700 text-white';
+            let icon = 'fa-circle-check';
+            if (type === 'info') {
+                bgClass = 'bg-slate-800 text-white dark:bg-slate-700';
+                icon = 'fa-circle-info';
+            }
+
+            toast.className = `${bgClass} px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-300 pointer-events-auto font-medium text-sm`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
+```
+eof

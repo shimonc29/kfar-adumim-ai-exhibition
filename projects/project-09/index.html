@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עולם הספרים - המלצות קריאה בהתאמה אישית</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .hide { display: none !important; }
+        /* Custom scrollbar for clean UI */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .avatar-speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 24px;
+            border-width: 8px 8px 0;
+            border-style: solid;
+            border-color: #ffffff transparent;
+            display: block;
+            width: 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-200 selection:text-amber-900 relative pb-20 sm:pb-0">
+
+    <!-- PHONE ENTRY & WHATSAPP MODAL (Shown on enter) -->
+    <div id="phone-modal" class="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 text-center relative overflow-hidden border border-amber-100">
+            <!-- Background Accent -->
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
+            
+            <div class="w-16 h-16 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
+                <i class="fa-solid fa-book-open-reader"></i>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-2xl font-black text-slate-800">ברוכים הבאים לעולם הספרים! 📚</h3>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    הכנס את מספר הטלפון שלך לקבלת עדכונים על ספרים חדשים והצטרפות לקבוצת ה-WhatsApp הקהילתית שלנו!
+                </p>
+            </div>
+
+            <!-- Form View -->
+            <form id="phone-form" onsubmit="handlePhoneSubmit(event)" class="space-y-4 text-right">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">מספר טלפון:</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-phone text-xs"></i>
+                        </span>
+                        <input type="tel" id="user-phone" required placeholder="050-0000000" pattern="[0-9\-]{9,12}"
+                            class="w-full pl-4 pr-9 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-600 transition-all dir-ltr text-right">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-lg shadow-amber-600/20 transition-all text-sm flex items-center justify-center gap-2">
+                    <span>אישור והצטרפות</span>
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                </button>
+            </form>
+
+            <!-- Success / WhatsApp Link View -->
+            <div id="whatsapp-success" class="hide space-y-4 pt-2">
+                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-sm space-y-2">
+                    <p class="font-bold flex items-center justify-center gap-1.5 text-base">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> נרשמת בהצלחה!
+                    </p>
+                    <p class="text-xs text-emerald-700">הנך מוזמן להצטרף אלינו לקבוצת הוואצאפ הבלעדית לחובבי ספרים:</p>
+                </div>
+
+                <a href="https://chat.whatsapp.com/" target="_blank" rel="noopener noreferrer" 
+                    onclick="closePhoneModal()"
+                    class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>מעבר לקבוצת WhatsApp</span>
+                </a>
+
+                <button onclick="closePhoneModal()" class="text-xs text-slate-400 hover:text-slate-600 font-medium underline pt-2">
+                    המשך לאתר ללא הצטרפות
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPANION AVATAR CHARACTER (תמונת/דמות מלווה) -->
+    <div id="companion-avatar" class="fixed bottom-4 left-4 z-40 flex items-end gap-3 pointer-events-none sm:pointer-events-auto">
+        <!-- Speech Bubble -->
+        <div id="avatar-bubble" class="bg-white border border-slate-200 shadow-xl rounded-2xl p-3.5 max-w-[220px] sm:max-w-[260px] text-xs font-semibold text-slate-700 relative avatar-speech-bubble transition-all duration-300 transform scale-100 opacity-100">
+            <button onclick="dismissBubble()" class="absolute -top-2 -right-2 w-5 h-5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-[10px]">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <p id="avatar-text">שלום! אני **בוקי**, עוזר הקריאה האישי שלך! במה נוכל להתחיל היום? 📖</p>
+        </div>
+
+        <!-- Avatar Character Box -->
+        <div onclick="triggerAvatarSpeech()" class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-tr from-amber-600 to-amber-400 rounded-2xl shadow-xl shadow-amber-600/30 flex items-center justify-center text-white text-2xl sm:text-3xl cursor-pointer hover:scale-105 transition-all animate-float relative flex-shrink-0 border-2 border-white">
+            <i class="fa-solid fa-robot"></i>
+            <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+        </div>
+    </div>
+
+    <!-- Header / Navigation -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="w-12 h-12 bg-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-amber-600/30">
+                    <i class="fa-solid fa-book-open text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">עולם הספרים</h1>
+                    <p class="text-xs text-slate-500 font-medium">המקום למצוא את הסיפור הבא שלך</p>
+                </div>
+            </div>
+            
+            <nav class="flex items-center gap-2 sm:gap-4">
+                <button onclick="switchTab('home')" id="nav-home" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-amber-50 text-amber-700">
+                    <i class="fa-solid fa-house ml-1.5"></i> ראשי
+                </button>
+                <button onclick="switchTab('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-wand-magic-sparkles ml-1.5"></i> שאלון התאמה
+                </button>
+                <button onclick="switchTab('favorites')" id="nav-favorites" class="relative px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-heart ml-1.5 text-rose-500"></i> מועדפים
+                    <span id="fav-badge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold hide">0</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- TAB: HOME -->
+        <div id="tab-home" class="space-y-12">
+            <!-- Hero Section -->
+            <section class="relative rounded-3xl bg-gradient-to-br from-amber-700 via-amber-800 to-amber-950 text-white p-8 sm:p-12 overflow-hidden shadow-xl">
+                <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-2xl space-y-6">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/30 text-amber-100 backdrop-blur-md">
+                        <i class="fa-solid fa-star text-amber-300"></i> המלצות נבחרות לשבוע זה
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">גלה את הספר הבא שלא תוכל להניח מהיד</h2>
+                    <p class="text-amber-100/90 text-base sm:text-lg font-light leading-relaxed">
+                        מחפש מותחן עוצר נשימה, רומן רומנטי מרגש או ספר מדע בדיוני שישנה את צורת החשיבה שלך? הגעת למקום הנכון. ענה על השאלון או דפדף בקטלוג שלנו.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="switchTab('quiz')" class="px-6 py-3.5 bg-white text-amber-900 font-bold rounded-2xl shadow-lg hover:bg-amber-50 transition-all transform hover:-translate-y-0.5">
+                            <i class="fa-solid fa-wand-magic-sparkles ml-2 text-amber-600"></i> התחל שאלון התאמה
+                        </button>
+                        <a href="#catalog" class="px-6 py-3.5 bg-amber-900/60 border border-amber-600/40 text-white font-medium rounded-2xl backdrop-blur-md hover:bg-amber-900/80 transition-all">
+                            צפה בכל הספרים <i class="fa-solid fa-arrow-down mr-2 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters & Search Section -->
+            <section id="catalog" class="space-y-6 pt-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800">ספריית ההמלצות</h3>
+                        <p class="text-sm text-slate-500">בחר ז'אנר או חפש לפי כותרת, סופר או תגיות</p>
+                    </div>
+                    
+                    <!-- Search Input -->
+                    <div class="relative w-full md:w-80">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="search-input" oninput="filterBooks()" placeholder="חפש ספר, סופר, ז'אנר..." 
+                            class="w-full pl-4 pr-10 py-3 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all shadow-sm">
+                    </div>
+                </div>
+
+                <!-- Genre Filter Pills -->
+                <div id="genre-filters" class="flex flex-wrap gap-2 pt-2">
+                    <button onclick="setGenreFilter('הכל')" class="genre-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-amber-600 text-white shadow-md shadow-amber-600/20" data-genre="הכל">הכל</button>
+                    <button onclick="setGenreFilter('מתח ופשע')" class="genre-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-genre="מתח ופשע">מתח ופשע</button>
+                    <button onclick="setGenreFilter('רומן')" class="genre-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-genre="רומן">רומן</button>
+                    <button onclick="setGenreFilter('מדע בדיוני ופנטזיה')" class="genre-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-genre="מדע בדיוני ופנטזיה">מדע בדיוני ופנטזיה</button>
+                    <button onclick="setGenreFilter('עיון והתפתחות')" class="genre-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-genre="עיון והתפתחות">עיון והתפתחות</button>
+                    <button onclick="setGenreFilter('ביוגרפיה')" class="genre-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-genre="ביוגרפיה">ביוגרפיה</button>
+                </div>
+            </section>
+
+            <!-- Books Grid -->
+            <section id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically populated via JS -->
+            </section>
+
+            <!-- Empty State for Search -->
+            <div id="no-books-found" class="hidden text-center py-16 space-y-4">
+                <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-book-skull"></i>
+                </div>
+                <h4 class="text-lg font-bold text-slate-700">לא נמצאו ספרים תואמים</h4>
+                <p class="text-sm text-slate-500">נסה לחפש מונח אחר או נקה את סינון הז'אנרים.</p>
+                <button onclick="resetFilters()" class="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-xl hover:bg-amber-700 transition-all">איפוס חיפוש</button>
+            </div>
+        </div>
+
+        <!-- TAB: QUIZ -->
+        <div id="tab-quiz" class="hide max-w-2xl mx-auto py-6 space-y-8">
+            <div class="text-center space-y-2">
+                <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">שאלון חכם</span>
+                <h2 class="text-3xl font-black text-slate-800">איזה ספר מתאים למצב הרוח שלך היום?</h2>
+                <p class="text-slate-500 text-sm">ענה על 3 שאלות קצרות ונגלה לך את ההמלצה המדויקת ביותר עבורך.</p>
+            </div>
+
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-xl p-6 sm:p-8 space-y-8">
+                <!-- Question Progress Bar -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs font-semibold text-slate-500">
+                        <span id="quiz-step-indicator">שאלה 1 מתוך 3</span>
+                        <span id="quiz-progress-text">33%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="bg-amber-600 h-full transition-all duration-300 w-1/3"></div>
+                    </div>
+                </div>
+
+                <!-- Quiz Form Container -->
+                <div id="quiz-questions-container">
+                    <!-- Question 1: Genre -->
+                    <div id="q-1" class="quiz-question space-y-4">
+                        <h3 class="text-lg font-bold text-slate-800">1. לאיזה ז'אנר ספרותי אתה נוטה יותר עכשיו?</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q1" value="מתח ופשע" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">🕵️ מתח, פשע וחקירות</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q1" value="רומן" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">❤️ רומן ודרמה מרגשת</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q1" value="מדע בדיוני ופנטזיה" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">🌌 מדע בדיוני ופנטזיה</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q1" value="עיון והתפתחות" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">💡 עיון, השראה והתפתחות</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 2: Length -->
+                    <div id="q-2" class="quiz-question hide space-y-4">
+                        <h3 class="text-lg font-bold text-slate-800">2. מהו אורך הספר המועדף עליך לקריאה הקרובה?</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q2" value="קצר" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">⚡ קצר (עד 250 עמ')</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q2" value="בינוני" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">📖 בינוני (250-400 עמ')</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q2" value="ארוך" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">📚 ארוך ומעמיק (400+ עמ')</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 3: Mood -->
+                    <div id="q-3" class="quiz-question hide space-y-4">
+                        <h3 class="text-lg font-bold text-slate-800">3. איזה מצב רוח או אווירה אתה מחפש בספר?</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q3" value="מותח וסוחף" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">🔥 מותח, קצבי וסוחף</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q3" value="מרגש ועמוק" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">💭 מרגש, מעורר מחשבה ועמוק</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q3" value="קליל וזורם" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">☕ קליל, זורם ומהנה</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all">
+                                <input type="radio" name="q3" value="מעשיר ומלמד" class="w-4 h-4 text-amber-600 focus:ring-amber-500 ml-3">
+                                <span class="text-sm font-medium text-slate-700">💡 מעשיר, מרחיב אופקים ומלמד</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Navigation Buttons -->
+                <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                    <button id="quiz-prev-btn" onclick="prevQuizStep()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-all hide">
+                        <i class="fa-solid fa-arrow-right ml-2"></i> הקודם
+                    </button>
+                    <div class="mr-auto">
+                        <button id="quiz-next-btn" onclick="nextQuizStep()" class="px-6 py-2.5 bg-amber-600 text-white rounded-xl text-sm font-bold shadow-md shadow-amber-600/20 hover:bg-amber-700 transition-all">
+                            הבא <i class="fa-solid fa-arrow-left mr-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Results Container -->
+            <div id="quiz-result-section" class="hide space-y-6">
+                <div class="text-center space-y-2">
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">ההתאמה המושלמת עבורך</span>
+                    <h3 class="text-2xl font-black text-slate-800">מצאנו את הספר האידיאלי בשבילך!</h3>
+                </div>
+                <div id="quiz-matched-book-card" class="bg-white rounded-3xl border border-slate-100 shadow-xl p-6 sm:p-8 flex flex-col md:flex-row gap-6 items-center">
+                    <!-- Book card injected by JS -->
+                </div>
+                <div class="text-center">
+                    <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-200 text-slate-700 text-sm font-semibold rounded-2xl hover:bg-slate-300 transition-all">
+                        <i class="fa-solid fa-rotate-right ml-2"></i> עשה שוב את השאלון
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: FAVORITES -->
+        <div id="tab-favorites" class="hide space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <h2 class="text-3xl font-black text-slate-800">הספרים המועדפים שלי</h2>
+                <p class="text-sm text-slate-500">רשימת הספרים ששמרת לקריאה עתידית.</p>
+            </div>
+
+            <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated by JS -->
+            </div>
+
+            <div id="no-favorites" class="hidden text-center py-20 space-y-4">
+                <div class="w-16 h-16 bg-rose-50 text-rose-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-regular fa-heart"></i>
+                </div>
+                <h4 class="text-lg font-bold text-slate-700">אין לך עדיין ספרים במועדפים</h4>
+                <p class="text-sm text-slate-500">לחץ על סמל הלב בכל ספר כדי לשמור אותו כאן.</p>
+                <button onclick="switchTab('home')" class="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-xl hover:bg-amber-700 transition-all">דפדף בספרים</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BOOK DETAILS MODAL -->
+    <div id="book-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hide flex items-center justify-center p-4">
+        <div id="modal-content-box" class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col transform transition-all">
+            <!-- Header bar inside modal -->
+            <div class="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50">
+                <div class="flex items-center gap-2">
+                    <span id="modal-book-genre" class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full"></span>
+                    <span id="modal-book-pages" class="text-xs text-slate-500 font-medium"></span>
+                </div>
+                <button onclick="closeBookModal()" class="w-9 h-9 bg-white border border-slate-200 text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-100 transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable modal body -->
+            <div class="p-6 sm:p-8 overflow-y-auto space-y-8">
+                <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                    <div class="w-48 h-64 bg-slate-100 rounded-2xl shadow-lg relative overflow-hidden flex-shrink-0 border border-slate-200">
+                        <img id="modal-image" src="" alt="Cover" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="flex-grow space-y-4 text-center sm:text-right">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+                            <h2 id="modal-title-main" class="text-2xl font-extrabold text-slate-800"></h2>
+                            <div class="flex items-center gap-1.5 bg-amber-50 px-3 py-1 rounded-xl text-amber-800 font-bold text-sm">
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <span id="modal-rating"></span>
+                            </div>
+                        </div>
+                        <p id="modal-author-main" class="text-sm font-semibold text-amber-700"></p>
+                        <p id="modal-summary" class="text-slate-600 text-sm leading-relaxed"></p>
+                        
+                        <div class="pt-2 flex flex-wrap justify-center sm:justify-start gap-2" id="modal-tags">
+                            <!-- Tags injected here -->
+                        </div>
+
+                        <div class="pt-4 flex items-center justify-center sm:justify-start gap-3">
+                            <button id="modal-fav-btn" onclick="" class="px-5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm text-slate-700 flex items-center gap-2 hover:bg-slate-50 transition-all">
+                                <i class="fa-regular fa-heart"></i> הוסף למועדפים
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Similar Books Section -->
+                <div class="space-y-4 pt-4 border-t border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-book-bookmark text-amber-600"></i> ספרים דומים שעשויים לעניין אותך
+                    </h3>
+                    <div id="similar-books-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- Similar books injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-100 mt-16 py-8 text-center text-sm text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-medium text-slate-700">עולם הספרים - כל הזכויות שמורות © 2026</p>
+            <p class="text-xs text-slate-400">נבנה באהבה עבור חובבי קריאה בשפה העברית.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Database of Books with Rich Image Covers
+        const booksData = [
+            {
+                id: 1,
+                title: "השען מרשות הציבור",
+                author: "ג'פרי דיבר",
+                genre: "מתח ופשע",
+                mood: "מותח וסוחף",
+                pages: "ארוך",
+                pageCount: 430,
+                rating: 4.8,
+                image: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600&q=80",
+                summary: "לינקולן רים, גאון הפלילים המשותק בכיסא גלגלים, חוזר לתיק מורכב ומטלטל מול רוצח סדרתי מתוחכם שמנהל משחק חתול ועכבר עירוני עוצר נשימה.",
+                tags: ["מתח", "חקירות", "רוצח סדרתי", "רב מכר"]
+            },
+            {
+                id: 2,
+                title: "אשת לפידות",
+                author: "שולמית לפיד",
+                genre: "מתח ופשע",
+                mood: "מרגש ועמוק",
+                pages: "בינוני",
+                pageCount: 320,
+                rating: 4.5,
+                image: "https://images.unsplash.com/photo-1509021436468-d51039746b40?auto=format&fit=crop&w=600&q=80",
+                summary: "ליזי בדיחי, עיתונאית מקומית באר שבעית חסרת מנוח, מוצאת את עצמה חוקרת רשת של תעלומות ופשעים סבוכים בלב הפריפריה הישראלית.",
+                tags: ["ישראלי", "תעלומה", "עיתונות", "חקירות"]
+            },
+            {
+                id: 3,
+                title: "אהבה בימי כולרה",
+                author: "גבריאל גרסיה מארקס",
+                genre: "רומן",
+                mood: "מרגש ועמוק",
+                pages: "ארוך",
+                pageCount: 410,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
+                summary: "סיפור אהבה אפי ומרגש חוצה ימים ועשורים בין פלורנטינו אריסה לפרמינה דאסה, המציג את כמיהת הלב האנושית בכל עוצמתה.",
+                tags: ["רומן קלאסי", "אהבה", "רב מכר", "לטיני"]
+            },
+            {
+                id: 4,
+                title: "לפני שייגמר הקפה",
+                author: "טושקאזו קאוואגוצ'י",
+                genre: "רומן",
+                mood: "קליל וזורם",
+                pages: "קצר",
+                pageCount: 210,
+                rating: 4.6,
+                image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80",
+                summary: "בבית קפה קטן בטוקיו, לקוחות יכולים לחזור אחורה בזמן – בתנאי אחד בלבד: עליהם לחזור לפני שהקפה יתקרר. ספר רגיש ונוגע ללב.",
+                tags: ["יפני", "פנטזיה רגישה", "זמן", "מרגש"]
+            },
+            {
+                id: 5,
+                title: "חולית (Dune)",
+                author: "פרנק הרברט",
+                genre: "מדע בדיוני ופנטזיה",
+                mood: "מעשיר ומלמד",
+                pages: "ארוך",
+                pageCount: 520,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+                summary: "יצירת המופת של המדע הבדיוני העולמי. סיפורו של פול אטראידיס על כוכב הלכת המדברי אראקיס, פוליטיקה של אימפריות, ותבלין נדיר.",
+                tags: ["מדע בדיוני", "פוליטיקה", "מדבר", "קלאסיקה"]
+            },
+            {
+                id: 6,
+                title: "ספריית החצות",
+                author: "מאט הייג",
+                genre: "מדע בדיוני ופנטזיה",
+                mood: "קליל וזורם",
+                pages: "בינוני",
+                pageCount: 280,
+                rating: 4.7,
+                image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80",
+                summary: "ספרייה קסומה שבה כל ספר הוא חיים אחרים שהגיבורה הייתה יכולה לחיות אם הייתה בוחרת אחרת. מסע פילוסופי וקליל על בחירות בחיים.",
+                tags: ["פנטזיה", "משמעות החיים", "מסע", "מרתק"]
+            },
+            {
+                id: 7,
+                title: "לחשוב מהר, לחשוב לאט",
+                author: "דניאל כהנמן",
+                genre: "עיון והתפתחות",
+                mood: "מעשיר ומלמד",
+                pages: "ארוך",
+                pageCount: 500,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&q=80",
+                summary: "חתן פרס נובל לכלכלה לוקח את הקורא למסע מרתק אל תוך שני המערכות ששולטות באופן שבו אנחנו מקבלים החלטות וחושבים.",
+                tags: ["פסיכולוגיה", "כלכלה התנהגותית", "חובה לקרוא", "ישראלי"]
+            },
+            {
+                id: 8,
+                title: "הרגלים אטומיים",
+                author: "ג'יימס קליר",
+                genre: "עיון והתפתחות",
+                mood: "מעשיר ומלמד",
+                pages: "בינוני",
+                pageCount: 310,
+                rating: 4.8,
+                image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=600&q=80",
+                summary: "מדריך מעשי מוכח לבניית הרגלים טובים ושבירת הרגלים רעים באמצעות שינויים קטנים ומצטברים שמובילים לתוצאות ענק.",
+                tags: ["התפתחות אישית", "פרודוקטיביות", "הרגל", "מעשי"]
+            },
+            {
+                id: 9,
+                title: "סטיב ג'ובס: הביוגרפיה",
+                author: "וולטר אייזקסון",
+                genre: "ביוגרפיה",
+                mood: "מעשיר ומלמד",
+                pages: "ארוך",
+                pageCount: 480,
+                rating: 4.7,
+                image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80",
+                summary: "סיפור חייו הסוער, הגאונות, הדרישות הבלתי מתפשרות והחזון של אחד הממציאים והיזמים הבולטים בהיסטוריה المודרנית.",
+                tags: ["ביוגרפיה", "טכנולוגיה", "אפל", "השראה"]
+            }
+        ];
+
+        // Companion Speech Sentences
+        const companionPhrases = [
+            "טיפ קטן: קריאה של 15 דקות ביום עוזרת להפחית לחץ נפשי! 🧘‍♂️",
+            "מחפש המלצה מדויקת?נסה את שאלון ההתאמה שלנו בחלק העליון! ✨",
+            "אל תשכח לסמן בלבלב את הספרים שאהבת כדי שתוכל לחזור אליהם מאוחר יותר! ❤️",
+            "ספר טוב הוא חבר אמיתי. מצאת משהו מעניין היום? 📚",
+            "רוצה לדבר על ספרים? הצטרף לקבוצת הוואצאפ הקהילתית שלנו! 💬"
+        ];
+
+        // Application State
+        let currentGenre = 'הכל';
+        let searchQuery = '';
+        let favorites = JSON.parse(localStorage.getItem('book_favorites')) || [];
+        let currentQuizStep = 1;
+        let quizAnswers = { q1: '', q2: '', q3: '' };
+
+        // Initialize App on Window Load
+        window.onload = function() {
+            renderBooks();
+            updateFavoritesBadge();
+
+            // Check if phone was already provided
+            if (localStorage.getItem('user_phone_submitted')) {
+                document.getElementById('phone-modal').classList.add('hide');
+            }
+        };
+
+        // Phone Form & WhatsApp Modal Handling
+        function handlePhoneSubmit(e) {
+            e.preventDefault();
+            const phone = document.getElementById('user-phone').value;
+            if (phone) {
+                localStorage.setItem('user_phone_submitted', 'true');
+                localStorage.setItem('user_phone_number', phone);
+                document.getElementById('phone-form').classList.add('hide');
+                document.getElementById('whatsapp-success').classList.remove('hide');
+                speakAvatar("תודה שנרשמת! הנה הקישור לקבוצת הוואצאפ שלנו! 🎉");
+            }
+        }
+
+        function closePhoneModal() {
+            document.getElementById('phone-modal').classList.add('hide');
+            speakAvatar("ברוכים הבאים! אל תהסס ללחוץ עליי לקבלת טיפים בקריאה. 😉");
+        }
+
+        // Companion Avatar Logic
+        function speakAvatar(text) {
+            const bubble = document.getElementById('avatar-bubble');
+            const avatarText = document.getElementById('avatar-text');
+            avatarText.innerHTML = text;
+            bubble.classList.remove('hide');
+            bubble.style.opacity = '1';
+            bubble.style.transform = 'scale(1)';
+        }
+
+        function triggerAvatarSpeech() {
+            const randomPhrase = companionPhrases[Math.floor(Math.random() * companionPhrases.length)];
+            speakAvatar(randomPhrase);
+        }
+
+        function dismissBubble() {
+            const bubble = document.getElementById('avatar-bubble');
+            bubble.style.opacity = '0';
+            bubble.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                bubble.classList.add('hide');
+            }, 300);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            document.getElementById('tab-home').classList.add('hide');
+            document.getElementById('tab-quiz').classList.add('hide');
+            document.getElementById('tab-favorites').classList.add('hide');
+
+            document.getElementById('nav-home').className = "px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100";
+            document.getElementById('nav-quiz').className = "px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100";
+            document.getElementById('nav-favorites').className = "px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100";
+
+            document.getElementById('tab-' + tabName).classList.remove('hide');
+            document.getElementById('nav-' + tabName).className = "px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-amber-50 text-amber-700 shadow-sm";
+
+            if (tabName === 'favorites') {
+                renderFavorites();
+                speakAvatar("הנה כל הספרים ששמרת במועדפים! רשימה מעולה. 💖");
+            } else if (tabName === 'quiz') {
+                speakAvatar("השאלון יעזור לי למצוא עבורך ספר בול בשבילך! ✨");
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Filter and Render Books Grid
+        function setGenreFilter(genre) {
+            currentGenre = genre;
+            document.querySelectorAll('.genre-btn').forEach(btn => {
+                if (btn.getAttribute('data-genre') === genre) {
+                    btn.className = "genre-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-amber-600 text-white shadow-md shadow-amber-600/20";
+                } else {
+                    btn.className = "genre-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+                }
+            });
+            renderBooks();
+        }
+
+        function filterBooks() {
+            searchQuery = document.getElementById('search-input').value.toLowerCase();
+            renderBooks();
+        }
+
+        function resetFilters() {
+            currentGenre = 'הכל';
+            searchQuery = '';
+            document.getElementById('search-input').value = '';
+            setGenreFilter('הכל');
+        }
+
+        function renderBooks() {
+            const grid = document.getElementById('books-grid');
+            const noBooks = document.getElementById('no-books-found');
+            grid.innerHTML = '';
+
+            const filtered = booksData.filter(book => {
+                const matchesGenre = currentGenre === 'הכל' || book.genre === currentGenre;
+                const matchesSearch = book.title.toLowerCase().includes(searchQuery) || 
+                                      book.author.toLowerCase().includes(searchQuery) ||
+                                      book.tags.some(tag => tag.toLowerCase().includes(searchQuery));
+                return matchesGenre && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                noBooks.classList.remove('hide');
+                return;
+            } else {
+                noBooks.classList.add('hide');
+            }
+
+            filtered.forEach(book => {
+                const isFav = favorites.includes(book.id);
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group";
+                card.innerHTML = `
+                    <div>
+                        <!-- Book Cover Image -->
+                        <div class="relative h-56 overflow-hidden bg-slate-100 cursor-pointer" onclick="openBookModal(${book.id})">
+                            <img src="${book.image}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+                            <span class="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-md text-amber-900 text-xs font-bold rounded-full shadow-sm">${book.genre}</span>
+                            <div class="absolute bottom-3 right-3 flex items-center gap-1 text-white text-xs font-bold bg-amber-600/90 backdrop-blur-md px-2.5 py-1 rounded-lg">
+                                <i class="fa-solid fa-star text-amber-300"></i>
+                                <span>${book.rating}</span>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-5 space-y-3 cursor-pointer" onclick="openBookModal(${book.id})">
+                            <div class="space-y-0.5">
+                                <h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-700 transition-colors leading-snug">${book.title}</h3>
+                                <p class="text-xs font-semibold text-amber-800">${book.author}</p>
+                            </div>
+                            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">${book.summary}</p>
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                ${book.tags.map(t => `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] rounded-md font-medium">#${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                        <button onclick="openBookModal(${book.id})" class="text-xs font-bold text-amber-700 hover:text-amber-800 transition-all">
+                            פרטים נוספים <i class="fa-solid fa-arrow-left mr-1"></i>
+                        </button>
+                        <button onclick="toggleFavorite(${book.id}, event)" class="w-9 h-9 rounded-xl flex items-center justify-center transition-all ${isFav ? 'bg-rose-50 text-rose-500 shadow-sm' : 'bg-white border border-slate-200 text-slate-400 hover:text-rose-500'}">
+                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Favorites Management
+        function toggleFavorite(bookId, event) {
+            if (event) event.stopPropagation();
+            const index = favorites.indexOf(bookId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                speakAvatar("הספר הוסר מהמועדפים.");
+            } else {
+                favorites.push(bookId);
+                speakAvatar("הספר נוסף בהצלחה לרשימת המועדפים שלך! ❤️");
+            }
+            localStorage.setItem('book_favorites', JSON.stringify(favorites));
+            updateFavoritesBadge();
+            renderBooks();
+            if (!document.getElementById('tab-favorites').classList.contains('hide')) {
+                renderFavorites();
+            }
+            if (window.currentModalBookId === bookId) {
+                updateModalFavButton(bookId);
+            }
+        }
+
+        function updateFavoritesBadge() {
+            const badge = document.getElementById('fav-badge');
+            if (favorites.length > 0) {
+                badge.innerText = favorites.length;
+                badge.classList.remove('hide');
+            } else {
+                badge.classList.add('hide');
+            }
+        }
+
+        function renderFavorites() {
+            const grid = document.getElementById('favorites-grid');
+            const noFavs = document.getElementById('no-favorites');
+            grid.innerHTML = '';
+
+            const favBooks = booksData.filter(b => favorites.includes(b.id));
+
+            if (favBooks.length === 0) {
+                noFavs.classList.remove('hide');
+                return;
+            } else {
+                noFavs.classList.add('hide');
+            }
+
+            favBooks.forEach(book => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group";
+                card.innerHTML = `
+                    <div>
+                        <div class="relative h-48 overflow-hidden bg-slate-100 cursor-pointer" onclick="openBookModal(${book.id})">
+                            <img src="${book.image}" alt="${book.title}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-5 space-y-2 cursor-pointer" onclick="openBookModal(${book.id})">
+                            <span class="px-2.5 py-0.5 bg-amber-50 text-amber-800 text-[10px] font-bold rounded-full">${book.genre}</span>
+                            <h3 class="text-lg font-bold text-slate-800">${book.title}</h3>
+                            <p class="text-xs font-semibold text-amber-800">${book.author}</p>
+                        </div>
+                    </div>
+                    <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                        <button onclick="openBookModal(${book.id})" class="text-xs font-bold text-amber-700">
+                            פרטים נוספים <i class="fa-solid fa-arrow-left mr-1"></i>
+                        </button>
+                        <button onclick="toggleFavorite(${book.id}, event)" class="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Book Details Modal & Recommendations
+        window.currentModalBookId = null;
+
+        function openBookModal(bookId) {
+            window.currentModalBookId = bookId;
+            const book = booksData.find(b => b.id === bookId);
+            if (!book) return;
+
+            document.getElementById('modal-book-genre').innerText = book.genre;
+            document.getElementById('modal-book-pages').innerText = `אורך: ${book.pages} (${book.pageCount} עמ')`;
+            document.getElementById('modal-image').src = book.image;
+            document.getElementById('modal-title-main').innerText = book.title;
+            document.getElementById('modal-author-main').innerText = `מאת: ${book.author}`;
+            document.getElementById('modal-rating').innerText = book.rating;
+            document.getElementById('modal-summary').innerText = book.summary;
+
+            // Render tags
+            const tagsContainer = document.getElementById('modal-tags');
+            tagsContainer.innerHTML = book.tags.map(t => `<span class="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs rounded-lg font-medium">#${t}</span>`).join('');
+
+            updateModalFavButton(bookId);
+            renderSimilarBooks(book);
+
+            document.getElementById('book-modal').classList.remove('hide');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateModalFavButton(bookId) {
+            const isFav = favorites.includes(bookId);
+            const favBtn = document.getElementById('modal-fav-btn');
+            favBtn.setAttribute('onclick', `toggleFavorite(${bookId})`);
+            if (isFav) {
+                favBtn.className = "px-5 py-2.5 rounded-xl border border-rose-200 bg-rose-50 font-medium text-sm text-rose-600 flex items-center gap-2 hover:bg-rose-100 transition-all";
+                favBtn.innerHTML = `<i class="fa-solid fa-heart"></i> הוסר ממועדפים`;
+            } else {
+                favBtn.className = "px-5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm text-slate-700 flex items-center gap-2 hover:bg-slate-50 transition-all";
+                favBtn.innerHTML = `<i class="fa-regular fa-heart"></i> הוסף למועדפים`;
+            }
+        }
+
+        function closeBookModal() {
+            document.getElementById('book-modal').classList.add('hide');
+            document.body.style.overflow = 'auto';
+            window.currentModalBookId = null;
+        }
+
+        function renderSimilarBooks(currentBook) {
+            const similarGrid = document.getElementById('similar-books-grid');
+            similarGrid.innerHTML = '';
+
+            const scoredBooks = booksData
+                .filter(b => b.id !== currentBook.id)
+                .map(b => {
+                    let score = 0;
+                    if (b.genre === currentBook.genre) score += 3;
+                    if (b.mood === currentBook.mood) score += 2;
+                    b.tags.forEach(tag => {
+                        if (currentBook.tags.includes(tag)) score += 1;
+                    });
+                    return { book: b, score: score };
+                })
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3);
+
+            scoredBooks.forEach(item => {
+                const b = item.book;
+                const card = document.createElement('div');
+                card.className = "p-3 bg-slate-50 rounded-2xl border border-slate-200/80 hover:border-amber-500 cursor-pointer transition-all flex gap-3 items-center";
+                card.setAttribute('onclick', `openBookModal(${b.id})`);
+                card.innerHTML = `
+                    <img src="${b.image}" class="w-12 h-16 object-cover rounded-xl shadow-sm flex-shrink-0">
+                    <div class="space-y-0.5 overflow-hidden">
+                        <span class="text-[10px] font-bold text-amber-700 bg-amber-100/60 px-1.5 py-0.5 rounded">${b.genre}</span>
+                        <h4 class="font-bold text-slate-800 text-xs truncate mt-0.5">${b.title}</h4>
+                        <p class="text-[11px] text-slate-500 truncate">${b.author}</p>
+                    </div>
+                `;
+                similarGrid.appendChild(card);
+            });
+        }
+
+        // Quiz Logic
+        function nextQuizStep() {
+            const currentRadios = document.querySelectorAll(`input[name="q${currentQuizStep}"]:checked`);
+            if (currentRadios.length === 0) {
+                speakAvatar("אנא בחר תשובה אחת לפני שממשיכים לשאלה הבאה! 🙂");
+                return;
+            }
+            quizAnswers[`q${currentQuizStep}`] = currentRadios[0].value;
+
+            if (currentQuizStep < 3) {
+                document.getElementById(`q-${currentQuizStep}`).classList.add('hide');
+                currentQuizStep++;
+                document.getElementById(`q-${currentQuizStep}`).classList.remove('hide');
+                updateQuizProgress();
+            } else {
+                calculateQuizResult();
+            }
+        }
+
+        function prevQuizStep() {
+            if (currentQuizStep > 1) {
+                document.getElementById(`q-${currentQuizStep}`).classList.add('hide');
+                currentQuizStep--;
+                document.getElementById(`q-${currentQuizStep}`).classList.remove('hide');
+                updateQuizProgress();
+            }
+        }
+
+        function updateQuizProgress() {
+            const percent = (currentQuizStep / 3) * 100;
+            document.getElementById('quiz-progress-bar').style.width = percent + '%';
+            document.getElementById('quiz-progress-text').innerText = Math.round(percent) + '%';
+            document.getElementById('quiz-step-indicator').innerText = `שאלה ${currentQuizStep} מתוך 3`;
+
+            const prevBtn = document.getElementById('quiz-prev-btn');
+            if (currentQuizStep > 1) {
+                prevBtn.classList.remove('hide');
+            } else {
+                prevBtn.classList.add('hide');
+            }
+
+            const nextBtn = document.getElementById('quiz-next-btn');
+            if (currentQuizStep === 3) {
+                nextBtn.innerHTML = `סיים וקבל המלצה <i class="fa-solid fa-check mr-2"></i>`;
+            } else {
+                nextBtn.innerHTML = `הבא <i class="fa-solid fa-arrow-left mr-2"></i>`;
+            }
+        }
+
+        function calculateQuizResult() {
+            document.getElementById('quiz-questions-container').classList.add('hide');
+            document.getElementById('quiz-next-btn').parentElement.parentElement.classList.add('hide');
+
+            let scored = booksData.map(book => {
+                let score = 0;
+                if (book.genre === quizAnswers.q1) score += 5;
+                if (book.pages === quizAnswers.q2) score += 3;
+                if (book.mood === quizAnswers.q3) score += 4;
+                return { book: book, score: score };
+            });
+
+            scored.sort((a, b) => b.score - a.score);
+            const bestBook = scored[0].book;
+
+            const cardContainer = document.getElementById('quiz-matched-book-card');
+            cardContainer.innerHTML = `
+                <div class="w-full sm:w-48 h-64 bg-slate-100 rounded-2xl overflow-hidden shadow-lg flex-shrink-0">
+                    <img src="${bestBook.image}" alt="${bestBook.title}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-grow space-y-4 text-right">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">${bestBook.genre}</span>
+                        <div class="flex items-center gap-1 bg-amber-50 px-3 py-1 rounded-xl text-amber-800 font-bold text-sm">
+                            <i class="fa-solid fa-star text-amber-500"></i>
+                            <span>${bestBook.rating}</span>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-800">${bestBook.title}</h3>
+                    <p class="text-sm font-semibold text-amber-700">מאת: ${bestBook.author}</p>
+                    <p class="text-slate-600 text-sm leading-relaxed">${bestBook.summary}</p>
+                    <div class="pt-2 flex flex-wrap gap-2">
+                        ${bestBook.tags.map(t => `<span class="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs rounded-lg font-medium">#${t}</span>`).join('')}
+                    </div>
+                    <div class="pt-4 flex items-center gap-3">
+                        <button onclick="openBookModal(${bestBook.id})" class="px-5 py-2.5 bg-amber-600 text-white rounded-xl text-sm font-bold shadow-md shadow-amber-600/20 hover:bg-amber-700 transition-all">
+                            צפה בכל הפרטים והמלצות דומות
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('quiz-result-section').classList.remove('hide');
+            speakAvatar(`מצאתי לך את **${bestBook.title}**! ספר מושלם עבורך! 🌟`);
+        }
+
+        function resetQuiz() {
+            currentQuizStep = 1;
+            quizAnswers = { q1: '', q2: '', q3: '' };
+            
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+
+            document.getElementById('quiz-result-section').classList.add('hide');
+            document.getElementById('quiz-questions-container').classList.remove('hide');
+            document.getElementById('quiz-next-btn').parentElement.parentElement.classList.remove('hide');
+
+            document.querySelectorAll('.quiz-question').forEach((q, idx) => {
+                if (idx === 0) q.classList.remove('hide');
+                else q.classList.add('hide');
+            });
+
+            updateQuizProgress();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אקדמיית הרובוטיקה - לומדים לתכנת ולבנות</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                    },
+                    colors: {
+                        robo: {
+                            dark: '#0B132B',
+                            darker: '#1C2541',
+                            blue: '#3A506B',
+                            cyan: '#5BC0BE',
+                            light: '#E6F9F9',
+                            neon: '#00FFCC'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 10px #5BC0BE' },
+                            '50%': { boxShadow: '0 0 25px #00FFCC' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0B132B;
+            color: #E6F9F9;
+        }
+        
+        .glass-panel {
+            background: rgba(28, 37, 65, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(91, 192, 190, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .hardware-tab.active {
+            background-color: #5BC0BE;
+            color: #0B132B;
+            border-color: #00FFCC;
+        }
+
+        .design-btn.active {
+            border: 2px solid #00FFCC;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+
+        /* SVG Robot Transitions */
+        #robot-svg path, #robot-svg rect, #robot-svg circle {
+            transition: all 0.4s ease;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B132B;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3A506B;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5BC0BE;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-robo-cyan selection:text-robo-dark">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-x-0 border-t-0 border-b rounded-none px-6 py-4 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer">
+                <i class="fas fa-robot text-robo-neon text-3xl"></i>
+                <span class="text-2xl font-black tracking-wider text-white">Robo<span class="text-robo-cyan">Learn</span></span>
+            </div>
+            <div class="hidden md:flex gap-8 font-bold">
+                <a href="#steps" class="hover:text-robo-neon transition-colors">שלבי למידה</a>
+                <a href="#hardware" class="hover:text-robo-neon transition-colors">חיבור חומרה</a>
+                <a href="#design-lab" class="hover:text-robo-neon transition-colors">מעבדת עיצוב</a>
+            </div>
+            <button class="bg-robo-cyan text-robo-dark px-6 py-2 rounded-full font-bold hover:bg-robo-neon transition-all hover:shadow-[0_0_15px_#00FFCC]">
+                התחל עכשיו
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <!-- Background Grid Effect -->
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#1C2541_1px,transparent_1px),linear-gradient(to_bottom,#1C2541_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+            <div class="text-center lg:text-right">
+                <div class="inline-block bg-robo-blue text-robo-light px-4 py-1 rounded-full text-sm font-bold tracking-wide mb-6 border border-robo-cyan">
+                    גרסה 1.0 - יוצאים לדרך
+                </div>
+                <h1 class="text-5xl lg:text-7xl font-black mb-6 leading-tight">
+                    הדרך שלך לבנות <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-robo-neon to-robo-cyan">רובוט אמיתי</span>
+                </h1>
+                <p class="text-xl text-gray-300 mb-8 max-w-lg mx-auto lg:mx-0">
+                    מאפס למאסטר ברובוטיקה. למד איך לחבר את החלקים, לתכנת את המוח האלקטרוני, ולעצב את הרובוט הייחודי שלך בסביבה אינטראקטיבית.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <a href="#steps" class="bg-robo-cyan text-robo-dark px-8 py-4 rounded-full font-bold text-lg hover:bg-robo-neon transition-all animate-pulse-glow inline-flex justify-center items-center gap-2">
+                        בואו נתחיל <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <a href="#design-lab" class="glass-panel px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-robo-dark transition-all inline-flex justify-center items-center gap-2">
+                        <i class="fas fa-paint-brush"></i> למעבדת העיצוב
+                    </a>
+                </div>
+            </div>
+            
+            <div class="relative flex justify-center animate-float hidden md:flex">
+                <!-- Decorative Tech SVG -->
+                <svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_30px_rgba(91,192,190,0.4)]">
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="#3A506B" stroke-width="2" stroke-dasharray="10 5" />
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="#5BC0BE" stroke-width="4" opacity="0.5" />
+                    <g fill="#00FFCC">
+                        <rect x="85" y="85" width="30" height="30" rx="5" />
+                        <circle cx="100" cy="65" r="5" />
+                        <circle cx="100" cy="135" r="5" />
+                        <circle cx="65" cy="100" r="5" />
+                        <circle cx="135" cy="100" r="5" />
+                    </g>
+                    <path d="M100 20 L100 40 M100 160 L100 180 M20 100 L40 100 M160 100 L180 100" stroke="#00FFCC" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section 1: The Steps -->
+    <section id="steps" class="py-20 bg-robo-darker">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl lg:text-5xl font-black mb-4">איך זה עובד?</h2>
+                <p class="text-xl text-gray-400">3 שלבים פשוטים בדרך לרובוט הראשון שלך</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="glass-panel p-8 text-center hover:transform hover:-translate-y-2 transition-all group">
+                    <div class="w-20 h-20 bg-robo-blue rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-robo-cyan transition-colors border-2 border-robo-cyan shadow-[0_0_15px_rgba(91,192,190,0.2)]">
+                        <i class="fas fa-book-open text-3xl text-white group-hover:text-robo-dark"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-white">1. מבוא והיכרות</h3>
+                    <p class="text-gray-400">נלמד מהו רובוט, ממה הוא מורכב (חיישנים, בקר, מנועים) ואיך המוח שלו חושב.</p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="glass-panel p-8 text-center hover:transform hover:-translate-y-2 transition-all group relative">
+                    <!-- Connector Line (Desktop) -->
+                    <div class="hidden md:block absolute top-1/4 -right-10 w-20 border-t-2 border-dashed border-robo-cyan -z-10"></div>
+                    
+                    <div class="w-20 h-20 bg-robo-blue rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-robo-cyan transition-colors border-2 border-robo-cyan shadow-[0_0_15px_rgba(91,192,190,0.2)]">
+                        <i class="fas fa-plug text-3xl text-white group-hover:text-robo-dark"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-white">2. חיבור פיזי</h3>
+                    <p class="text-gray-400">נעבוד עם חוטי גישור ומטריצה, נחבר את החיישנים והמנועים אל לוח הבקרה (Arduino).</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="glass-panel p-8 text-center hover:transform hover:-translate-y-2 transition-all group relative">
+                    <!-- Connector Line (Desktop) -->
+                    <div class="hidden md:block absolute top-1/4 -right-10 w-20 border-t-2 border-dashed border-robo-cyan -z-10"></div>
+                    
+                    <div class="w-20 h-20 bg-robo-blue rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-robo-cyan transition-colors border-2 border-robo-cyan shadow-[0_0_15px_rgba(91,192,190,0.2)]">
+                        <i class="fas fa-code text-3xl text-white group-hover:text-robo-dark"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-white">3. תכנות (קידוד)</h3>
+                    <p class="text-gray-400">נכתוב שורות קוד שנותנות פקודות לרובוט: מתי לנסוע, מתי לעצור ואיך להגיב לסביבה.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Hardware Connections -->
+    <section id="hardware" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl lg:text-5xl font-black mb-4">איך מחברים את החלקים?</h2>
+                <p class="text-xl text-gray-400">לחץ על הרכיבים כדי לראות לאן כל חוט מתחבר</p>
+            </div>
+
+            <div class="glass-panel p-4 md:p-8 flex flex-col lg:flex-row gap-8 items-center">
+                
+                <!-- Buttons/Tabs -->
+                <div class="w-full lg:w-1/3 flex flex-col gap-4">
+                    <button onclick="showHardware('sensor')" id="btn-sensor" class="hardware-tab active w-full text-right p-4 rounded-xl border-2 border-transparent bg-robo-darker hover:bg-robo-blue transition-all flex items-center justify-between group">
+                        <div>
+                            <div class="font-bold text-xl">חיישן מרחק (אולטרסוני)</div>
+                            <div class="text-sm opacity-80 mt-1">מודד מרחק באמצעות גלי קול</div>
+                        </div>
+                        <i class="fas fa-wifi text-2xl opacity-50 group-hover:opacity-100"></i>
+                    </button>
+                    
+                    <button onclick="showHardware('motor')" id="btn-motor" class="hardware-tab w-full text-right p-4 rounded-xl border-2 border-transparent bg-robo-darker hover:bg-robo-blue transition-all flex items-center justify-between group">
+                        <div>
+                            <div class="font-bold text-xl">מנוע DC + גלגל</div>
+                            <div class="text-sm opacity-80 mt-1">מניע את הרובוט קדימה ואחורה</div>
+                        </div>
+                        <i class="fas fa-truck-monster text-2xl opacity-50 group-hover:opacity-100"></i>
+                    </button>
+
+                    <button onclick="showHardware('led')" id="btn-led" class="hardware-tab w-full text-right p-4 rounded-xl border-2 border-transparent bg-robo-darker hover:bg-robo-blue transition-all flex items-center justify-between group">
+                        <div>
+                            <div class="font-bold text-xl">נורת אזהרה (LED)</div>
+                            <div class="text-sm opacity-80 mt-1">מאותתת כשהרובוט קרוב לקיר</div>
+                        </div>
+                        <i class="fas fa-lightbulb text-2xl opacity-50 group-hover:opacity-100"></i>
+                    </button>
+                </div>
+
+                <!-- Display Area -->
+                <div class="w-full lg:w-2/3 bg-robo-dark rounded-2xl p-6 min-h-[300px] border border-robo-blue flex flex-col justify-center relative overflow-hidden">
+                    <!-- Sensor Info -->
+                    <div id="info-sensor" class="hardware-info active-info animate-[fadeIn_0.5s_ease-in]">
+                        <h3 class="text-2xl font-bold mb-4 text-robo-cyan"><i class="fas fa-wifi ml-2"></i> חיבור חיישן אולטרסוני (HC-SR04)</h3>
+                        <div class="grid sm:grid-cols-2 gap-6 items-center">
+                            <ul class="space-y-3 text-lg">
+                                <li class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-red-500"></div> <b>VCC</b> מתחבר ל-5V בארדואינו (מתח)</li>
+                                <li class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-black border border-gray-600"></div> <b>GND</b> מתחבר ל-GND (אדמה)</li>
+                                <li class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-yellow-400"></div> <b>TRIG</b> מתחבר לפין דיגיטלי (למשל 9)</li>
+                                <li class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-blue-500"></div> <b>ECHO</b> מתחבר לפין דיגיטלי (למשל 10)</li>
+                            </ul>
+                            <div class="bg-robo-darker p-4 rounded-xl text-center font-mono text-sm text-robo-neon">
+                                // דוגמת קוד קצרה:<br>
+                                pinMode(9, OUTPUT); // Trig<br>
+                                pinMode(10, INPUT); // Echo
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Motor Info -->
+                    <div id="info-motor" class="hardware-info hidden">
+                        <h3 class="text-2xl font-bold mb-4 text-robo-cyan"><i class="fas fa-truck-monster ml-2"></i> חיבור מנוע לבקר מנועים</h3>
+                        <div class="grid sm:grid-cols-2 gap-6 items-center">
+                            <ul class="space-y-3 text-lg">
+                                <li class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-red-500"></div> <b>חוט אדום (מנוע)</b> מתחבר ליציאה בבקר מנועים</li>
+                                <li class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-black border border-gray-600"></div> <b>חוט שחור (מנוע)</b> מתחבר ליציאה בבקר</li>
+                                <li><i>הערה:</i> בקר המנועים מתחבר לארדואינו דרך פיני PWM כדי לשלוט במהירות.</li>
+                            </ul>
+                            <div class="bg-robo-darker p-4 rounded-xl text-center font-mono text-sm text-robo-neon">
+                                // דוגמת קוד קצרה:<br>
+                                analogWrite(enA, 255); // מהירות<br>
+                                digitalWrite(in1, HIGH); // קדימה<br>
+                                digitalWrite(in2, LOW);
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LED Info -->
+                    <div id="info-led" class="hardware-info hidden">
+                        <h3 class="text-2xl font-bold mb-4 text-robo-cyan"><i class="fas fa-lightbulb ml-2"></i> חיבור נורת LED</h3>
+                        <div class="grid sm:grid-cols-2 gap-6 items-center">
+                            <ul class="space-y-3 text-lg">
+                                <li class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-red-500"></div> <b>רגל ארוכה (פלוס)</b> מתחברת לפין דיגיטלי דרך נגד (220 אום)</li>
+                                <li class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-black border border-gray-600"></div> <b>רגל קצרה (מינוס)</b> מתחברת ל-GND</li>
+                                <li class="mt-4 text-sm text-gray-400"><i class="fas fa-info-circle"></i> חובה לחבר נגד כדי לא לשרוף את הנורה!</li>
+                            </ul>
+                            <div class="bg-robo-darker p-4 rounded-xl text-center font-mono text-sm text-robo-neon">
+                                // דוגמת קוד קצרה:<br>
+                                pinMode(13, OUTPUT);<br>
+                                digitalWrite(13, HIGH); // הדלק<br>
+                                delay(1000);<br>
+                                digitalWrite(13, LOW); // כבה
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Design Lab (Interactive) -->
+    <section id="design-lab" class="py-20 bg-robo-darker relative overflow-hidden">
+        <!-- Glow effect behind robot -->
+        <div class="absolute top-1/2 left-1/4 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-robo-cyan opacity-20 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl lg:text-5xl font-black mb-4">מעבדת העיצוב</h2>
+                <p class="text-xl text-gray-400">עצב את הרובוט שלך איך שאתה אוהב לפני שתתחיל לבנות</p>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Controls Panel -->
+                <div class="lg:col-span-4 glass-panel p-6 space-y-8 z-10">
+                    
+                    <!-- הצבע -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 border-b border-robo-blue pb-2"><i class="fas fa-palette ml-2 text-robo-cyan"></i> צבע הרובוט</h3>
+                        <div class="flex gap-3">
+                            <button onclick="changeColor('#5BC0BE')" class="design-btn active w-12 h-12 rounded-full bg-[#5BC0BE] hover:scale-110 transition-transform"></button>
+                            <button onclick="changeColor('#EF476F')" class="design-btn w-12 h-12 rounded-full bg-[#EF476F] hover:scale-110 transition-transform"></button>
+                            <button onclick="changeColor('#FFD166')" class="design-btn w-12 h-12 rounded-full bg-[#FFD166] hover:scale-110 transition-transform"></button>
+                            <button onclick="changeColor('#8338EC')" class="design-btn w-12 h-12 rounded-full bg-[#8338EC] hover:scale-110 transition-transform"></button>
+                            <button onclick="changeColor('#F8F9FA')" class="design-btn w-12 h-12 rounded-full bg-[#F8F9FA] hover:scale-110 transition-transform"></button>
+                        </div>
+                    </div>
+
+                    <!-- הראש -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 border-b border-robo-blue pb-2"><i class="fas fa-robot ml-2 text-robo-cyan"></i> סוג הראש</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="changeHead('square')" id="btn-head-square" class="design-btn active bg-robo-blue py-3 rounded-xl font-bold hover:bg-robo-cyan hover:text-robo-dark transition-colors">
+                                ריבוע קלאסי
+                            </button>
+                            <button onclick="changeHead('round')" id="btn-head-round" class="design-btn bg-robo-blue py-3 rounded-xl font-bold hover:bg-robo-cyan hover:text-robo-dark transition-colors">
+                                כיפה (R2D2)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- גלגלים -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 border-b border-robo-blue pb-2"><i class="fas fa-circle-notch ml-2 text-robo-cyan"></i> מערכת נסיעה</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="changeWheels('wheels')" id="btn-wheels-wheels" class="design-btn active bg-robo-blue py-3 rounded-xl font-bold hover:bg-robo-cyan hover:text-robo-dark transition-colors">
+                                גלגלים רגילים
+                            </button>
+                            <button onclick="changeWheels('tracks')" id="btn-wheels-tracks" class="design-btn bg-robo-blue py-3 rounded-xl font-bold hover:bg-robo-cyan hover:text-robo-dark transition-colors">
+                                זחלי טנק
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Save/Print -->
+                    <div class="pt-4 text-center">
+                        <button onclick="saveDesign()" class="w-full bg-robo-cyan text-robo-dark py-3 rounded-xl font-black text-lg hover:bg-robo-neon transition-colors shadow-lg">
+                            <i class="fas fa-check-circle ml-2"></i> אני מוכן לבנות!
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Preview Canvas -->
+                <div class="lg:col-span-8 flex justify-center items-center h-[500px] z-10 relative">
+                    <!-- The SVG Robot -->
+                    <svg id="robot-svg" width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+                        
+                        <!-- Antenna (Always visible) -->
+                        <g id="robot-antenna">
+                            <line x1="150" y1="80" x2="150" y2="40" stroke="#888" stroke-width="4" />
+                            <circle id="antenna-bulb" cx="150" cy="35" r="8" fill="#FF3366" class="animate-pulse" />
+                        </g>
+
+                        <!-- Head: Square (Default) -->
+                        <g id="head-square">
+                            <rect class="robot-color-part" x="100" y="80" width="100" height="80" rx="10" fill="#5BC0BE" stroke="#1C2541" stroke-width="4" />
+                            <!-- Eyes -->
+                            <rect x="120" y="105" width="20" height="10" rx="2" fill="#1C2541" />
+                            <rect x="160" y="105" width="20" height="10" rx="2" fill="#1C2541" />
+                            <!-- Mouth -->
+                            <rect x="130" y="135" width="40" height="5" rx="2" fill="#1C2541" />
+                        </g>
+
+                        <!-- Head: Round (Hidden initially) -->
+                        <g id="head-round" style="display: none;">
+                            <path class="robot-color-part" d="M 100 160 A 50 50 0 0 1 200 160 Z" fill="#5BC0BE" stroke="#1C2541" stroke-width="4" />
+                            <!-- Eye single (Cyclops style) -->
+                            <circle cx="150" cy="120" r="15" fill="#1C2541" />
+                            <circle cx="150" cy="120" r="5" fill="#00FFCC" />
+                        </g>
+
+                        <!-- Body (Always visible) -->
+                        <g id="robot-body-group">
+                            <rect class="robot-color-part" x="80" y="170" width="140" height="150" rx="15" fill="#5BC0BE" stroke="#1C2541" stroke-width="4" />
+                            <!-- Display Screen / Sensor Area -->
+                            <rect x="100" y="190" width="100" height="60" rx="5" fill="#1C2541" />
+                            <!-- Pulse line in screen -->
+                            <path d="M 110 220 L 130 220 L 140 200 L 160 240 L 170 220 L 190 220" stroke="#00FFCC" stroke-width="3" fill="none" class="animate-pulse" />
+                            
+                            <!-- Control Panel -->
+                            <circle cx="120" cy="280" r="10" fill="#FFD166" />
+                            <circle cx="150" cy="280" r="10" fill="#EF476F" />
+                            <circle cx="180" cy="280" r="10" fill="#3A506B" />
+                        </g>
+
+                        <!-- Arms (Always visible) -->
+                        <g id="robot-arms">
+                            <!-- Left Arm -->
+                            <rect x="40" y="190" width="30" height="100" rx="10" fill="#888" stroke="#1C2541" stroke-width="3" />
+                            <circle class="robot-color-part" cx="55" cy="190" r="15" fill="#5BC0BE" />
+                            <!-- Right Arm -->
+                            <rect x="230" y="190" width="30" height="100" rx="10" fill="#888" stroke="#1C2541" stroke-width="3" />
+                            <circle class="robot-color-part" cx="245" cy="190" r="15" fill="#5BC0BE" />
+                        </g>
+
+                        <!-- Wheels: Normal (Default) -->
+                        <g id="wheels-normal">
+                            <!-- Left Wheel -->
+                            <rect x="60" y="300" width="40" height="70" rx="10" fill="#222" stroke="#1C2541" stroke-width="2" />
+                            <rect x="65" y="310" width="30" height="50" rx="5" fill="#444" />
+                            <!-- Right Wheel -->
+                            <rect x="200" y="300" width="40" height="70" rx="10" fill="#222" stroke="#1C2541" stroke-width="2" />
+                            <rect x="205" y="310" width="30" height="50" rx="5" fill="#444" />
+                        </g>
+
+                        <!-- Wheels: Tracks (Hidden initially) -->
+                        <g id="wheels-tracks" style="display: none;">
+                            <!-- Big central track base -->
+                            <path d="M 60 350 L 240 350 A 20 20 0 0 0 260 330 L 260 330 A 20 20 0 0 0 240 310 L 60 310 A 20 20 0 0 0 40 330 L 40 330 A 20 20 0 0 0 60 350 Z" fill="#222" stroke="#1C2541" stroke-width="3" />
+                            <!-- Track wheels -->
+                            <circle cx="70" cy="330" r="12" fill="#555" />
+                            <circle cx="110" cy="330" r="12" fill="#555" />
+                            <circle cx="150" cy="330" r="12" fill="#555" />
+                            <circle cx="190" cy="330" r="12" fill="#555" />
+                            <circle cx="230" cy="330" r="12" fill="#555" />
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#050914] py-8 text-center text-gray-500 border-t border-robo-blue">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-center gap-2 mb-4 text-white font-bold text-xl">
+                <i class="fas fa-robot text-robo-cyan"></i> RoboLearn
+            </div>
+            <p>© 2024 אקדמיית הרובוטיקה. נבנה באהבה למדע, טכנולוגיה ויוצרים צעירים.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification (Custom alert) -->
+    <div id="toast" class="fixed bottom-5 right-5 glass-panel bg-robo-blue text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-[100]">
+        <i class="fas fa-info-circle text-robo-neon text-2xl"></i>
+        <span id="toast-msg" class="font-bold"></span>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // ----------------------------------------------------
+        // Hardware Tabs Logic
+        // ----------------------------------------------------
+        function showHardware(type) {
+            // Update Buttons
+            document.querySelectorAll('.hardware-tab').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + type).classList.add('active');
+
+            // Update Info Panels
+            document.querySelectorAll('.hardware-info').forEach(info => {
+                info.classList.add('hidden');
+                info.classList.remove('active-info');
+            });
+            document.getElementById('info-' + type).classList.remove('hidden');
+            document.getElementById('info-' + type).classList.add('active-info');
+        }
+
+        // ----------------------------------------------------
+        // Design Lab Logic
+        // ----------------------------------------------------
+        
+        // 1. Change Colors
+        function changeColor(colorHex) {
+            // Update SVG parts
+            const parts = document.querySelectorAll('.robot-color-part');
+            parts.forEach(part => {
+                part.setAttribute('fill', colorHex);
+            });
+
+            // Update UI buttons styling
+            document.querySelectorAll('.design-btn[onclick^="changeColor"]').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.getAttribute('onclick').includes(colorHex)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // 2. Change Head
+        function changeHead(type) {
+            document.getElementById('head-square').style.display = 'none';
+            document.getElementById('head-round').style.display = 'none';
+            
+            document.getElementById('head-' + type).style.display = 'block';
+
+            // Update buttons
+            document.getElementById('btn-head-square').classList.remove('active');
+            document.getElementById('btn-head-round').classList.remove('active');
+            document.getElementById('btn-head-' + type).classList.add('active');
+        }
+
+        // 3. Change Wheels
+        function changeWheels(type) {
+            document.getElementById('wheels-normal').style.display = 'none';
+            document.getElementById('wheels-tracks').style.display = 'none';
+            
+            document.getElementById('wheels-' + type).style.display = 'block';
+
+            // Update buttons
+            document.getElementById('btn-wheels-wheels').classList.remove('active');
+            document.getElementById('btn-wheels-tracks').classList.remove('active');
+            document.getElementById('btn-wheels-' + type).classList.add('active');
+        }
+
+        // 4. Save/Confirm (Custom Toast instead of alert)
+        function saveDesign() {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-msg');
+            
+            msg.innerText = "העיצוב נשמר בהצלחה! אפשר להתחיל לבנות את הרובוט המיוחד שלך.";
+            
+            // Show toast
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            // Hide after 3.5 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>

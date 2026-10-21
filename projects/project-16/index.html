@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" id="app-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EA SPORTS F1 25: 2026 Season Edition Simulation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js GLTFLoader -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Titillium Web for EA F1 broadcast styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background-color: #05070a;
+            color: #ffffff;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .ea-f1-bg {
+            background: radial-gradient(circle at 50% 20%, rgba(225, 6, 0, 0.3) 0%, rgba(5, 7, 10, 0.98) 80%),
+                        linear-gradient(180deg, #0a0d14 0%, #020305 100%);
+        }
+
+        .ea-card {
+            background: linear-gradient(135deg, rgba(25, 32, 48, 0.85) 0%, rgba(8, 12, 20, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ea-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: rgba(225, 6, 0, 0.9);
+            box-shadow: 0 15px 40px rgba(225, 6, 0, 0.4);
+        }
+
+        /* Speed Blur Filter Overlay for Motion Effect */
+        .motion-blur-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            z-index: 15;
+        }
+
+        .ea-logo-badge {
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between ea-f1-bg text-gray-100">
+
+    <!-- Broadcast Top Header Bar -->
+    <header class="w-full bg-black/90 border-b border-red-600/60 px-6 py-2.5 flex justify-between items-center z-50 sticky top-0 backdrop-blur-xl shadow-2xl">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="bg-white text-black font-black px-2.5 py-0.5 text-xs rounded tracking-tighter ea-logo-badge">EA SPORTS</span>
+                <div class="bg-gradient-to-r from-red-600 to-red-700 text-white font-black italic px-3 py-1 rounded-sm text-xl tracking-wider shadow-lg shadow-red-600/50 flex items-center gap-1">
+                    <span>F1® 25</span>
+                    <span class="text-[10px] bg-black/40 px-1.5 py-0.5 rounded font-sans not-italic">2026 PACK</span>
+                </div>
+            </div>
+            <span class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 text-[11px] font-bold px-2.5 py-0.5 rounded italic uppercase hidden sm:inline-block shadow-sm">
+                OFFICIAL 2026 SEASON SIMULATION
+            </span>
+        </div>
+
+        <div id="header-selection-info" class="hidden lg:flex items-center gap-4 text-xs">
+            <div class="flex items-center gap-2 bg-gray-900/80 px-3 py-1 rounded-md border border-gray-700">
+                <span class="text-gray-400" data-i18n="lbl_team">קבוצה:</span>
+                <span class="font-bold text-white" id="info-team-name">-</span>
+            </div>
+            <div class="flex items-center gap-2 bg-gray-900/80 px-3 py-1 rounded-md border border-gray-700">
+                <span class="text-gray-400" data-i18n="lbl_driver">נהג:</span>
+                <span class="font-bold text-white" id="info-driver-name">-</span>
+            </div>
+            <div class="flex items-center gap-2 bg-gray-900/80 px-3 py-1 rounded-md border border-gray-700">
+                <span class="text-gray-400" data-i18n="lbl_track">מסלול:</span>
+                <span class="font-bold text-white" id="info-track-name">-</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button id="lang-btn" onclick="toggleLanguage()" class="ea-btn-secondary text-white font-bold px-3 py-1 text-xs flex items-center gap-1.5 rounded">
+                <i class="fa-solid fa-globe text-red-500"></i>
+                <span id="lang-btn-text">English</span>
+            </button>
+
+            <button onclick="resetToHome()" class="ea-btn-secondary text-white font-bold px-3.5 py-1 text-xs flex items-center gap-1.5 rounded">
+                <i class="fa-solid fa-house"></i>
+                <span data-i18n="btn_home">תפריט</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4 relative z-10">
+
+        <!-- STEP 1: TEAM SELECTION -->
+        <section id="step-team" class="w-full max-w-7xl mx-auto py-4">
+            <div class="text-center mb-6">
+                <div class="inline-block bg-red-600/20 text-red-400 text-xs font-bold tracking-widest px-3 py-1 rounded-full uppercase border border-red-500/30 mb-2" data-i18n="step1_sub">
+                    2026 GRID PACK
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black italic uppercase tracking-wider text-white" data-i18n="step1_title">בחר קבוצה לעונת 2026</h1>
+                <p class="text-gray-400 mt-1 text-sm" data-i18n="step1_desc">כולל קבוצות אאודי (Audi) וקאדילק (Cadillac) החדשות שנכנסו לסבב במלואן!</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-2" id="teams-grid">
+                <!-- Dynamic Teams Injection -->
+            </div>
+        </section>
+
+        <!-- STEP 2: DRIVER SELECTION -->
+        <section id="step-driver" class="w-full max-w-4xl mx-auto py-4 hidden">
+            <div class="text-center mb-6">
+                <button onclick="goToStep('team')" class="text-sm text-red-400 hover:text-red-300 mb-2 inline-flex items-center gap-1 transition">
+                    <i class="fa-solid fa-arrow-right rtl:rotate-0 ltr:rotate-180"></i> <span data-i18n="btn_back_team">חזרה לקבוצות</span>
+                </button>
+                <div class="inline-block bg-red-600/20 text-red-400 text-xs font-bold tracking-widest px-3 py-1 rounded-full uppercase border border-red-500/30 mb-2" data-i18n="step2_sub">
+                    2026 DRIVER LINEUP
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black italic uppercase tracking-wider text-white" data-i18n="step2_title">בחר נהג מרוצים</h1>
+                <p class="text-gray-400 mt-1 text-sm" id="selected-team-subtitle">קבוצה נבחרה</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4" id="drivers-grid">
+                <!-- Dynamic Drivers Injection -->
+            </div>
+        </section>
+
+        <!-- STEP 3: TRACK SELECTION -->
+        <section id="step-track" class="w-full max-w-6xl mx-auto py-4 hidden">
+            <div class="text-center mb-6">
+                <button onclick="goToStep('driver')" class="text-sm text-red-400 hover:text-red-300 mb-2 inline-flex items-center gap-1 transition">
+                    <i class="fa-solid fa-arrow-right rtl:rotate-0 ltr:rotate-180"></i> <span data-i18n="btn_back_driver">חזרה לנהגים</span>
+                </button>
+                <div class="inline-block bg-red-600/20 text-red-400 text-xs font-bold tracking-widest px-3 py-1 rounded-full uppercase border border-red-500/30 mb-2" data-i18n="step3_sub">
+                    2026 OFFICIAL CIRCUITS
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black italic uppercase tracking-wider text-white" data-i18n="step3_title">בחר מסלול מרוצים</h1>
+                <p class="text-gray-400 mt-1 text-sm" data-i18n="step3_desc">מכיל את המסלול החדש לחלוטין: Madrid GP (MADRING 🇪🇸)</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-2" id="tracks-grid">
+                <!-- Dynamic Tracks Injection -->
+            </div>
+        </section>
+
+        <!-- STEP 4: RACE CANVAS & 2026 HUD SCREEN -->
+        <section id="step-race" class="w-full h-[calc(100vh-80px)] relative overflow-hidden hidden rounded-2xl border border-gray-800 shadow-2xl">
+            <!-- Speed Motion Overlay -->
+            <div class="motion-blur-overlay"></div>
+
+            <!-- Canvas Container -->
+            <div id="canvas-container" class="w-full h-full relative bg-black"></div>
+
+            <!-- Top Broadcast HUD Panel -->
+            <div class="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none z-20">
+                <div class="pointer-events-auto flex items-center gap-3">
+                    <button id="cam-toggle-btn" onclick="toggleCameraView()" class="hud-glass hover:bg-red-600/80 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold text-sm shadow-lg border border-white/20 transition">
+                        <i class="fa-solid fa-camera-retro text-red-400"></i>
+                        <span id="cam-mode-text" data-i18n="cam_chase">מצלמה: מבט קולנועי דרמטי</span>
+                        <span class="bg-white/20 text-xs px-1.5 py-0.5 rounded font-mono">[C]</span>
+                    </button>
+                </div>
+
+                <!-- Position & Leaderboard HUD -->
+                <div class="hud-glass px-6 py-2.5 rounded-2xl text-center shadow-xl">
+                    <div class="text-[10px] uppercase font-bold tracking-widest text-gray-400" data-i18n="hud_pos">מיקום</div>
+                    <div class="text-3xl font-black italic text-yellow-400" id="hud-position">1 / 8</div>
+                </div>
+
+                <!-- Lap Times HUD -->
+                <div class="hud-glass px-6 py-2.5 rounded-2xl text-right shadow-xl">
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-widest text-gray-400" data-i18n="hud_lap">הקפה</div>
+                            <div class="text-xl font-bold italic text-white" id="hud-laps">1 / 3</div>
+                        </div>
+                        <div class="h-7 w-px bg-gray-700"></div>
+                        <div>
+                            <div class="text-[10px] uppercase font-bold tracking-widest text-gray-400" data-i18n="hud_time">זמן הקפה</div>
+                            <div class="text-xl font-mono font-bold text-green-400" id="hud-laptime">00:00.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2026 SPECIFIC REGULATION DASHBOARD (Bottom HUD) -->
+            <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end pointer-events-none z-20">
+                
+                <!-- Speedometer & 2026 Engine Controls -->
+                <div class="hud-glass p-4 rounded-2xl w-80 shadow-2xl pointer-events-auto">
+                    <!-- RPM Lights -->
+                    <div class="flex justify-between gap-1 mb-2" id="rpm-lights">
+                        <div class="h-2 flex-1 rounded bg-gray-800" id="rpm-1"></div>
+                        <div class="h-2 flex-1 rounded bg-gray-800" id="rpm-2"></div>
+                        <div class="h-2 flex-1 rounded bg-gray-800" id="rpm-3"></div>
+                        <div class="h-2 flex-1 rounded bg-gray-800" id="rpm-4"></div>
+                        <div class="h-2 flex-1 rounded bg-gray-800" id="rpm-5"></div>
+                        <div class="h-2 flex-1 rounded bg-gray-800" id="rpm-6"></div>
+                    </div>
+
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-xs font-bold text-gray-400" data-i18n="hud_speed">מהירות</span>
+                        <span class="text-xs font-mono font-bold text-red-400" id="hud-gear">GEAR 1</span>
+                    </div>
+
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-5xl font-black italic tracking-tighter text-white" id="hud-speed">0</span>
+                        <span class="text-xs font-bold text-gray-400" data-i18n="hud_kmh">קמ"ש</span>
+                    </div>
+
+                    <!-- 2026 ACTIVE AERO & OVERTAKE HUD CONTROLS -->
+            <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-gray-800">
+                <!-- Active Aero Indicator (Z-Mode vs X-Mode) -->
+                <div id="hud-aero-box" class="bg-gray-900/90 border border-gray-700 px-2 py-1.5 rounded-lg text-center transition">
+                    <div class="text-[9px] uppercase font-bold text-gray-400">ACTIVE AERO [E]</div>
+                    <div id="hud-aero-mode" class="text-xs font-extrabold text-cyan-400 italic">Z-MODE (CORNER)</div>
+                </div>
+
+                <!-- 2026 Overtake Mode Indicator -->
+                <div id="hud-overtake-box" class="bg-gray-900/90 border border-gray-700 px-2 py-1.5 rounded-lg text-center transition">
+                    <div class="text-[9px] uppercase font-bold text-gray-400">OVERTAKE BOOST [SPACE]</div>
+                    <div id="hud-overtake-status" class="text-xs font-extrabold text-gray-500 italic">READY</div>
+                </div>
+            </div>
+
+            <!-- Battery Charge Level Bar -->
+            <div class="mt-2">
+                <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1">
+                    <span>ERS BATTERY (2026)</span>
+                    <span id="hud-battery-text">100%</span>
+                </div>
+                <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                    <div id="hud-battery-bar" class="bg-cyan-400 h-full w-full transition-all"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Touch Controls for Mobile -->
+        <div class="md:hidden flex flex-col gap-2 pointer-events-auto items-center">
+            <div class="flex gap-2">
+                <button id="btn-up" class="w-12 h-12 bg-red-600/80 text-white rounded-full font-bold flex items-center justify-center shadow-lg"><i class="fa-solid fa-chevron-up"></i></button>
+                <button id="btn-overtake" class="w-12 h-12 bg-purple-600/80 text-white rounded-full font-bold text-xs flex items-center justify-center shadow-lg">BOOST</button>
+                <button id="btn-aero" class="w-12 h-12 bg-cyan-600/80 text-white rounded-full font-bold text-xs flex items-center justify-center shadow-lg">AERO</button>
+            </div>
+            <div class="flex gap-3">
+                <button id="btn-left" class="w-12 h-12 bg-gray-800/80 text-white rounded-full font-bold flex items-center justify-center shadow-lg"><i class="fa-solid fa-chevron-left"></i></button>
+                <button id="btn-down" class="w-12 h-12 bg-gray-800/80 text-white rounded-full font-bold flex items-center justify-center shadow-lg"><i class="fa-solid fa-chevron-down"></i></button>
+                <button id="btn-right" class="w-12 h-12 bg-gray-800/80 text-white rounded-full font-bold flex items-center justify-center shadow-lg"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Minimap Panel -->
+        <div class="hud-glass p-3 rounded-2xl w-40 h-40 shadow-xl flex flex-col items-center justify-center relative pointer-events-auto">
+            <div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest absolute top-2 left-3" data-i18n="hud_map">מפת מסלול</div>
+            <canvas id="minimap-canvas" width="130" height="130" class="mt-2"></canvas>
+        </div>
+    </div>
+
+    <!-- Keys Hint Bar -->
+    <div class="absolute bottom-24 left-1/2 transform -translate-x-1/2 hidden md:flex gap-4 pointer-events-none text-xs text-gray-300 bg-black/75 backdrop-blur-md px-5 py-2 rounded-full border border-gray-700">
+        <span><kbd class="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-600 text-white">W / ↑</kbd> האצה</span>
+        <span><kbd class="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-600 text-white">E</kbd> <span class="text-cyan-400 font-bold">Active Aero (X/Z)</span></span>
+        <span><kbd class="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-600 text-white">SPACE</kbd> <span class="text-pink-400 font-bold">Overtake Boost</span></span>
+        <span><kbd class="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-600 text-white">C</kbd> מצלמה</span>
+    </div>
+
+    <!-- Race Finish Modal -->
+    <div id="race-finish-modal" class="absolute inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 hidden">
+        <div class="hud-glass p-8 rounded-3xl border border-red-500/50 max-w-md w-full text-center space-y-6 shadow-2xl">
+            <div class="text-yellow-400 text-6xl mb-2"><i class="fa-solid fa-trophy"></i></div>
+            <h2 class="text-3xl font-black italic uppercase tracking-wider text-white" data-i18n="modal_finished">המרוץ הסתיים!</h2>
+            
+            <div class="space-y-3 py-2 bg-gray-900/80 rounded-xl p-4 border border-gray-800">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400" data-i18n="modal_pos">מיקום סופי:</span>
+                    <span id="final-position" class="text-2xl font-black text-yellow-400">1/8</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400" data-i18n="modal_time">זמן כולל:</span>
+                    <span id="final-time" class="text-lg font-mono text-green-400">00:00.00</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400" data-i18n="modal_lap">הקפה מהירה:</span>
+                    <span id="final-best-lap" class="text-lg font-mono text-cyan-400">00:00.00</span>
+                </div>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="restartRace()" class="ea-btn-primary flex-1 py-3 font-bold text-white rounded" data-i18n="btn_restart">מרוץ חוזר</button>
+                <button onclick="resetToHome()" class="ea-btn-secondary flex-1 py-3 font-bold text-white rounded" data-i18n="btn_home">תפריט ראשי</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer class="w-full bg-black/90 border-t border-gray-900 py-2.5 text-center text-xs text-gray-500">
+EA SPORTS™ F1® 25: 2026 Season Edition Fan Web Engine &copy; 2026.
+</footer>
+
+<script>
+
+        let cameraAngles = ['cinematic', 'chase', 'cockpit'];
+        let currentCamIndex = 0;
+
+        // --- GLOBAL DATA & APP STATE DEFINITIONS ---
+        let currentLang = 'he';
+
+        const i18n = {
+            he: {
+                official_team: "קבוצה רשמית 2026",
+                btn_select_team: "בחר קבוצה",
+                btn_select_driver: "בחר נהג",
+                btn_select_track: "בחר מסלול",
+                rating: "דירוג:",
+                lbl_team: "קבוצה:",
+                lbl_driver: "נהג:",
+                lbl_track: "מסלול:",
+                btn_home: "תפריט",
+                btn_back_team: "חזרה לקבוצות",
+                btn_back_driver: "חזרה לנהגים",
+                step1_sub: "סגל 2026",
+                step1_title: "בחר קבוצה לעונת 2026",
+                step1_desc: "כולל קבוצות אאודי (Audi) וקאדילק (Cadillac) החדשות שנכנסו לסבב במלואן!",
+                step2_sub: "נהגי עונת 2026",
+                step2_title: "בחר נהג מרוצים",
+                step3_sub: "מסלולים רשמיים 2026",
+                step3_title: "בחר מסלול מרוצים",
+                step3_desc: "מכיל את המסלול החדש לחלוטין: Madrid GP (MADRING 🇪🇸)",
+                cam_chase: "מצלמה: מבט גב",
+                cam_cockpit: "מצלמה: מבט קוקפיט",
+                hud_pos: "מיקום",
+                hud_lap: "הקפה",
+                hud_time: "זמן הקפה",
+                hud_speed: "מהירות",
+                hud_kmh: 'קמ"ש',
+                hud_map: "מפת מסלול",
+                modal_finished: "המרוץ הסתיים!",
+                modal_pos: "מיקום סופי:",
+                modal_time: "זמן כולל:",
+                modal_lap: "הקפה מהירה:",
+                btn_restart: "מרוץ חוזר",
+                length: "אורך:",
+                turns: "פניות:",
+                laps: "הקפות:"
+            },
+            en: {
+                official_team: "OFFICIAL 2026 TEAM",
+                btn_select_team: "SELECT TEAM",
+                btn_select_driver: "SELECT DRIVER",
+                btn_select_track: "SELECT TRACK",
+                rating: "Rating:",
+                lbl_team: "Team:",
+                lbl_driver: "Driver:",
+                lbl_track: "Track:",
+                btn_home: "Menu",
+                btn_back_team: "Back to Teams",
+                btn_back_driver: "Back to Drivers",
+                step1_sub: "2026 GRID PACK",
+                step1_title: "SELECT 2026 TEAM",
+                step1_desc: "Featuring full grid debuts for Audi Sport and Cadillac F1 Team!",
+                step2_sub: "2026 DRIVER LINEUP",
+                step2_title: "SELECT DRIVER",
+                step3_sub: "2026 OFFICIAL CIRCUITS",
+                step3_title: "SELECT RACE CIRCUIT",
+                step3_desc: "Includes the all-new street circuit: Madrid GP (MADRING 🇪🇸)",
+                cam_chase: "Cam: Chase View",
+                cam_cockpit: "Cam: Cockpit View",
+                hud_pos: "POSITION",
+                hud_lap: "LAP",
+                hud_time: "LAP TIME",
+                hud_speed: "SPEED",
+                hud_kmh: "KM/H",
+                hud_map: "TRACK MAP",
+                modal_finished: "RACE FINISHED!",
+                modal_pos: "Final Position:",
+                modal_time: "Total Time:",
+                modal_lap: "Best Lap:",
+                btn_restart: "RESTART RACE",
+                length: "Length:",
+                turns: "Turns:",
+                laps: "Laps:"
+            }
+        };
+
+        const TEAMS_DATA = [
+            {
+                id: 'cadillac',
+                name: 'Cadillac F1 Team',
+                color: '#e5c158',
+                carColor: 0xe5c158,
+                drivers: [
+                    { id: 'perez', name: 'Sergio Perez', number: '11', country: '🇲🇽', skill: 0.88 },
+                    { id: 'zhou', name: 'Guanyu Zhou', number: '24', country: '🇨🇳', skill: 0.84 }
+                ]
+            },
+            {
+                id: 'audi',
+                name: 'Audi Revolut F1 Team',
+                color: '#e10600',
+                carColor: 0xe10600,
+                drivers: [
+                    { id: 'hulkenberg', name: 'Nico Hulkenberg', number: '27', country: '🇩🇪', skill: 0.89 },
+                    { id: 'bortoleto', name: 'Gabriel Bortoleto', number: '5', country: '🇧🇷', skill: 0.86 }
+                ]
+            },
+            {
+                id: 'ferrari',
+                name: 'Scuderia Ferrari HP',
+                color: '#dc0000',
+                carColor: 0xdc0000,
+                drivers: [
+                    { id: 'hamilton', name: 'Lewis Hamilton', number: '44', country: '🇬🇧', skill: 0.96 },
+                    { id: 'leclerc', name: 'Charles Leclerc', number: '16', country: '🇲🇨', skill: 0.95 }
+                ]
+            },
+            {
+                id: 'mclaren',
+                name: 'McLaren F1 Team',
+                color: '#ff8000',
+                carColor: 0xff8000,
+                drivers: [
+                    { id: 'norris', name: 'Lando Norris', number: '4', country: '🇬🇧', skill: 0.94 },
+                    { id: 'piastri', name: 'Oscar Piastri', number: '81', country: '🇦🇺', skill: 0.93 }
+                ]
+            },
+            {
+                id: 'redbull',
+                name: 'Oracle Red Bull Racing',
+                color: '#141432',
+                carColor: 0x141432,
+                drivers: [
+                    { id: 'verstappen', name: 'Max Verstappen', number: '1', country: '🇳🇱', skill: 0.98 },
+                    { id: 'lawson', name: 'Liam Lawson', number: '30', country: '🇳🇿', skill: 0.87 }
+                ]
+            },
+            {
+                id: 'mercedes',
+                name: 'Mercedes-AMG PETRONAS',
+                color: '#00a19c',
+                carColor: 0x00a19c,
+                drivers: [
+                    { id: 'russell', name: 'George Russell', number: '63', country: '🇬🇧', skill: 0.92 },
+                    { id: 'antonelli', name: 'Kimi Antonelli', number: '12', country: '🇮🇹', skill: 0.88 }
+                ]
+            }
+        ];
+
+        const TRACKS_DATA = [
+            { id: 'madring', nameHe: 'Madrid GP - MADRING', nameEn: 'Madrid GP - MADRING', flag: '🇪🇸', difficulty: 'PRO', length: '5.47 km', turns: 20, laps: 3, color: 0x1f2833 },
+            { id: 'monaco', nameHe: 'מונקו - Monte Carlo', nameEn: 'Monaco GP - Monte Carlo', flag: '🇲🇨', difficulty: 'HARD', length: '3.33 km', turns: 19, laps: 3, color: 0x132238 },
+            { id: 'monza', nameHe: 'מונזה - Temple of Speed', nameEn: 'Monza - Temple of Speed', flag: '🇮🇹', difficulty: 'EASY', length: '5.79 km', turns: 11, laps: 3, color: 0x2d3a24 },
+            { id: 'silverstone', nameHe: 'סילברסטון - Silverstone', nameEn: 'Silverstone Circuit', flag: '🇬🇧', difficulty: 'MEDIUM', length: '5.89 km', turns: 18, laps: 3, color: 0x223322 }
+        ];
+
+        let AppState = {
+            selectedTeam: null,
+            selectedDriver: null,
+            selectedTrack: null,
+            isCameraCockpit: false,
+            raceActive: false
+        };
+
+        const gltfLoader = new THREE.GLTFLoader();
+
+        // ניתן להזין כאן קישור ישיר (Direct URL) לקובץ gltf/glb של מכונית F1
+        // לדוגמה: "https://example.com/models/f1_car.glb"
+        const CUSTOM_GLTF_MODEL_URL = ""; 
+
+        /**
+         * טעינת דגם GLTF/GLB מקישור ישיר עם גיבוי לבניית Model ידנית
+         */
+        function loadF1CarModel(url, teamColor, driverNumber, isPlayer = false, callback) {
+            if (url && url.trim() !== "") {
+                gltfLoader.load(
+                    url,
+                    (gltf) => {
+                        const model = gltf.scene;
+                        
+                        // התאמת גודל וסיבוב הדגם שנטען
+                        model.scale.set(1, 1, 1); 
+                        model.traverse((child) => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        });
+
+                        const carGroup = new THREE.Group();
+                        carGroup.add(model);
+                        
+                        if (isPlayer) activeAeroWings = []; // איפוס/הגדרת רכיבים במידת הצורך
+                        
+                        callback(carGroup);
+                    },
+                    (xhr) => {
+                        console.log(`GLTF Loading: ${(xhr.loaded / xhr.total * 100).toFixed(1)}%`);
+                    },
+                    (error) => {
+                        console.warn("GLTF Load failed, falling back to procedural car model:", error);
+                        // גיבוי במידה והטעינה נכשלה
+                        const proceduralCar = createDetailed2026F1Car(teamColor, driverNumber, isPlayer);
+                        callback(proceduralCar);
+                    }
+                );
+            } else {
+                // במידה ולא הוגדר קישור, ניצור את הדגם הפרוצדורלי הרגיל
+                const proceduralCar = createDetailed2026F1Car(teamColor, driverNumber, isPlayer);
+                callback(proceduralCar);
+            }
+        }
+
+        function initApp() {
+            renderTeams();
+            renderTracks();
+            showStep('team');
+            updateI18nText();
+        }
+
+        function renderTeams() {
+            const grid = document.getElementById('teams-grid');
+            if (!grid) return;
+            grid.innerHTML = TEAMS_DATA.map(team => `
+                <div onclick="selectTeam('${team.id}')" class="ea-card p-5 rounded-2xl cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-2 h-full" style="background-color: ${team.color}"></div>
+                    <div>
+                        <span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">${i18n[currentLang].official_team}</span>
+                        <h3 class="text-xl font-black italic uppercase text-white mt-1 group-hover:text-red-400 transition-colors">${team.name}</h3>
+                        <p class="text-xs text-gray-400 mt-2">${team.drivers.map(d => d.name).join(' & ')}</p>
+                    </div>
+                    <div class="mt-6 flex justify-between items-center">
+                        <span class="text-xs font-bold text-red-500 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                            ${i18n[currentLang].btn_select_team} <i class="fa-solid fa-chevron-left rtl:rotate-0 ltr:rotate-180 text-[10px]"></i>
+                        </span>
+                        <div class="w-4 h-4 rounded-full border border-white/20" style="background-color: ${team.color}"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectTeam(teamId) {
+            AppState.selectedTeam = TEAMS_DATA.find(t => t.id === teamId);
+            renderDrivers();
+            goToStep('driver');
+        }
+
+        function renderDrivers() {
+            const grid = document.getElementById('drivers-grid');
+            const subtitle = document.getElementById('selected-team-subtitle');
+            if (!grid || !AppState.selectedTeam) return;
+
+            if (subtitle) subtitle.innerText = AppState.selectedTeam.name;
+
+            grid.innerHTML = AppState.selectedTeam.drivers.map(driver => `
+                <div onclick="selectDriver('${driver.id}')" class="ea-card p-6 rounded-2xl cursor-pointer flex justify-between items-center group">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">${driver.country}</span>
+                            <span class="text-xs font-mono bg-red-600/30 text-red-400 border border-red-500/30 px-2 py-0.5 rounded font-bold">#${driver.number}</span>
+                        </div>
+                        <h3 class="text-2xl font-black italic uppercase text-white group-hover:text-red-400 transition-colors">${driver.name}</h3>
+                        <p class="text-xs text-gray-400">${i18n[currentLang].rating} <span class="text-yellow-400 font-bold">${Math.round(driver.skill * 100)}</span></p>
+                    </div>
+                    <button class="bg-red-600 group-hover:bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-lg">
+                        ${i18n[currentLang].btn_select_driver}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function selectDriver(driverId) {
+            AppState.selectedDriver = AppState.selectedTeam.drivers.find(d => d.id === driverId);
+            goToStep('track');
+        }
+
+        function renderTracks() {
+            const grid = document.getElementById('tracks-grid');
+            if (!grid) return;
+
+            grid.innerHTML = TRACKS_DATA.map(track => {
+                const name = currentLang === 'he' ? track.nameHe : track.nameEn;
+                return `
+                    <div onclick="selectTrack('${track.id}')" class="ea-card p-5 rounded-2xl cursor-pointer flex flex-col justify-between group">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-2xl">${track.flag}</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-500/30">${track.difficulty}</span>
+                            </div>
+                            <h3 class="text-lg font-black italic uppercase text-white group-hover:text-red-400 transition-colors">${name}</h3>
+                            <div class="mt-3 space-y-1 text-xs text-gray-400 font-mono">
+                                <div class="flex justify-between"><span>${i18n[currentLang].length}</span><span class="text-white">${track.length}</span></div>
+                                <div class="flex justify-between"><span>${i18n[currentLang].turns}</span><span class="text-white">${track.turns}</span></div>
+                                <div class="flex justify-between"><span>${i18n[currentLang].laps}</span><span class="text-white">${track.laps}</span></div>
+                            </div>
+                        </div>
+                        <button class="mt-6 w-full bg-white/10 group-hover:bg-red-600 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition-colors border border-white/20 group-hover:border-transparent">
+                            ${i18n[currentLang].btn_select_track}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectTrack(trackId) {
+            AppState.selectedTrack = TRACKS_DATA.find(t => t.id === trackId);
+            goToStep('race');
+        }
+
+        function goToStep(stepName) {
+            showStep(stepName);
+        }
+
+        function resetToHome() {
+            AppState.selectedTeam = null;
+            AppState.selectedDriver = null;
+            AppState.selectedTrack = null;
+            const modal = document.getElementById('race-finish-modal');
+            if (modal) modal.classList.add('hidden');
+            goToStep('team');
+        }
+
+        function updateHeaderState() {
+            const infoContainer = document.getElementById('header-selection-info');
+            if (!infoContainer) return;
+
+            if (AppState.selectedTeam || AppState.selectedDriver || AppState.selectedTrack) {
+                infoContainer.classList.remove('hidden');
+                document.getElementById('info-team-name').innerText = AppState.selectedTeam ? AppState.selectedTeam.name : '-';
+                document.getElementById('info-driver-name').innerText = AppState.selectedDriver ? AppState.selectedDriver.name : '-';
+                document.getElementById('info-track-name').innerText = AppState.selectedTrack ? (currentLang === 'he' ? AppState.selectedTrack.nameHe : AppState.selectedTrack.nameEn) : '-';
+            } else {
+                infoContainer.classList.add('hidden');
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'he' ? 'en' : 'he';
+            const html = document.getElementById('app-html');
+            html.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+            document.getElementById('lang-btn-text').innerText = currentLang === 'he' ? 'English' : 'עברית';
+            updateI18nText();
+            renderTeams();
+            if (AppState.selectedTeam) renderDrivers();
+            renderTracks();
+        }
+
+        function updateI18nText() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerText = i18n[currentLang][key];
+                }
+            });
+        }
+
+        function showStep(stepName) {
+            ['team', 'driver', 'track', 'race'].forEach(s => {
+                const stepEl = document.getElementById(`step-${s}`);
+                if (stepEl) stepEl.classList.add('hidden');
+            });
+
+            const currentStepEl = document.getElementById(`step-${stepName}`);
+            if (currentStepEl) currentStepEl.classList.remove('hidden');
+
+            updateHeaderState();
+
+            if (stepName === 'race') {
+                start3DRace();
+            } else if (AppState.raceActive) {
+                stop3DRace();
+            }
+        }
+
+        function toggleCameraView() {
+            currentCamIndex = (currentCamIndex + 1) % cameraAngles.length;
+            const btnText = document.getElementById('cam-mode-text');
+            if (currentCamIndex === 0) {
+                btnText.innerText = "מצלמה: זווית קולנועית (EA F1 25)";
+                AppState.isCameraCockpit = false;
+            } else if (currentCamIndex === 1) {
+                btnText.innerText = i18n[currentLang].cam_chase;
+                AppState.isCameraCockpit = false;
+            } else {
+                btnText.innerText = i18n[currentLang].cam_cockpit;
+                AppState.isCameraCockpit = true;
+            }
+        }
+
+        function start3DRace() {
+            AppState.raceActive = true;
+            const container = document.getElementById('canvas-container');
+            container.innerHTML = '';
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb); // Realistic Sky Color
+            scene.fog = new THREE.FogExp2(0x87ceeb, 0.001);
+
+            camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 2000);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(width, height);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.25;
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+            scene.add(ambientLight);
+
+            const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.2);
+            sunLight.position.set(250, 400, 180);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 4096;
+            sunLight.shadow.mapSize.height = 4096;
+            sunLight.shadow.camera.near = 0.5;
+            sunLight.shadow.camera.far = 1200;
+            sunLight.shadow.camera.left = -300;
+            sunLight.shadow.camera.right = 300;
+            sunLight.shadow.camera.top = 300;
+            sunLight.shadow.camera.bottom = -300;
+            sunLight.shadow.bias = -0.0001;
+            scene.add(sunLight);
+
+            generateTrackCurve(AppState.selectedTrack.id);
+            buildTrack3D();
+
+            // טעינת רכב השחקן עם תמיכה ב-GLTF
+            loadF1CarModel(CUSTOM_GLTF_MODEL_URL, AppState.selectedTeam.carColor, AppState.selectedDriver.number, true, (carGroup) => {
+                playerMesh = carGroup;
+                scene.add(playerMesh);
+
+                const startPoint = trackCurve.getPointAt(0);
+                const startTangent = trackCurve.getTangentAt(0);
+                playerPhysics.x = startPoint.x;
+                playerPhysics.z = startPoint.z;
+                playerPhysics.angle = Math.atan2(startTangent.x, startTangent.z);
+                playerPhysics.speed = 0;
+                playerPhysics.progress = 0;
+                playerPhysics.lap = 1;
+                playerPhysics.batteryCharge = 100;
+                playerPhysics.lapStartTime = Date.now();
+            });
+
+            createAIOpponents();
+
+            const minimapCanvas = document.getElementById('minimap-canvas');
+            minimapCtx = minimapCanvas.getContext('2d');
+
+            window.addEventListener('resize', onWindowResize);
+            animateRace();
+        }
+
+        function buildTrack3D() {
+            const trackWidth = 24;
+            const numSegments = 600;
+            
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const kerbPositions = [];
+
+            for (let i = 0; i <= numSegments; i++) {
+                const t = i / numSegments;
+                const point = trackCurve.getPointAt(t);
+                const tangent = trackCurve.getTangentAt(t);
+                const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+
+                const leftPoint = point.clone().add(normal.clone().multiplyScalar(trackWidth / 2));
+                const rightPoint = point.clone().add(normal.clone().multiplyScalar(-trackWidth / 2));
+
+                positions.push(leftPoint.x, leftPoint.y, leftPoint.z);
+                positions.push(rightPoint.x, rightPoint.y, rightPoint.z);
+
+                // High Resolution Kerbs (Red/White/Yellow Apex Curbs)
+                const kerbLeftOuter = leftPoint.clone().add(normal.clone().multiplyScalar(2.2));
+                const kerbRightOuter = rightPoint.clone().add(normal.clone().multiplyScalar(-2.2));
+
+                kerbPositions.push(leftPoint.x, 0.08, leftPoint.z);
+                kerbPositions.push(kerbLeftOuter.x, 0.08, kerbLeftOuter.z);
+                kerbPositions.push(rightPoint.x, 0.08, rightPoint.z);
+                kerbPositions.push(kerbRightOuter.x, 0.08, kerbRightOuter.z);
+            }
+
+            const indices = [];
+            const kerbIndices = [];
+            for (let i = 0; i < numSegments; i++) {
+                const r1 = i * 2, r2 = (i + 1) * 2;
+                indices.push(r1, r2, r1 + 1);
+                indices.push(r1 + 1, r2, r2 + 1);
+
+                const k1 = i * 4, k2 = (i + 1) * 4;
+                kerbIndices.push(k1, k2, k1 + 1);
+                kerbIndices.push(k1 + 1, k2, k2 + 1);
+                kerbIndices.push(k1 + 2, k2 + 2, k1 + 3);
+                kerbIndices.push(k1 + 3, k2 + 2, k2 + 3);
+            }
+
+            geometry.setIndex(indices);
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.computeVertexNormals();
+
+            const trackMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ 
+                color: 0x1a1d24, 
+                roughness: 0.45,
+                metalness: 0.2 
+            }));
+            trackMesh.receiveShadow = true;
+            scene.add(trackMesh);
+
+            const kerbGeometry = new THREE.BufferGeometry();
+            kerbGeometry.setIndex(kerbIndices);
+            kerbGeometry.setAttribute('position', new THREE.Float32BufferAttribute(kerbPositions, 3));
+            kerbGeometry.computeVertexNormals();
+
+            const kerbMesh = new THREE.Mesh(kerbGeometry, new THREE.MeshStandardMaterial({
+                color: 0xe10600,
+                roughness: 0.3
+            }));
+            scene.add(kerbMesh);
+
+            // Ground Grass / City Surface
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(3000, 3000),
+                new THREE.MeshStandardMaterial({ color: 0x223322, roughness: 0.9 })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -0.2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Sponsor Banners (Lenovo, EA SPORTS) and Safety Catch Fences
+            for (let i = 0; i < numSegments; i += 8) {
+                const t = i / numSegments;
+                const point = trackCurve.getPointAt(t);
+                const tangent = trackCurve.getTangentAt(t);
+                const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+
+                const barrierPos = point.clone().add(normal.clone().multiplyScalar(-trackWidth / 2 - 3.0));
+                
+                // Outer Concrete Barrier with Sponsors
+                const barrierColor = (i % 32 === 0) ? 0xe10600 : (i % 16 === 0 ? 0xffffff : 0x002288);
+                const barrier = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.8, 1.8, 9),
+                    new THREE.MeshStandardMaterial({ color: barrierColor, roughness: 0.3, metalness: 0.2 })
+                );
+                barrier.position.set(barrierPos.x, 0.9, barrierPos.z);
+                barrier.rotation.y = Math.atan2(tangent.x, tangent.z);
+                barrier.castShadow = true;
+                barrier.receiveShadow = true;
+                scene.add(barrier);
+            }
+        }
+
+        function createDetailed2026F1Car(teamColor, driverNumber, isPlayer = false) {
+            const carGroup = new THREE.Group();
+
+            const bodyMat = new THREE.MeshStandardMaterial({ 
+                color: teamColor, 
+                metalness: 0.9, 
+                roughness: 0.1,
+                envMapIntensity: 1.5 
+            });
+            const carbonMat = new THREE.MeshStandardMaterial({ color: 0x0d0f12, roughness: 0.2, metalness: 0.8 });
+            const tireMat = new THREE.MeshStandardMaterial({ color: 0x111215, roughness: 0.9 });
+            const rimMat = new THREE.MeshStandardMaterial({ color: 0x151820, metalness: 0.95, roughness: 0.05 });
+            
+            // Helmet: Neon Yellow/Green Visor as seen in Cadillac F1 #11 Artwork!
+            const helmetMat = new THREE.MeshStandardMaterial({ 
+                color: 0xccff00, 
+                roughness: 0.1, 
+                metalness: 0.5,
+                emissive: 0x334400,
+                emissiveIntensity: 0.3
+            });
+
+            // Sleek Aerodynamic Body
+            const body = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.45, 3.4), bodyMat);
+            body.position.set(0, 0.4, 0);
+            body.castShadow = true;
+            carGroup.add(body);
+
+            // Engine Cover & Dorsal Shark Fin
+            const fin = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.65, 1.6), bodyMat);
+            fin.position.set(0, 0.75, -0.5);
+            fin.castShadow = true;
+            carGroup.add(fin);
+
+            // Extended 2026 Nosecone
+            const nose = new THREE.Mesh(new THREE.ConeGeometry(0.38, 2.1, 12), bodyMat);
+            nose.rotation.x = Math.PI / 2;
+            nose.position.set(0, 0.35, 2.2);
+            nose.castShadow = true;
+            carGroup.add(nose);
+
+            // Complex 2026 Front Wing Elements
+            const fWingBase = new THREE.Mesh(new THREE.BoxGeometry(2.45, 0.05, 0.7), carbonMat);
+            fWingBase.position.set(0, 0.16, 2.95);
+            fWingBase.castShadow = true;
+            carGroup.add(fWingBase);
+
+            const fWingEndplateL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.4, 0.8), bodyMat);
+            fWingEndplateL.position.set(-1.22, 0.28, 2.95);
+            carGroup.add(fWingEndplateL);
+
+            const fWingEndplateR = fWingEndplateL.clone();
+            fWingEndplateR.position.x = 1.22;
+            carGroup.add(fWingEndplateR);
+
+            // Active DRS Rear Wing
+            const rWingFlap = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.1, 0.6), carbonMat);
+            rWingFlap.position.set(0, 1.15, -1.7);
+            rWingFlap.castShadow = true;
+            carGroup.add(rWingFlap);
+
+            if (isPlayer) activeAeroWings.push(rWingFlap);
+
+            // Cockpit & Fluorescent Driver Helmet
+            const halo = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.05, 10, 20, Math.PI), carbonMat);
+            halo.rotation.x = -Math.PI / 2;
+            halo.position.set(0, 0.76, 0.3);
+            carGroup.add(halo);
+
+            const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.22, 20, 20), helmetMat);
+            helmet.position.set(0, 0.68, 0.12);
+            carGroup.add(helmet);
+
+            // Wheels & Rim Covers
+            const tireGeo = new THREE.CylinderGeometry(0.52, 0.52, 0.45, 32);
+            const rimCapGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.46, 24);
+
+            const wheelPositions = [
+                { x: -1.15, y: 0.52, z: 1.4 },
+                { x: 1.15, y: 0.52, z: 1.4 },
+                { x: -1.15, y: 0.52, z: -1.3 },
+                { x: 1.15, y: 0.52, z: -1.3 }
+            ];
+
+            wheelPositions.forEach(p => {
+                const pivot = new THREE.Group();
+                pivot.position.set(p.x, p.y, p.z);
+
+                const tire = new THREE.Mesh(tireGeo, tireMat);
+                tire.rotation.z = Math.PI / 2;
+                tire.castShadow = true;
+                pivot.add(tire);
+
+                const rimCap = new THREE.Mesh(rimCapGeo, rimMat);
+                rimCap.rotation.z = Math.PI / 2;
+                pivot.add(rimCap);
+
+                carGroup.add(pivot);
+        });
+
+        return carGroup;
+    }
+
+    // --- THREE.JS GRAPHICS & 2026 ACTIVE AERO PHYSICS ENGINE ---
+    let scene, camera, renderer;
+    let playerMesh, playerSteeringWheelMesh;
+    let activeAeroWings = [];
+    let aiCars = [];
+    let trackCurve;
+    let trackPathPoints = [];
+
+    let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, s: false, a: false, d: false, e: false, ' ': false };
+
+        // 2026 Physics State
+        let playerPhysics = {
+            speed: 0,
+            baseMaxSpeed: 1.25,
+            maxSpeed: 1.25,
+            accel: 0.02,
+            decel: 0.022,
+            brakePower: 0.04,
+            friction: 0.007,
+            angle: 0,
+            x: 0,
+            z: 0,
+            lap: 1,
+            lapStartTime: 0,
+            bestLapTime: Infinity,
+            progress: 0,
+            offTrack: false,
+            // 2026 REGULATION FEATURES
+            activeAeroMode: 'Z-MODE', // 'Z-MODE' (High Downforce) or 'X-Mode' (Low Drag Straight)
+            overtakeActive: false,
+            batteryCharge: 100
+        };
+
+        let minimapCtx;
+
+        function start3DRace() {
+            AppState.raceActive = true;
+            const container = document.getElementById('canvas-container');
+            container.innerHTML = '';
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x060911);
+            scene.fog = new THREE.FogExp2(0x060911, 0.0016);
+
+            camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 1500);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(width, height);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // Lighting setup
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xfffaed, 1.4);
+            dirLight.position.set(160, 260, 100);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 2048;
+            dirLight.shadow.mapSize.height = 2048;
+            scene.add(dirLight);
+
+            generateTrackCurve(AppState.selectedTrack.id);
+            buildTrack3D();
+
+        playerMesh = createDetailed2026F1Car(AppState.selectedTeam.carColor, AppState.selectedDriver.number, true);
+        scene.add(playerMesh);
+
+        const startPoint = trackCurve.getPointAt(0);
+        const startTangent = trackCurve.getTangentAt(0);
+        playerPhysics.x = startPoint.x;
+        playerPhysics.z = startPoint.z;
+        playerPhysics.angle = Math.atan2(startTangent.x, startTangent.z);
+        playerPhysics.speed = 0;
+        playerPhysics.progress = 0;
+        playerPhysics.lap = 1;
+        playerPhysics.batteryCharge = 100;
+        playerPhysics.lapStartTime = Date.now();
+
+        createAIOpponents();
+
+        const minimapCanvas = document.getElementById('minimap-canvas');
+        minimapCtx = minimapCanvas.getContext('2d');
+
+        window.addEventListener('resize', onWindowResize);
+        animateRace();
+    }
+
+    function stop3DRace() {
+        AppState.raceActive = false;
+        window.removeEventListener('resize', onWindowResize);
+    }
+
+    function onWindowResize() {
+        const container = document.getElementById('canvas-container');
+        if (!container || !renderer || !camera) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    function generateTrackCurve(trackId) {
+        let points = [];
+
+        if (trackId === 'madring') {
+            // 2026 All-New Spanish GP - MADRING Circuit
+            points = [
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(180, 0, 10),
+                new THREE.Vector3(260, 0, 110),
+                new THREE.Vector3(220, 0, 240),
+                new THREE.Vector3(120, 0, 290),
+                new THREE.Vector3(-40, 0, 260),
+                new THREE.Vector3(-140, 0, 180),
+                new THREE.Vector3(-200, 0, 60),
+                new THREE.Vector3(-110, 0, -50)
+            ];
+        } else if (trackId === 'monaco') {
+            points = [
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(140, 0, 20),
+                new THREE.Vector3(200, 0, 160),
+                new THREE.Vector3(130, 0, 240),
+                new THREE.Vector3(50, 0, 210),
+                new THREE.Vector3(20, 0, 170),
+                new THREE.Vector3(70, 0, 100),
+                new THREE.Vector3(180, 0, 40),
+                new THREE.Vector3(-40, 0, -70)
+            ];
+        } else if (trackId === 'monza') {
+            points = [
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(450, 0, 0),
+                new THREE.Vector3(500, 0, 60),
+                new THREE.Vector3(420, 0, 140),
+                new THREE.Vector3(250, 0, 220),
+                new THREE.Vector3(-80, 0, 120),
+                new THREE.Vector3(-100, 0, 30)
+            ];
+        } else {
+            // Silverstone
+            points = [
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(220, 0, -30),
+                new THREE.Vector3(300, 0, 90),
+                new THREE.Vector3(200, 0, 240),
+                new THREE.Vector3(-140, 0, 190),
+                new THREE.Vector3(-180, 0, 60)
+            ];
+        }
+
+        trackCurve = new THREE.CatmullRomCurve3(points, true, 'centripetal', 0.5);
+        trackPathPoints = trackCurve.getPoints(300);
+    }
+
+    function buildTrack3D() {
+        const trackWidth = 22;
+        const numSegments = 500;
+        
+        // Asphalt Track Geometry
+        const geometry = new THREE.BufferGeometry();
+        const positions = [];
+        const uvs = [];
+
+        // Kerbs (Red/Yellow/White Apexes as seen in F1 25 promo)
+        const kerbGeometry = new THREE.BufferGeometry();
+        const kerbPositions = [];
+
+        for (let i = 0; i <= numSegments; i++) {
+            const t = i / numSegments;
+            const point = trackCurve.getPointAt(t);
+            const tangent = trackCurve.getTangentAt(t);
+            const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+
+            const leftPoint = point.clone().add(normal.clone().multiplyScalar(trackWidth / 2));
+            const rightPoint = point.clone().add(normal.clone().multiplyScalar(-trackWidth / 2));
+
+            positions.push(leftPoint.x, leftPoint.y, leftPoint.z);
+            positions.push(rightPoint.x, rightPoint.y, rightPoint.z);
+
+            // Red/Yellow/White Racing Kerbs
+            const kerbLeftOuter = leftPoint.clone().add(normal.clone().multiplyScalar(1.8));
+            const kerbRightOuter = rightPoint.clone().add(normal.clone().multiplyScalar(-1.8));
+
+            kerbPositions.push(leftPoint.x, 0.05, leftPoint.z);
+            kerbPositions.push(kerbLeftOuter.x, 0.05, kerbLeftOuter.z);
+            kerbPositions.push(rightPoint.x, 0.05, rightPoint.z);
+            kerbPositions.push(kerbRightOuter.x, 0.05, kerbRightOuter.z);
+        }
+
+        const indices = [];
+        const kerbIndices = [];
+        for (let i = 0; i < numSegments; i++) {
+            const r1 = i * 2, r2 = (i + 1) * 2;
+            indices.push(r1, r2, r1 + 1);
+            indices.push(r1 + 1, r2, r2 + 1);
+
+            const k1 = i * 4, k2 = (i + 1) * 4;
+            // Left Kerb
+            kerbIndices.push(k1, k2, k1 + 1);
+            kerbIndices.push(k1 + 1, k2, k2 + 1);
+            // Right Kerb
+            kerbIndices.push(k1 + 2, k2 + 2, k1 + 3);
+            kerbIndices.push(k1 + 3, k2 + 2, k2 + 3);
+        }
+
+        geometry.setIndex(indices);
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.computeVertexNormals();
+
+        const trackMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ 
+            color: 0x1f232b, 
+            roughness: 0.6,
+            metalness: 0.1 
+        }));
+        trackMesh.receiveShadow = true;
+        scene.add(trackMesh);
+
+        // Kerbs Mesh (F1 2026 Red/Yellow/White kerbs)
+        kerbGeometry.setIndex(kerbIndices);
+        kerbGeometry.setAttribute('position', new THREE.Float32BufferAttribute(kerbPositions, 3));
+        kerbGeometry.computeVertexNormals();
+        const kerbMesh = new THREE.Mesh(kerbGeometry, new THREE.MeshStandardMaterial({
+            color: 0xe10600,
+            roughness: 0.4
+        }));
+        scene.add(kerbMesh);
+
+        // Ground Environment Surface
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(2200, 2200),
+            new THREE.MeshStandardMaterial({ color: AppState.selectedTrack.color || 0x111620, roughness: 0.9 })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.15;
+        scene.add(ground);
+
+        // Safety Barriers and Sponsor Banners along track (EA SPORTS, LENOVO style)
+        for (let i = 0; i < numSegments; i += 12) {
+            const t = i / numSegments;
+            const point = trackCurve.getPointAt(t);
+            const tangent = trackCurve.getTangentAt(t);
+            const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+
+            // Right Safety Concrete Barrier
+            const barrierPos = point.clone().add(normal.clone().multiplyScalar(-trackWidth / 2 - 2.5));
+            const barrier = new THREE.Mesh(
+                new THREE.BoxGeometry(0.8, 1.4, 8),
+                new THREE.MeshStandardMaterial({ color: (i % 24 === 0) ? 0xe10600 : 0xffffff, roughness: 0.5 })
+            );
+            barrier.position.set(barrierPos.x, 0.7, barrierPos.z);
+            barrier.rotation.y = Math.atan2(tangent.x, tangent.z);
+            scene.add(barrier);
+        }
+    }
+
+    // --- 2026 SPEC F1 CAR MESH (Detailed 2026 Regulation Model matching the EA F1 25 Artwork) ---
+    function createDetailed2026F1Car(teamColor, driverNumber, isPlayer = false) {
+        const carGroup = new THREE.Group();
+
+        // High gloss metallic materials for EA SPORTS F1 25 Look
+        const bodyMat = new THREE.MeshStandardMaterial({ color: teamColor, metalness: 0.85, roughness: 0.15 });
+        const carbonMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0c, roughness: 0.3, metalness: 0.5 });
+        const tireMat = new THREE.MeshStandardMaterial({ color: 0x111113, roughness: 0.95 });
+        const rimMat = new THREE.MeshStandardMaterial({ color: 0x1f242e, metalness: 0.9, roughness: 0.1 });
+        const rimAccentMat = new THREE.MeshStandardMaterial({ color: 0xe10600, metalness: 0.8, roughness: 0.2 });
+        const helmetMat = new THREE.MeshStandardMaterial({ color: isPlayer ? 0xccff00 : 0xffffff, metalness: 0.3, roughness: 0.2 });
+
+        // 1. Sleek 2026 Chassis Body
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.42, 3.2), bodyMat);
+        body.position.set(0, 0.38, 0);
+        body.castShadow = true;
+        carGroup.add(body);
+
+        // Engine Cover Fin (Shark Fin 2026)
+        const fin = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.5, 1.4), bodyMat);
+        fin.position.set(0, 0.7, -0.6);
+        carGroup.add(fin);
+
+        // 2. Complex Aerodynamic 2026 Front Nosecone
+        const nose = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.9, 8), bodyMat);
+        nose.rotation.x = Math.PI / 2;
+        nose.position.set(0, 0.32, 2.1);
+        carGroup.add(nose);
+
+        // Front Wing Complex Flaps (Matching Cadillac white/black front wing in promo image)
+        const fWingBase = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.04, 0.6), carbonMat);
+        fWingBase.position.set(0, 0.15, 2.7);
+        carGroup.add(fWingBase);
+
+        const fWingEndplateL = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.35, 0.7), bodyMat);
+        fWingEndplateL.position.set(-1.15, 0.25, 2.7);
+        carGroup.add(fWingEndplateL);
+
+        const fWingEndplateR = fWingEndplateL.clone();
+        fWingEndplateR.position.x = 1.15;
+        carGroup.add(fWingEndplateR);
+
+        // 3. 2026 Active Rear Wing Flap
+        const rWingPillars = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.6, 0.3), carbonMat);
+        rWingPillars.position.set(0, 0.8, -1.6);
+        carGroup.add(rWingPillars);
+
+        const rWingFlap = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.08, 0.55), carbonMat);
+        rWingFlap.position.set(0, 1.1, -1.65);
+        carGroup.add(rWingFlap);
+
+        if (isPlayer) {
+            activeAeroWings.push(rWingFlap);
+        }
+
+        // 4. Driver Cockpit, HALO Structure & Fluorescent Helmet (As seen in F1 25 cover)
+        const halo = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.045, 8, 16, Math.PI), carbonMat);
+        halo.rotation.x = -Math.PI / 2;
+        halo.position.set(0, 0.72, 0.25);
+        carGroup.add(halo);
+
+        const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), helmetMat);
+        helmet.position.set(0, 0.65, 0.1);
+        carGroup.add(helmet);
+
+        // 5. 2026 Low Profile Wheels with Wheel Covers (F1 25 Style)
+        const tireGeo = new THREE.CylinderGeometry(0.48, 0.48, 0.42, 24);
+        const rimCapGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.43, 18);
+
+        const wheelPositions = [
+            { x: -1.1, y: 0.48, z: 1.3, steer: true },
+            { x: 1.1, y: 0.48, z: 1.3, steer: true },
+            { x: -1.1, y: 0.48, z: -1.2, steer: false },
+            { x: 1.1, y: 0.48, z: -1.2, steer: false }
+        ];
+
+        carGroup.wheels = [];
+        wheelPositions.forEach(p => {
+            const pivot = new THREE.Group();
+            pivot.position.set(p.x, p.y, p.z);
+            
+            const tire = new THREE.Mesh(tireGeo, tireMat);
+            tire.rotation.z = Math.PI / 2;
+            tire.castShadow = true;
+            pivot.add(tire);
+
+            const rimCap = new THREE.Mesh(rimCapGeo, rimMat);
+            rimCap.rotation.z = Math.PI / 2;
+            pivot.add(rimCap);
+
+            carGroup.add(pivot);
+            if (p.steer) carGroup.wheels.push(pivot);
+        });
+
+        if (isPlayer) {
+            const wheelShape = new THREE.BoxGeometry(0.48, 0.28, 0.08);
+            playerSteeringWheelMesh = new THREE.Mesh(wheelShape, carbonMat);
+            playerSteeringWheelMesh.position.set(0, 0.66, 0.38);
+            carGroup.add(playerSteeringWheelMesh);
+        }
+
+        return carGroup;
+    }
+
+    function createAIOpponents() {
+        aiCars = [];
+        let opponentTeams = TEAMS_DATA.filter(t => t.id !== AppState.selectedTeam.id);
+
+        for (let i = 0; i < 7; i++) {
+            let team = opponentTeams[i % opponentTeams.length];
+            let driver = team.drivers[i % 2];
+
+            let carMesh = createDetailed2026F1Car(team.carColor, driver.number, false);
+            scene.add(carMesh);
+
+            let startProgress = 0.98 - (i * 0.025);
+            if (startProgress < 0) startProgress += 1;
+
+            aiCars.push({
+                mesh: carMesh,
+                driver: driver,
+                progress: startProgress,
+                speed: 0.00065 + (driver.skill * 0.00025),
+                lap: 1,
+                x: 0,
+                z: 0
+            });
+        }
+    }
+
+    // --- KEY LISTENERS FOR 2026 ACTIVE AERO & OVERTAKE ---
+    window.addEventListener('keydown', e => {
+        if (e.key === 'e' || e.key === 'E') {
+            playerPhysics.activeAeroMode = playerPhysics.activeAeroMode === 'Z-MODE' ? 'X-MODE' : 'Z-MODE';
+            updateAeroUI();
+        }
+        if (e.key === ' ') {
+            playerPhysics.overtakeActive = true;
+        }
+        if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.key.toLowerCase())) {
+            keys[e.key] = true;
+            keys[e.key.toLowerCase()] = true;
+        }
+    });
+
+    window.addEventListener('keyup', e => {
+        if (e.key === ' ') {
+            playerPhysics.overtakeActive = false;
+        }
+        if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.key.toLowerCase())) {
+            keys[e.key] = false;
+            keys[e.key.toLowerCase()] = false;
+        }
+    });
+
+    function updateAeroUI() {
+        const modeEl = document.getElementById('hud-aero-mode');
+        const boxEl = document.getElementById('hud-aero-box');
+        if (playerPhysics.activeAeroMode === 'X-MODE') {
+            modeEl.innerText = 'X-MODE (LOW DRAG)';
+            modeEl.className = 'text-xs font-extrabold text-green-400 italic';
+            boxEl.classList.add('mode-active');
+        } else {
+            modeEl.innerText = 'Z-MODE (CORNERING)';
+            modeEl.className = 'text-xs font-extrabold text-cyan-400 italic';
+            boxEl.classList.remove('mode-active');
+        }
+    }
+
+    function updatePlayerPhysics() {
+        if (!playerMesh) return; // הגנה במידה והדגם עוד בלמידה מ-GLTF
+
+        if (playerPhysics.activeAeroMode === 'X-MODE') {
+            playerPhysics.maxSpeed = playerPhysics.baseMaxSpeed * 1.20;
+        } else {
+            playerPhysics.maxSpeed = playerPhysics.baseMaxSpeed;
+        }
+
+        let boostFactor = 1.0;
+        if (playerPhysics.overtakeActive && playerPhysics.batteryCharge > 0) {
+            boostFactor = 1.35;
+            playerPhysics.batteryCharge = Math.max(0, playerPhysics.batteryCharge - 0.4);
+            document.getElementById('hud-overtake-box').classList.add('overtake-active');
+        } else {
+            document.getElementById('hud-overtake-box').classList.remove('overtake-active');
+            if (keys.ArrowDown || keys.s || playerPhysics.speed < 0.2) {
+                playerPhysics.batteryCharge = Math.min(100, playerPhysics.batteryCharge + 0.15);
+            }
+        }
+
+        if (keys.ArrowUp || keys.w) {
+            const targetMax = playerPhysics.maxSpeed * boostFactor;
+            playerPhysics.speed = Math.min(playerPhysics.speed + playerPhysics.accel * boostFactor, targetMax);
+        } else if (keys.ArrowDown || keys.s) {
+            playerPhysics.speed = Math.max(playerPhysics.speed - playerPhysics.brakePower, -playerPhysics.maxSpeed * 0.2);
+        } else {
+            if (playerPhysics.speed > 0) playerPhysics.speed = Math.max(0, playerPhysics.speed - playerPhysics.friction);
+        }
+
+        const grip = playerPhysics.activeAeroMode === 'Z-MODE' ? 1.25 : 0.85;
+        const steerFactor = 0.042 * grip * (1 - (playerPhysics.speed / (playerPhysics.maxSpeed * 2.5)));
+
+        if (keys.ArrowLeft || keys.a) playerPhysics.angle += steerFactor;
+        if (keys.ArrowRight || keys.d) playerPhysics.angle -= steerFactor;
+
+        playerPhysics.x += Math.sin(playerPhysics.angle) * playerPhysics.speed * 2.6;
+        playerPhysics.z += Math.cos(playerPhysics.angle) * playerPhysics.speed * 2.6;
+
+        playerMesh.position.set(playerPhysics.x, 0, playerPhysics.z);
+        playerMesh.rotation.y = playerPhysics.angle;
+
+        activeAeroWings.forEach(wing => {
+            wing.rotation.x = playerPhysics.activeAeroMode === 'X-MODE' ? -Math.PI / 6 : 0;
+        });
+
+        updateTrackProgress();
+    }
+
+    function updateTrackProgress() {
+        let minDistance = Infinity;
+        let closestT = 0;
+
+        for (let i = 0; i <= 150; i++) {
+            let t = i / 150;
+            let pt = trackCurve.getPointAt(t);
+            let dist = Math.hypot(pt.x - playerPhysics.x, pt.z - playerPhysics.z);
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestT = t;
+            }
+        }
+
+        if (playerPhysics.progress > 0.9 && closestT < 0.1) {
+            playerPhysics.lap++;
+            const lapTime = (Date.now() - playerPhysics.lapStartTime) / 1000;
+            if (lapTime < playerPhysics.bestLapTime) playerPhysics.bestLapTime = lapTime;
+            playerPhysics.lapStartTime = Date.now();
+
+            if (playerPhysics.lap > AppState.selectedTrack.laps) {
+                finishRace();
+            }
+        }
+        playerPhysics.progress = closestT;
+    }
+
+    function updateAIOpponents() {
+        aiCars.forEach((ai) => {
+            ai.progress += ai.speed;
+            if (ai.progress >= 1) {
+                ai.progress -= 1;
+                ai.lap++;
+            }
+
+            const pt = trackCurve.getPointAt(ai.progress);
+            const tangent = trackCurve.getTangentAt(ai.progress);
+
+            ai.x = pt.x;
+            ai.z = pt.z;
+            ai.mesh.position.set(pt.x, 0, pt.z);
+            ai.mesh.rotation.y = Math.atan2(tangent.x, tangent.z);
+        });
+    }
+
+    function calculateRacePositions() {
+        let competitors = [
+            { id: 'player', name: AppState.selectedDriver.name, score: (playerPhysics.lap - 1) + playerPhysics.progress },
+            ...aiCars.map((ai, index) => ({ id: `ai_${index}`, name: ai.driver.name, score: (ai.lap - 1) + ai.progress }))
+        ];
+        competitors.sort((a, b) => b.score - a.score);
+        let playerRank = competitors.findIndex(c => c.id === 'player') + 1;
+        document.getElementById('hud-position').innerText = `${playerRank} / ${competitors.length}`;
+    }
+
+    function updateCamera() {
+        if (AppState.isCameraCockpit) {
+            const camOffset = new THREE.Vector3(0, 0.72, 0.12).applyAxisAngle(new THREE.Vector3(0, 1, 0), playerPhysics.angle);
+            camera.position.copy(playerMesh.position).add(camOffset);
+            const lookTarget = playerMesh.position.clone().add(
+                new THREE.Vector3(Math.sin(playerPhysics.angle) * 12, 0.72, Math.cos(playerPhysics.angle) * 12)
+            );
+            camera.lookAt(lookTarget);
+        } else {
+            // Low Angle Dynamic Broadcast Orbit Cam matching EA F1 25 Artwork Style
+            const followDist = 7.5;
+            const camX = playerPhysics.x - Math.sin(playerPhysics.angle - 0.2) * followDist;
+            const camZ = playerPhysics.z - Math.cos(playerPhysics.angle - 0.2) * followDist;
+            camera.position.set(camX, 2.2, camZ);
+            camera.lookAt(playerPhysics.x, 0.7, playerPhysics.z);
+        }
+    }
+
+    function updateHUD() {
+        const speedKmh = Math.round(Math.abs(playerPhysics.speed) * 315);
+        document.getElementById('hud-speed').innerText = speedKmh;
+
+        const gear = speedKmh === 0 ? 'N' : `GEAR ${Math.min(8, Math.floor(speedKmh / 38) + 1)}`;
+        document.getElementById('hud-gear').innerText = gear;
+
+        const rpmPercent = Math.min(100, (speedKmh / 320) * 100);
+        for (let i = 1; i <= 6; i++) {
+            const light = document.getElementById(`rpm-${i}`);
+            if (rpmPercent > i * 15) {
+                light.style.backgroundColor = i > 4 ? '#ff0055' : (i > 2 ? '#ffcc00' : '#00ff88');
+            } else {
+                light.style.backgroundColor = '#1f2937';
+            }
+        }
+
+        document.getElementById('hud-battery-text').innerText = `${Math.round(playerPhysics.batteryCharge)}%`;
+        document.getElementById('hud-battery-bar').style.width = `${playerPhysics.batteryCharge}%`;
+
+        document.getElementById('hud-laps').innerText = `${Math.min(playerPhysics.lap, AppState.selectedTrack.laps)} / ${AppState.selectedTrack.laps}`;
+
+        const elapsedSec = ((Date.now() - playerPhysics.lapStartTime) / 1000).toFixed(2);
+        document.getElementById('hud-laptime').innerText = formatTime(elapsedSec);
+
+        drawMinimap();
+    }
+
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = (seconds % 60).toFixed(2);
+        return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function drawMinimap() {
+        if (!minimapCtx) return;
+        const w = minimapCtx.canvas.width;
+        const h = minimapCtx.canvas.height;
+        minimapCtx.clearRect(0, 0, w, h);
+
+        minimapCtx.save();
+        minimapCtx.translate(w / 2, h / 2);
+        minimapCtx.scale(0.3, 0.3);
+
+        minimapCtx.beginPath();
+        minimapCtx.strokeStyle = '#444455';
+        minimapCtx.lineWidth = 14;
+
+        trackPathPoints.forEach((pt, index) => {
+            if (index === 0) minimapCtx.moveTo(pt.x, pt.z);
+            else minimapCtx.lineTo(pt.x, pt.z);
+        });
+        minimapCtx.closePath();
+        minimapCtx.stroke();
+
+        aiCars.forEach(ai => {
+            minimapCtx.beginPath();
+            minimapCtx.fillStyle = '#ff3355';
+            minimapCtx.arc(ai.x, ai.z, 7, 0, Math.PI * 2);
+            minimapCtx.fill();
+        });
+
+        minimapCtx.beginPath();
+        minimapCtx.fillStyle = '#00ffaa';
+        minimapCtx.arc(playerPhysics.x, playerPhysics.z, 9, 0, Math.PI * 2);
+        minimapCtx.fill();
+
+        minimapCtx.restore();
+    }
+
+    function animateRace() {
+        if (!AppState.raceActive) return;
+        requestAnimationFrame(animateRace);
+
+        updatePlayerPhysics();
+        updateAIOpponents();
+        calculateRacePositions();
+        updateCamera();
+        updateHUD();
+
+        renderer.render(scene, camera);
+    }
+
+    function finishRace() {
+        AppState.raceActive = false;
+        const modal = document.getElementById('race-finish-modal');
+        document.getElementById('final-position').innerText = document.getElementById('hud-position').innerText;
+        document.getElementById('final-best-lap').innerText = playerPhysics.bestLapTime === Infinity ? '--:--' : formatTime(playerPhysics.bestLapTime);
+        modal.classList.remove('hidden');
+    }
+
+    function restartRace() {
+        document.getElementById('race-finish-modal').classList.add('hidden');
+        start3DRace();
+    }
+
+    window.onload = () => {
+        initApp();
+    };
+</script>
+</body>
+</html>

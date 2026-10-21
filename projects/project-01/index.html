@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מתכונים ביתיים - Home Recipes</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --border-color: #e9ecef;
+            --primary-color: #ff6b6b;
+            --primary-hover: #ee5253;
+            --secondary-color: #48dbfb;
+            --badge-green: #10ac84;
+            --badge-yellow: #feca57;
+            --badge-red: #ff6b6b;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #f8f9fa;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select, button, input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar input {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .recipe-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recipe-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .recipe-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .recipe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+            gap: 10px;
+        }
+
+        .health-badge {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .badge-healthy { background-color: var(--badge-green); }
+        .badge-balanced { background-color: var(--badge-yellow); }
+        .badge-treat { background-color: var(--badge-red); }
+
+        .recipe-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: 1rem 0;
+            background-color: var(--bg-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .recipe-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--primary-color);
+            border: none;
+            background: none;
+            font-size: 1rem;
+        }
+
+        .comments-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .comment {
+            background-color: var(--bg-color);
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-comment-box {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .add-comment-box input {
+            flex-grow: 1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo" id="app-title">🍳 מנות ביתיות</div>
+        <div class="controls">
+            <button onclick="toggleTheme()" id="theme-btn">🌙</button>
+            <select id="lang-select" onchange="changeLanguage(this.value)">
+                <option value="he">עברית</option>
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="ru">Русский</option>
+            </select>
+            <button class="btn-primary" onclick="openModal()" id="add-recipe-btn">+ הוסף מנה</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="filter-bar">
+            <input type="text" id="search-input" placeholder="חפש מנה..." oninput="filterRecipes()">
+            <select id="filter-health" onchange="filterRecipes()">
+                <option value="all">כל הרמות הבריאותיות</option>
+                <option value="healthy">בריא מאוד</option>
+                <option value="balanced">מאוזן</option>
+                <option value="treat">פינוק</option>
+            </select>
+        </div>
+
+        <div class="recipes-grid" id="recipes-container"></div>
+    </div>
+
+    <!-- Modal Form -->
+    <div class="modal" id="recipe-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">הוספת מנה חדשה</h2>
+            <form id="recipe-form" onsubmit="saveRecipe(event)">
+                <div class="form-group">
+                    <label id="lbl-title">שם המנה</label>
+                    <input type="text" id="recipe-title" required>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-img">קישור לתמונה</label>
+                    <input type="url" id="recipe-img" required>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-cals">קלוריות</label>
+                    <input type="number" id="recipe-cals" required>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-protein">חלבון (גרם)</label>
+                    <input type="number" id="recipe-protein" required>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-time">זמן הכנה (דקות)</label>
+                    <input type="number" id="recipe-time" required>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-cost">עלות מוערכת (₪)</label>
+                    <input type="number" id="recipe-cost" required>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-health">רמת בריאות</label>
+                    <select id="recipe-health">
+                        <option value="healthy">בריא מאוד</option>
+                        <option value="balanced">מאוזן</option>
+                        <option value="treat">פינוק</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-prep">אופן ההכנה</label>
+                    <textarea id="recipe-prep" rows="3" required></textarea>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                    <button type="button" onclick="closeModal()" id="btn-cancel">ביטול</button>
+                    <button type="submit" class="btn-primary" id="btn-save">שמור</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            he: {
+                title: "🍳 מנות ביתיות",
+                addRecipe: "+ הוסף מנה",
+                searchPlaceholder: "חפש מנה...",
+                allHealth: "כל הרמות הבריאותיות",
+                healthy: "בריא מאוד",
+                balanced: "מאוזן",
+                treat: "פינוק",
+                cals: "קלוריות",
+                protein: "חלבון",
+                time: "זמן",
+                cost: "עלות",
+                mins: "דק'",
+                share: "שתף",
+                commentPlaceholder: "כתוב תגובה...",
+                modalTitle: "הוספת מנה חדשה",
+                lblTitle: "שם המנה",
+                lblImg: "קישור לתמונה",
+                lblCals: "קלוריות",
+                lblProtein: "חלבון (גרם)",
+                lblTime: "זמן הכנה (דקות)",
+                lblCost: "עלות מוערכת",
+                lblHealth: "רמת בריאות",
+                lblPrep: "אופן ההכנה",
+                btnCancel: "ביטול",
+                btnSave: "שמור"
+            },
+            en: {
+                title: "🍳 Home Recipes",
+                addRecipe: "+ Add Recipe",
+                searchPlaceholder: "Search recipe...",
+                allHealth: "All Health Levels",
+                healthy: "Very Healthy",
+                balanced: "Balanced",
+                treat: "Treat",
+                cals: "Calories",
+                protein: "Protein",
+                time: "Time",
+                cost: "Cost",
+                mins: "mins",
+                share: "Share",
+                commentPlaceholder: "Write a comment...",
+                modalTitle: "Add New Recipe",
+                lblTitle: "Recipe Name",
+                lblImg: "Image URL",
+                lblCals: "Calories",
+                lblProtein: "Protein (g)",
+                lblTime: "Prep Time (mins)",
+                lblCost: "Estimated Cost",
+                lblHealth: "Health Level",
+                lblPrep: "Preparation",
+                btnCancel: "Cancel",
+                btnSave: "Save"
+            }
+        };
+
+        let currentLang = 'he';
+
+        const initialRecipes = [
+            {
+                id: 1,
+                title: "חזה עוף באורז וירקות",
+                img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500",
+                cals: 450,
+                protein: 42,
+                time: 30,
+                cost: 25,
+                health: "healthy",
+                prep: "צולים את חזה העוף במחבת, מבשלים אורז יסמין ומקפיצים ירקות. מערבבים הכל יחד.",
+                likes: 18,
+                comments: [{ text: "יצא ממש טעים ומשביע!", likes: 4 }]
+            },
+            {
+                id: 2,
+                title: "שקשוקה ביתית אסלית",
+                img: "https://images.unsplash.com/photo-1590412200988-a436970781fa?w=500",
+                cals: 380,
+                protein: 18,
+                time: 20,
+                cost: 15,
+                health: "balanced",
+                prep: "מטגנים בצל, פלפלים ועגבניות. מוסיפים תבלינים וביצים ומבשלים על אש קטנה.",
+                likes: 29,
+                comments: [{ text: "אחלה ארוחת ערב!", likes: 6 }]
+            },
+            {
+                id: 3,
+                title: "פילה סלמון בתנור עם עשבי תיבול",
+                img: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500",
+                cals: 520,
+                protein: 46,
+                time: 25,
+                cost: 45,
+                health: "healthy",
+                prep: "מברישים את הפילה בשמן זית, שום, לימון ושמיר. אופים ב-200 מעלות כ-18 דקות.",
+                likes: 35,
+                comments: [{ text: "קלי קלות ויוצא מעדן!", likes: 8 }]
+            },
+            {
+                id: 4,
+                title: "קציצות בשר ברוטב עגבניות עשיר",
+                img: "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=500",
+                cals: 580,
+                protein: 38,
+                time: 50,
+                cost: 35,
+                health: "balanced",
+                prep: "מערבבים בקר טחון עם תבלינים וירק, יוצרים קציצות ומבשלים ברוטב עגבניות כ-40 דקות.",
+                likes: 42,
+                comments: [{ text: "מזכיר את האוכל של סבתא!", likes: 11 }]
+            },
+            {
+                id: 5,
+                title: "סלט טופו וקינואה אסייתי",
+                img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500",
+                cals: 360,
+                protein: 22,
+                time: 20,
+                cost: 20,
+                health: "healthy",
+                prep: "קולים טופו במחבת, מערבבים עם קינואה מבושלת, מלפפון, גזר ורוטב סויה-שומשום.",
+                likes: 15,
+                comments: [{ text: "ארוחה קלילה ומעולה לצהריים.", likes: 2 }]
+            },
+            {
+                id: 6,
+                title: "פסטה שמנת פטריות קלאסית",
+                img: "https://images.unsplash.com/photo-1621996346565-e3def646d959?w=500",
+                cals: 690,
+                protein: 16,
+                time: 25,
+                cost: 28,
+                health: "treat",
+                prep: "מטגנים פטריות ושום בחמאה, מוסיפים שמנת מתוקה, אגוז מוסקט ופסטה מבושלת.",
+                likes: 54,
+                comments: [{ text: "מושחת וטעים ברמות!", likes: 15 }]
+            },
+            {
+                id: 7,
+                title: "תבשיל עדשים ירוקות ואורז (מג'דרה)",
+                img: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500",
+                cals: 410,
+                protein: 19,
+                time: 40,
+                cost: 12,
+                health: "healthy",
+                prep: "מבשלים עדשים ירוקות ואורז מלא עם כמונית והמון בצל מטוגן מוזהב מעל.",
+                likes: 21,
+                comments: [{ text: "מנה זולה, בריאה ומשביעה מאוד.", likes: 5 }]
+            },
+            {
+                id: 8,
+                title: "שניצל ביתי פריך עם פירה",
+                img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500",
+                cals: 720,
+                protein: 45,
+                time: 35,
+                cost: 30,
+                health: "treat",
+                prep: "ציפוי חזה עוף בביצה ופירורי לחם מוזהבים, טיגון עמוק והגשה לצד פירה תפוחי אדמה.",
+                likes: 60,
+                comments: [{ text: "אין על שניצל ביתי ביום שישי!", likes: 18 }]
+            },
+            {
+                id: 9,
+                title: "מרק כתובים מזין (דלעת, גזר ועדשים)",
+                img: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500",
+                cals: 280,
+                protein: 12,
+                time: 45,
+                cost: 18,
+                health: "healthy",
+                prep: "מבשלים דלעת, גזר, בטטה ועדשים אדומות, מבלנדרים למרק חלק ומודגש בג'ינג'ר.",
+                likes: 27,
+                comments: [{ text: "מחמם את הלב בימים קרים.", likes: 7 }]
+            },
+            {
+                id: 10,
+                title: "פנקייק חלבון ושיבולת שועל",
+                img: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500",
+                cals: 340,
+                protein: 28,
+                time: 15,
+                cost: 14,
+                health: "healthy",
+                prep: "רססים בננה, ביצה, שיבולת שועל ואבקת חלבון. מטגנים במחבת טפלון ומגישים עם פירות.",
+                likes: 31,
+                comments: [{ text: "הארוחה המושלמת לפני אימון!", likes: 9 }]
+            }
+        ];
+
+        let recipes = JSON.parse(localStorage.getItem('recipes')) || initialRecipes;
+
+        function renderRecipes(filterList = recipes) {
+            const container = document.getElementById('recipes-container');
+            const t = translations[currentLang] || translations['en'];
+            container.innerHTML = '';
+
+            filterList.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'recipe-card';
+                card.innerHTML = `
+                    <img src="${r.img}" class="recipe-img" alt="${r.title}">
+                    <div class="recipe-content">
+                        <div class="recipe-header">
+                            <h3>${r.title}</h3>
+                            <span class="health-badge badge-${r.health}">${t[r.health]}</span>
+                        </div>
+                        <div class="recipe-stats">
+                            <div>🔥 ${t.cals}: ${r.cals}</div>
+                            <div>💪 ${t.protein}: ${r.protein}g</div>
+                            <div>⏱️ ${t.time}: ${r.time} ${t.mins}</div>
+                            <div>💰 ${t.cost}: ₪${r.cost}</div>
+                        </div>
+                        <p style="font-size:0.9rem; margin-bottom:1rem;"><strong>אופן הכנה:</strong> ${r.prep}</p>
+                        <div class="recipe-actions">
+                            <button class="like-btn" onclick="likeRecipe(${r.id})">❤️ ${r.likes}</button>
+                            <button onclick="shareRecipe('${r.title}')">📤 ${t.share}</button>
+                        </div>
+                        <div class="comments-section">
+                            ${r.comments.map((c, i) => `
+                                <div class="comment">
+                                    <span>${c.text}</span>
+                                    <button class="like-btn" onclick="likeComment(${r.id}, ${i})">👍 ${c.likes}</button>
+                                </div>
+                            `).join('')}
+                            <div class="add-comment-box">
+                                <input type="text" placeholder="${t.commentPlaceholder}" id="input-com-${r.id}">
+                                <button onclick="addComment(${r.id})">💬</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function likeRecipe(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (recipe) {
+                recipe.likes++;
+                saveAndRender();
+            }
+        }
+
+        function likeComment(recipeId, commentIdx) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (recipe && recipe.comments[commentIdx]) {
+                recipe.comments[commentIdx].likes++;
+                saveAndRender();
+            }
+        }
+
+        function addComment(recipeId) {
+            const input = document.getElementById(`input-com-${recipeId}`);
+            if (input.value.trim()) {
+                const recipe = recipes.find(r => r.id === recipeId);
+                recipe.comments.push({ text: input.value.trim(), likes: 0 });
+                input.value = '';
+                saveAndRender();
+            }
+        }
+
+        function shareRecipe(title) {
+            if (navigator.share) {
+                navigator.share({ title, text: `תראה את המתכון הזה: ${title}` });
+            } else {
+                alert(`הקישור לשיתוף המנה "${title}" הועתק!`);
+            }
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('recipes', JSON.stringify(recipes));
+            filterRecipes();
+        }
+
+        function filterRecipes() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const health = document.getElementById('filter-health').value;
+
+            const filtered = recipes.filter(r => {
+                const matchesSearch = r.title.toLowerCase().includes(search);
+                const matchesHealth = health === 'all' || r.health === health;
+                return matchesSearch && matchesHealth;
+            });
+
+            renderRecipes(filtered);
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.dir = (lang === 'he' || lang === 'ar') ? 'rtl' : 'ltr';
+            const t = translations[lang] || translations['en'];
+
+            document.getElementById('app-title').innerText = t.title;
+            document.getElementById('add-recipe-btn').innerText = t.addRecipe;
+            document.getElementById('search-input').placeholder = t.searchPlaceholder;
+            
+            filterRecipes();
+        }
+
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        }
+
+        function openModal() { document.getElementById('recipe-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('recipe-modal').style.display = 'none'; }
+
+        function saveRecipe(e) {
+            e.preventDefault();
+            const newRecipe = {
+                id: Date.now(),
+                title: document.getElementById('recipe-title').value,
+                img: document.getElementById('recipe-img').value,
+                cals: Number(document.getElementById('recipe-cals').value),
+                protein: Number(document.getElementById('recipe-protein').value),
+                time: Number(document.getElementById('recipe-time').value),
+                cost: Number(document.getElementById('recipe-cost').value),
+                health: document.getElementById('recipe-health').value,
+                prep: document.getElementById('recipe-prep').value,
+                likes: 0,
+                comments: []
+            };
+
+            recipes.unshift(newRecipe);
+            saveAndRender();
+            closeModal();
+            document.getElementById('recipe-form').reset();
+        }
+
+        // Initial Load
+        renderRecipes();
+    </script>
+</body>
+</html>

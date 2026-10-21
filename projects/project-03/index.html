@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTime - המלצות מדיה לפי זמן פנוי</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts - Rubik -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f6ff',
+                            100: '#e0edff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            accent: '#f59e0b',
+                            rose: '#e11d48'
+                        },
+                        darkbg: '#0f172a',
+                        darkcard: '#1e293b'
+                    },
+                    fontFamily: {
+                        sans: ['Rubik', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 9999px;
+            border: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #60a5fa;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <header class="sticky top-0 z-40 glass-card border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="resetSearch()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid font-bold fa-clock-rotate-left text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-xl tracking-wide bg-gradient-to-r from-white via-slate-200 to-brand-500 bg-clip-text text-transparent">CineTime</h1>
+                    <p class="text-xs text-slate-400 font-normal">המלצות מדיה לפי זמן פנוי</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="toggleWatchlistModal()" class="relative p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 transition-all border border-slate-700/60 flex items-center gap-2 text-sm font-medium">
+                    <i class="fa-solid fa-bookmark text-brand-accent"></i>
+                    <span class="hidden sm:inline">רשימת צפייה</span>
+                    <span id="watchlistCount" class="bg-brand-rose text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Search Controls Box -->
+        <section class="glass-card rounded-3xl p-6 sm:p-8 mb-10 shadow-2xl shadow-indigo-950/40 relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-60 h-60 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-20 -bottom-20 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <h2 class="text-2xl sm:text-4xl font-black mb-3 text-white">כמה זמן פנוי יש לך עכשיו?</h2>
+                <p class="text-slate-400 text-sm sm:text-base">הגדר/י את אורך הזמן והז'אנר המועדף, ואנחנו נמצא עבורך את התוכן המדויק ביותר שלא ישרוף לך רגע מיותר.</p>
+            </div>
+
+            <!-- Time Selector Section -->
+            <div class="mb-8 max-w-3xl mx-auto bg-slate-900/60 p-6 rounded-2xl border border-slate-800/80">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-slate-400 text-sm font-medium flex items-center gap-2">
+                        <i class="fa-regular fa-hourglass-half text-brand-500"></i> זמן מוערך לצפייה:
+                    </span>
+                    <div class="text-right">
+                        <span id="timeDisplay" class="text-3xl sm:text-4xl font-extrabold text-brand-500">45</span>
+                        <span class="text-lg text-slate-300 font-semibold mr-1">דקות</span>
+                    </div>
+                </div>
+
+                <input type="range" id="timeSlider" min="10" max="180" step="5" value="45" oninput="updateTimeDisplay(this.value)">
+
+                <!-- Quick Presets -->
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-5">
+                    <button onclick="setPresetTime(15, event)" class="preset-btn py-2 px-3 text-xs sm:text-sm font-medium rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all text-center">15 דק'</button>
+                    <button onclick="setPresetTime(30, event)" class="preset-btn py-2 px-3 text-xs sm:text-sm font-medium rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all text-center">30 דק'</button>
+                    <button onclick="setPresetTime(45, event)" class="preset-btn active-preset py-2 px-3 text-xs sm:text-sm font-medium rounded-xl bg-brand-600 text-white border border-brand-500 transition-all text-center shadow-md">45 דק'</button>
+                    <button onclick="setPresetTime(60, event)" class="preset-btn py-2 px-3 text-xs sm:text-sm font-medium rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all text-center">60 דק'</button>
+                    <button onclick="setPresetTime(90, event)" class="preset-btn py-2 px-3 text-xs sm:text-sm font-medium rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all text-center">90 דק'</button>
+                    <button onclick="setPresetTime(120, event)" class="preset-btn py-2 px-3 text-xs sm:text-sm font-medium rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all text-center">120 דק'</button>
+                </div>
+            </div>
+
+            <!-- Genre & Filters Section -->
+            <div class="max-w-3xl mx-auto mb-8">
+                <label class="block text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-film text-brand-500"></i> בחירת ז'אנר (אופציונלי):
+                </label>
+                <div id="genreChips" class="flex flex-wrap gap-2">
+                    <!-- Genres injected by JS -->
+                </div>
+            </div>
+
+            <!-- Streaming Platforms Section -->
+            <div class="max-w-3xl mx-auto mb-8">
+                <label class="block text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-tv text-brand-500"></i> איזה אפליקציות/פלטפורמות יש לך בבית?
+                </label>
+                <div id="platformChips" class="flex flex-wrap gap-2 sm:gap-3">
+                    <!-- Platforms injected by JS -->
+                </div>
+            </div>
+
+            <!-- Additional Secondary Filters -->
+            <div class="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">סוג המדיה:</label>
+                    <select id="mediaTypeFilter" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-brand-500">
+                        <option value="all">הכל (סרטים, סדרות, סרטים קצרים)</option>
+                        <option value="movie">סרטים בלבד</option>
+                        <option value="tv">סדרות (פרק בודד/רצף)</option>
+                        <option value="short">סרטים קצרים (עד 30 דק')</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">הגבלת גיל צפייה:</label>
+                    <select id="ageFilter" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-brand-500">
+                        <option value="16">כל הגילאים (עד 16+)</option>
+                        <option value="12">עד גיל 12+</option>
+                        <option value="6">עד גיל 0-6+ (לכל המשפחה)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">דירוג מינימלי:</label>
+                    <select id="ratingFilter" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-brand-500">
+                        <option value="0">כל הדירוגים</option>
+                        <option value="6">★ 6.0 ומעלה</option>
+                        <option value="7" selected>★ 7.0 ומעלה (מומלץ)</option>
+                        <option value="8">★ 8.0 ומעלה (איכותי ביותר)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="text-center">
+                <button onclick="findRecommendations()" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-brand-600 via-brand-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-lg rounded-2xl shadow-xl shadow-brand-500/25 transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-3 mx-auto">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>מצא לי מה לראות</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="resultsSection" class="hidden min-h-[400px]">
+            
+            <!-- Result Bar Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-800">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <span>תוצאות מומלצות ל-</span>
+                        <span id="selectedTimeBadge" class="text-brand-500">45 דקות</span>
+                    </h3>
+                    <p id="resultsCountNotice" class="text-xs text-slate-400 mt-1">נמצאו התאמות מומלצות לפי אלגוריתם הדירוג והזמן</p>
+                </div>
+                
+                <!-- Sort Options -->
+                <div class="flex items-center gap-2 text-xs text-slate-400">
+                    <span>מיון לפי:</span>
+                    <button onclick="sortResults('score')" id="sortScoreBtn" class="px-3 py-1.5 rounded-lg bg-brand-600 text-white font-medium">התאמה מיטבית</button>
+                    <button onclick="sortResults('rating')" id="sortRatingBtn" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">דירוג</button>
+                    <button onclick="sortResults('runtime')" id="sortTimeBtn" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">אורך מדויק</button>
+                </div>
+            </div>
+
+            <!-- Top Match Spotlight Card -->
+            <div id="topMatchContainer" class="mb-10"></div>
+
+            <!-- Secondary Grid -->
+            <h4 class="text-lg font-bold text-slate-300 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-list-ul text-brand-500"></i> אפשרויות מצוינות נוספות:
+            </h4>
+            <div id="resultsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- Loading Spinner State -->
+        <div id="loadingState" class="hidden py-20 text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent mb-4"></div>
+            <p class="text-slate-300 font-medium">סורק סרטים וסדרות ומחשב חלוני זמן מדויקים...</p>
+        </div>
+
+        <!-- Empty / Edge Cases State -->
+        <div id="emptyState" class="hidden py-16 text-center glass-card rounded-3xl max-w-xl mx-auto p-8">
+            <div class="w-16 h-16 bg-slate-800 text-brand-accent rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-film-slash"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">לא נמצאו תוצאות מדויקות</h3>
+            <p id="emptyStateMessage" class="text-slate-400 text-sm mb-6">נסה להרחיב את טווח הזמן או לבחור ז'אנרים נוספים.</p>
+            <button onclick="resetSearch()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-xl border border-slate-700">
+                איפוס סינונים
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Media Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-card bg-slate-900 border border-slate-700 w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl relative my-8">
+            <button onclick="closeDetailModal()" class="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-slate-900/80 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 transition-all">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Watchlist Modal -->
+    <div id="watchlistModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-bookmark text-brand-accent"></i> רשימת הצפייה שלי
+                </h3>
+                <button onclick="toggleWatchlistModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div id="watchlistContainer" class="overflow-y-auto flex-grow space-y-3 pr-1">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-t border-slate-800 bg-slate-950/60 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>CineTime &copy; 2026 - מערכת המלצות תוכן לפי זמן פנוי. נתונים מסופקים על ידי TMDB API.</p>
+        </div>
+    </footer>
+
+    <script>
+        // State variables
+        let selectedTime = 45;
+        let selectedGenre = '';
+        let selectedPlatforms = [];
+        let watchlist = JSON.parse(localStorage.getItem('cineTime_watchlist') || '[]');
+        let currentResults = [];
+
+        const GENRES = [
+            { id: '', name: 'הכל' },
+            { id: '28', name: 'אקשן' },
+            { id: '35', name: 'קומדיה' },
+            { id: '18', name: 'דרמה' },
+            { id: '878', name: 'מדע בדיוני' },
+            { id: '16', name: 'אנימציה' },
+            { id: '53', name: 'מתח' },
+            { id: '99', name: 'דוקומנטרי' },
+            { id: '10749', name: 'רומנטיקה' }
+        ];
+
+        const PLATFORMS = [
+            { id: 'netflix', name: 'Netflix', color: 'bg-red-600/20 text-red-400 border-red-500/40', icon: 'fa-play' },
+            { id: 'yesplus', name: 'YES+', color: 'bg-indigo-600/20 text-indigo-400 border-indigo-500/40', icon: 'fa-tv' },
+            { id: 'disney', name: 'Disney+', color: 'bg-blue-600/20 text-blue-400 border-blue-500/40', icon: 'fa-hat-wizard' },
+            { id: 'apple', name: 'Apple TV+', color: 'bg-slate-300/20 text-slate-200 border-slate-400/40', icon: 'fa-apple' },
+            { id: 'prime', name: 'Prime Video', color: 'bg-cyan-600/20 text-cyan-400 border-cyan-500/40', icon: 'fa-amazon' },
+            { id: 'hot', name: 'HOT / NEXT', color: 'bg-rose-600/20 text-rose-400 border-rose-500/40', icon: 'fa-tv' }
+        ];
+
+        // Extended Database of Movies, Short Films, and TV Episodes
+        const MEDIA_DATABASE = [
+            // Short Films (10 - 25 min)
+            { id: 's1', title: 'הציפורים והעננים (Piper)', type: 'short', genreId: '16', runtime: 12, rating: 8.4, ageRating: '0+', year: 2016, platforms: ['disney', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/91I27o24S9eJ09x8Ym7Yv6Oa49Y.jpg', overview: 'סרט קצר ומרהיב מבית פיקסאר על גוזל חוף חמוד שמפחד מגלי הים הקרים. דרך ניסיון וטעייה, ובעזרתו של סרטן קטן, הוא לומד להתגבר על הפחד ולגלות את עולם המים הקסום.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 's2', title: 'האהבה הראשונה שלי', type: 'short', genreId: '10749', runtime: 18, rating: 7.6, ageRating: '12+', year: 2021, platforms: ['netflix', 'yesplus'], poster: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=500&q=80', overview: 'סיפור קצר ומרגש על פגישה מקרית בתחנת רכבת מרכזית בשעת לילה מאוחרת, שמפתחת שיחה קסומה בין שני זרים שמשנה את תפיסת עולמם על זוגיות והחלטות בחיים.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 's3', title: 'המדריך להרפתקאות קצרות', type: 'short', genreId: '35', runtime: 22, rating: 7.8, ageRating: '6+', year: 2020, platforms: ['apple', 'hot', 'yesplus'], poster: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=500&q=80', overview: 'קומדיה קצרה וקצבית המציגה צעיר שיוצא לאתגר בלתי אפשרי: לדחוס סדר יום שלם של הרפתקאות, ספורט אתגרי ומפגשים חברתיים לתוך 20 דקות בלבד.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+
+            // TV Series Episodes (20 - 55 min)
+            { id: 'tv1', title: 'מראה שחורה: סאן ג"וניפרו', type: 'tv', genreId: '878', runtime: 35, rating: 8.7, ageRating: '16+', year: 2016, platforms: ['netflix'], poster: 'https://image.tmdb.org/t/p/w500/pE89j0I2Wv0H5n3TjXW7N8Jb5aJ.jpg', overview: 'פרק מפתח בודד ועצמאי בסדרת המדע בדיוני המפורסמת. עיירת נופש חופית שטופת שמש בשנות ה-80 חושפת סוד עתידני מופלא על טכנולוגיה, נשמה וחיים לאחר המוות.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'tv2', title: 'סיינפלד: הפורום (The Contest)', type: 'tv', genreId: '35', runtime: 23, rating: 9.2, ageRating: '12+', year: 1992, platforms: ['netflix', 'yesplus', 'hot'], poster: 'https://image.tmdb.org/t/p/w500/aTyTo9Hn8l4G1L5v030i2L9i1bC.jpg', overview: 'אחד הפרקים הקומיים האייקוניים ביותר בתולדות הטלוויזיה. ארבעת החברים נכנסים להתערבות משעשעת על שליטה עצמית, בפרק שניתן לראות וליהנות ממנו מכל הלב גם ללא היכרות מוקדמת.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'tv3', title: 'אהבה, מוות ורובוטים', type: 'tv', genreId: '16', runtime: 15, rating: 8.2, ageRating: '16+', year: 2021, platforms: ['netflix'], poster: 'https://image.tmdb.org/t/p/w500/asDvOp871J3iN6n8b4N1uXv0w0u.jpg', overview: 'סיפור אנימציה קצרצר, מרהיב ויזואלית ועוצר נשימה על עולם עתידני פוסט-אפוקליפטי בו רובוטים חוקרים את הריסות הציוויליזציה האנושית בסקרנות.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'tv4', title: 'המשרד: ארוחת ערב', type: 'tv', genreId: '35', runtime: 28, rating: 9.0, ageRating: '12+', year: 2008, platforms: ['netflix', 'prime', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/q7R9N9y8K9S0m4Y6v0R3w2P1n01.jpg', overview: 'פרק עצמאי וקורע מצחוק במיוחד. מייקל וג"אן מארחים ארוחת ערב בביתם לעובדי המשרד, אך האווירה המתוחה והוויכוחים הבלתי נגמרים הופכים את הערב לקומדיית מבוכה מופלאה.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'tv5', title: 'הכתר (The Crown)', type: 'tv', genreId: '18', runtime: 52, rating: 8.2, ageRating: '16+', year: 2020, platforms: ['netflix'], poster: 'https://image.tmdb.org/t/p/w500/2L2G2b6uV2d50r8S4O2pY5v10d8.jpg', overview: 'דרמה תקופתית מרתקת העוקבת אחר מאחורי הקלעים של משפחת המלוכה הבריטית במהלך אירועים היסטוריים דרמטיים ומלאי תככים פוליטיים.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+
+            // Feature Movies (45 - 180 min)
+            { id: 'm1', title: 'מקום שקט (A Quiet Place)', type: 'movie', genreId: '53', runtime: 90, rating: 7.5, ageRating: '16+', year: 2018, platforms: ['netflix', 'hot', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/n312P29R9m13T6y2G8s9pT0i5v3.jpg', overview: 'עולם שתרבותו חרבה בגלל יצורים טורפים בעלי שמיעה על-אנושית. משפחה אחת נלחמת לשרוד בחוות עץ מבודדת תוך שמירה על דממה מוחלטת.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'm2', title: '1917', type: 'movie', genreId: '28', runtime: 119, rating: 8.2, ageRating: '16+', year: 2019, platforms: ['prime', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/iL2m3wWn3V1lS01e2L0O3b9j3I1.jpg', overview: 'שני חיילים צעירים במלחמת העולם הראשונה מקבלים משימה בלתי אפשרית: לחצות את שטח האויב מרושת המלכודות בזמן שיא כדי למסור הודעה המובילה למניעת טבח נוראי.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'm3', title: 'פאלם ספרינגס (Palm Springs)', type: 'movie', genreId: '35', runtime: 90, rating: 7.4, ageRating: '16+', year: 2020, platforms: ['apple', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/oE1s2sXvL2pI0S1O5I4oY8oV0d.jpg', overview: 'קומדיה רומנטית מבריקה ושנונה. ניילס ושרה נפגשים בחתונה שטופת שמש בקליפורניה ומוצאים את עצמם לכודים יחד בלולאת זמן אינסופית המכריחה אותם לחיות את אותו היום שוב ושוב.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'm4', title: 'וויפלאש (Whiplash)', type: 'movie', genreId: '18', runtime: 106, rating: 8.5, ageRating: '16+', year: 2014, platforms: ['netflix', 'prime', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/o9U3p0a10g8d0b2Y5y8n3v8I0.jpg', overview: 'מתפופף ג"אז צעיר ושאפתן מתקבל להרכב היוקרתי ביותר בארה"ב, אך נתקל במנצח קשוח ותובעני שלא יעצור בשום אמצעי פסיכולוגי כדי לסחוט ממנו הגעה למצוינות.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'm5', title: 'ספיידרמן: ממד העכביש', type: 'movie', genreId: '16', runtime: 117, rating: 8.4, ageRating: '12+', year: 2018, platforms: ['disney', 'netflix', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/ii2I2nL1n9jI1b3g0J3b1n5I2.jpg', overview: 'נער צעיר מברוקלין בשם מיילס מוראלס הופך לספיידרמן החדש ומגלה שיש עוד גיבורים בעלי כוחות דומים שהגיעו מממדים מקבילים כדי להציל את היקום.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'm6', title: 'בין כוכבים (Interstellar)', type: 'movie', genreId: '878', runtime: 169, rating: 8.7, ageRating: '12+', year: 2014, platforms: ['prime', 'hot', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/gEU2G2121s8v99Y8g3m90w.jpg', overview: 'בעתיד שבו כדור הארץ סובל מרעב אקלימי חמור, צוות אסטרונאוטים יוצא למסע נועז בחור תולעת בחלל העמוק כדי למצוא כוכב לכת חלופי שיבטיח את הישרדות האנושות.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' },
+            { id: 'm7', title: 'מוצאים את נמו (Finding Nemo)', type: 'movie', genreId: '16', runtime: 100, rating: 8.1, ageRating: '0+', year: 2003, platforms: ['disney', 'yesplus'], poster: 'https://image.tmdb.org/t/p/w500/e3i0mS4d23d8y2m11I2X8w10n.jpg', overview: 'סרט לכל המשפחה. דג שיירת זהיר יוצא למסע חיפושים מרהיב במעמקי האוקיינוס הגדול כדי להציל את בנו נמו שנלכד בידי צוללן.', trailer: 'https://www.youtube.com/embed/tTjHEyEAlsc' }
+        ];
+
+        function updateTimeDisplay(val) {
+            selectedTime = parseInt(val, 10);
+            const displayEl = document.getElementById('timeDisplay');
+            const sliderEl = document.getElementById('timeSlider');
+            if (displayEl) displayEl.innerText = selectedTime;
+            if (sliderEl && sliderEl.value != selectedTime) sliderEl.value = selectedTime;
+        }
+
+        function getFallbackImage(title) {
+            const cleanTitle = encodeURIComponent(title || 'CineTime');
+            return `https://placehold.co/500x750/1e293b/3b82f6?text=${cleanTitle}`;
+        }
+
+        function setPresetTime(time, evt) {
+            updateTimeDisplay(time);
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active-preset', 'bg-brand-600', 'text-white', 'border-brand-500', 'shadow-md');
+                btn.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+            });
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.classList.add('active-preset', 'bg-brand-600', 'text-white', 'border-brand-500', 'shadow-md');
+                evt.currentTarget.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+            }
+        }
+
+        function toggleGenre(genreId) {
+            selectedGenre = selectedGenre === genreId ? '' : genreId;
+            renderGenres();
+        }
+
+        function togglePlatform(platformId) {
+            const index = selectedPlatforms.indexOf(platformId);
+            if (index > -1) {
+                selectedPlatforms.splice(index, 1);
+            } else {
+                selectedPlatforms.push(platformId);
+            }
+            renderPlatforms();
+        }
+
+        function renderGenres() {
+            const container = document.getElementById('genreChips');
+            if (!container) return;
+            container.innerHTML = GENRES.map(g => {
+                const isActive = selectedGenre === g.id;
+                return `
+                    <button onclick="toggleGenre('${g.id}')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${isActive ? 'bg-brand-600 text-white border border-brand-500 shadow-md' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'}">
+                        ${g.name}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderPlatforms() {
+            const container = document.getElementById('platformChips');
+            if (!container) return;
+            container.innerHTML = PLATFORMS.map(p => {
+                const isSelected = selectedPlatforms.includes(p.id);
+                return `
+                    <button onclick="togglePlatform('${p.id}')" class="px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2 ${isSelected ? 'bg-brand-600 text-white border-brand-500 shadow-md ring-2 ring-brand-500/50' : p.color}">
+                        <i class="fa-solid ${p.icon}"></i>
+                        <span>${p.name}</span>
+                        ${isSelected ? '<i class="fa-solid fa-check text-xs ml-1"></i>' : ''}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function getPlatformBadgeHTML(platformIds) {
+            return platformIds.map(id => {
+                const p = PLATFORMS.find(item => item.id === id);
+                if (!p) return '';
+                return `<span class="text-[10px] px-2 py-0.5 rounded-md ${p.color} font-medium border inline-block">${p.name}</span>`;
+            }).join(' ');
+        }
+
+        function showEmptyState() {
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+        }
+
+        function resetSearch() {
+            selectedGenre = '';
+            selectedPlatforms = [];
+            selectedTime = 45;
+            updateTimeDisplay(45);
+            document.getElementById('mediaTypeFilter').value = 'all';
+            document.getElementById('ageFilter').value = '16';
+            document.getElementById('ratingFilter').value = '7';
+            renderGenres();
+            renderPlatforms();
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('loadingState').classList.add('hidden');
+        }
+
+        function findRecommendations() {
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+
+            setTimeout(() => {
+                document.getElementById('loadingState').classList.add('hidden');
+
+                const typeFilter = document.getElementById('mediaTypeFilter').value;
+                const ageFilter = parseInt(document.getElementById('ageFilter').value);
+                const ratingFilter = parseFloat(document.getElementById('ratingFilter').value);
+
+                const filtered = MEDIA_DATABASE.filter(item => {
+                    // Filter Genre
+                    if (selectedGenre && item.genreId !== selectedGenre) return false;
+
+                    // Filter Type
+                    if (typeFilter !== 'all' && item.type !== typeFilter) return false;
+
+                    // Filter Age
+                    const itemAgeNum = parseInt(item.ageRating);
+                    if (itemAgeNum > ageFilter) return false;
+
+                    // Filter Rating
+                    if (item.rating < ratingFilter) return false;
+
+                    // Filter Streaming Platforms
+                    if (selectedPlatforms.length > 0) {
+                        const hasPlatform = item.platforms.some(p => selectedPlatforms.includes(p));
+                        if (!hasPlatform) return false;
+                    }
+
+                    return true;
+                });
+
+                currentResults = filtered.map(item => {
+                    const timeDiff = Math.abs(selectedTime - item.runtime);
+                    const timeScore = Math.max(0, 60 - (timeDiff * 2.5));
+                    const ratingScore = (item.rating / 10) * 40;
+                    const totalScore = Math.round(timeScore + ratingScore);
+
+                    return {
+                        ...item,
+                        score: totalScore,
+                        timeDiff: timeDiff
+                    };
+                });
+
+                currentResults.sort((a, b) => b.score - a.score);
+
+                if (currentResults.length === 0) {
+                    showEmptyState();
+                } else {
+                    renderResults();
+                }
+            }, 400);
+        }
+
+        function renderResults() {
+            const section = document.getElementById('resultsSection');
+            const badge = document.getElementById('selectedTimeBadge');
+            const spotlightContainer = document.getElementById('topMatchContainer');
+            const grid = document.getElementById('resultsGrid');
+
+            badge.innerText = `${selectedTime} דקות`;
+            section.classList.remove('hidden');
+
+            const topMatch = currentResults[0];
+            const remainingTime = selectedTime - topMatch.runtime;
+            const isBookmarked = watchlist.some(w => w.id === topMatch.id);
+
+            spotlightContainer.innerHTML = `
+                <div class="glass-card bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-2 border-brand-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-6 items-center">
+                    <div class="absolute -top-10 -left-10 bg-brand-500/20 w-40 h-40 rounded-full blur-2xl"></div>
+                    
+                    <div class="relative w-full md:w-56 h-80 rounded-2xl overflow-hidden flex-shrink-0 shadow-xl border border-slate-700 bg-slate-950">
+                        <img src="${topMatch.poster}" alt="${topMatch.title}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${getFallbackImage(topMatch.title)}';">
+                        <div class="absolute top-3 right-3 bg-brand-rose text-white text-xs font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                            <i class="fa-solid fa-crown text-amber-300"></i> ההתאמה המושלמת
+                        </div>
+                        <div class="absolute bottom-3 left-3 bg-slate-900/90 text-amber-300 text-xs font-extrabold px-2.5 py-1 rounded-lg border border-slate-700">
+                            גילאי ${topMatch.ageRating}
+                        </div>
+                    </div>
+
+                    <div class="flex-grow text-right">
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="bg-brand-500/20 text-brand-500 text-xs font-bold px-3 py-1 rounded-lg border border-brand-500/30">
+                                ציון התאמה: ${topMatch.score}%
+                            </span>
+                            <span class="bg-slate-800 text-slate-300 text-xs font-medium px-3 py-1 rounded-lg border border-slate-700">
+                                ${getTypeLabel(topMatch.type)}
+                            </span>
+                            <span class="bg-indigo-500/20 text-indigo-300 text-xs font-bold px-2.5 py-1 rounded-lg border border-indigo-500/30">
+                                <i class="fa-solid fa-user-shield text-xs mr-1"></i> גיל ${topMatch.ageRating}
+                            </span>
+                            <span class="text-amber-400 font-bold text-sm flex items-center gap-1 mr-auto">
+                                <i class="fa-solid fa-star"></i> ${topMatch.rating}
+                            </span>
+                        </div>
+
+                        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">${topMatch.title}</h3>
+                        
+                        <div class="flex flex-wrap gap-1.5 mb-3">
+                            <span class="text-xs text-slate-400 ml-1">זמין ב:</span>
+                            ${getPlatformBadgeHTML(topMatch.platforms)}
+                        </div>
+
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4 max-w-2xl">${topMatch.overview}</p>
+
+                        <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800 mb-6 flex flex-wrap justify-between items-center gap-3">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-regular fa-clock text-brand-500 text-xl"></i>
+                                <div>
+                                    <div class="text-xs text-slate-400">אורך התוכן:</div>
+                                    <div class="text-sm font-bold text-white">${topMatch.runtime} דקות</div>
+                                </div>
+                            </div>
+                            <div class="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                                ${remainingTime === 0 ? 'נכנס בדיוק על הדקה!' : `חוסך לך ${remainingTime} דקות מהחלון הפנוי`}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openDetailModal('${topMatch.id}')" class="px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm rounded-xl shadow-lg transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> צפה בטריילר ותקציר
+                            </button>
+                            <button onclick="toggleBookmark('${topMatch.id}')" class="px-5 py-3 ${isBookmarked ? 'bg-slate-800 text-brand-rose border-brand-rose/40' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} text-sm font-medium rounded-xl border border-slate-700 transition-all flex items-center gap-2">
+                                <i class="fa-${isBookmarked ? 'solid' : 'regular'} fa-bookmark"></i>
+                                <span>${isBookmarked ? 'שמור ברשימה' : 'שמור לצפייה'}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const remainingResults = currentResults.slice(1);
+
+            grid.innerHTML = remainingResults.map(item => {
+                const isBooked = watchlist.some(w => w.id === item.id);
+                return `
+                    <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 hover:border-slate-700 transition-all group flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 overflow-hidden bg-slate-950">
+                                <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-300" onerror="this.onerror=null; this.src='${getFallbackImage(item.title)}';">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                                
+                                <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-amber-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1">
+                                    <i class="fa-solid fa-star"></i> ${item.rating}
+                                </span>
+
+                                <span class="absolute top-3 left-3 bg-indigo-900/90 text-indigo-200 text-xs font-bold px-2 py-0.5 rounded-md border border-indigo-700">
+                                    ${item.ageRating}
+                                </span>
+
+                                <span class="absolute bottom-3 right-3 bg-brand-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-lg">
+                                    ${item.runtime} דקות
+                                </span>
+                            </div>
+
+                            <div class="p-5">
+                                <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
+                                    <span>${getTypeLabel(item.type)}</span>
+                                    <span>${item.year}</span>
+                                </div>
+                                <h4 class="text-lg font-bold text-white mb-2 group-hover:text-brand-500 transition-colors">${item.title}</h4>
+                                <div class="flex flex-wrap gap-1 mb-3">
+                                    ${getPlatformBadgeHTML(item.platforms)}
+                                </div>
+                                <p class="text-slate-400 text-xs line-clamp-3 leading-relaxed mb-4">${item.overview}</p>
+                            </div>
+                        </div>
+
+                        <div class="px-5 pb-5 pt-0 flex gap-2">
+                            <button onclick="openDetailModal('${item.id}')" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all text-center">
+                                תקציר וטריילר
+                            </button>
+                            <button onclick="toggleBookmark('${item.id}')" class="p-2.5 bg-slate-800 hover:bg-slate-700 ${isBooked ? 'text-brand-rose' : 'text-slate-400'} rounded-xl transition-all border border-slate-700">
+                                <i class="fa-${isBooked ? 'solid' : 'regular'} fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openDetailModal(id) {
+            const item = MEDIA_DATABASE.find(m => m.id === id);
+            if (!item) return;
+
+            const isBooked = watchlist.some(w => w.id === item.id);
+            const container = document.getElementById('modalContent');
+
+            container.innerHTML = `
+                <div class="relative h-64 sm:h-80 w-full overflow-hidden">
+                    <iframe class="w-full h-full" src="${item.trailer}?autoplay=1&mute=1" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="p-6 sm:p-8">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="text-xs font-bold text-brand-500 bg-brand-500/10 px-2.5 py-1 rounded-md">
+                                ${getTypeLabel(item.type)} • ${item.runtime} דקות
+                            </span>
+                            <h2 class="text-2xl sm:text-3xl font-black text-white mt-2">${item.title}</h2>
+                        </div>
+                        <div class="text-amber-400 font-bold text-lg flex items-center gap-1 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+                            <i class="fa-solid fa-star"></i> ${item.rating}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-xs text-slate-400">זמין לצפייה באפליקציות:</span>
+                        <div class="flex flex-wrap gap-1">
+                            ${getPlatformBadgeHTML(item.platforms)}
+                        </div>
+                    </div>
+                    
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">${item.overview}</p>
+
+                    <div class="flex gap-4 border-t border-slate-800 pt-6">
+                        <button onclick="toggleBookmark('${item.id}'); openDetailModal('${item.id}');" class="flex-1 py-3 ${isBooked ? 'bg-brand-rose text-white' : 'bg-brand-600 text-white hover:bg-brand-500'} font-bold text-sm rounded-xl transition-all text-center flex items-center justify-center gap-2">
+                            <i class="fa-${isBooked ? 'solid' : 'regular'} fa-bookmark"></i>
+                            <span>${isBooked ? 'הסר מרשימת צפייה' : 'הוסף לרשימת צפייה'}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.getElementById('modalContent').innerHTML = '';
+        }
+
+        function toggleBookmark(id) {
+            const item = MEDIA_DATABASE.find(m => m.id === id);
+            if (!item) return;
+
+            const index = watchlist.findIndex(w => w.id === id);
+            if (index >= 0) {
+                watchlist.splice(index, 1);
+            } else {
+                watchlist.push(item);
+            }
+
+            localStorage.setItem('cineTime_watchlist', JSON.stringify(watchlist));
+            updateWatchlistCount();
+            
+            // Refresh results if visible
+            if (currentResults.length > 0) {
+                renderResults();
+            }
+            if (!document.getElementById('watchlistModal').classList.contains('hidden')) {
+                renderWatchlistModal();
+            }
+        }
+
+        function updateWatchlistCount() {
+            document.getElementById('watchlistCount').innerText = watchlist.length;
+        }
+
+        function toggleWatchlistModal() {
+            const modal = document.getElementById('watchlistModal');
+            if (modal.classList.contains('hidden')) {
+                renderWatchlistModal();
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function renderWatchlistModal() {
+            const container = document.getElementById('watchlistContainer');
+            if (watchlist.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-slate-500 text-sm">
+                        רשימת הצפייה שלך ריקה כרגע.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = watchlist.map(item => `
+                <div class="flex items-center justify-between gap-4 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
+                    <img src="${item.poster}" class="w-12 h-16 rounded-xl object-cover">
+                    <div class="flex-grow">
+                        <h4 class="text-sm font-bold text-white">${item.title}</h4>
+                        <span class="text-xs text-slate-400">${item.runtime} דקות • ★ ${item.rating}</span>
+                    </div>
+                    <button onclick="toggleBookmark('${item.id}')" class="p-2 text-slate-400 hover:text-brand-rose transition-colors">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function getTypeLabel(type) {
+            switch(type) {
+                case 'movie': return 'סרט קולנוע';
+                case 'tv': return 'פרק בסדרה';
+                case 'short': return 'סרט קצר';
+                default: return 'תוכן מדיה';
+            }
+        }
+
+        function sortResults(criterion) {
+            if (criterion === 'score') currentResults.sort((a,b) => b.score - a.score);
+            if (criterion === 'rating') currentResults.sort((a,b) => b.rating - a.rating);
+            if (criterion === 'runtime') currentResults.sort((a,b) => a.timeDiff - b.timeDiff);
+            
+            renderResults();
+        }
+
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderGenres();
+            renderPlatforms();
+            updateWatchlistCount();
+        });
+    </script>
+</body>
+</html>

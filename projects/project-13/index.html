@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>המדריך ל-11 בתי הקפה הכי שווים בתל אביב | ביס קטן</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+        body { 
+            font-family: 'Rubik', sans-serif; 
+            scroll-behavior: smooth;
+        }
+        .star-rating .fa-star {
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .filter-btn.active {
+            background-color: #f59e0b;
+            color: #ffffff;
+            border-color: #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Toast Notification Container -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-gray-900 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 border border-gray-700">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-message" class="text-sm font-medium">הפעולה בוצעה בהצלחה</span>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-gray-100">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center gap-2.5 group">
+                <div class="bg-amber-500 group-hover:bg-amber-600 text-white p-2 rounded-xl font-bold text-lg shadow-sm transition">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-gray-900">ביס קטן <span class="text-amber-500">.</span></span>
+            </a>
+            <nav class="hidden md:flex gap-8 font-medium text-gray-600 text-sm">
+                <a href="#featured" class="text-amber-500 font-semibold">המלצת המערכת</a>
+                <a href="#cafe-list" class="hover:text-amber-500 transition">כל בתי הקפה (11)</a>
+                <a href="#reviews" class="hover:text-amber-500 transition">חוות דעת</a>
+            </nav>
+            <div class="flex items-center gap-2">
+                <button onclick="shareWhatsApp('המדריך המלא ל-11 בתי הקפה הכי שווים בתל אביב!')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-full font-medium text-sm transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span class="hidden sm:inline">שתף בוואצאפ</span>
+                </button>
+                <button onclick="focusSearch()" class="bg-gray-100 hover:bg-amber-50 text-gray-700 hover:text-amber-600 px-3.5 py-2 rounded-full font-medium text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass text-amber-500"></i> 
+                    <span class="hidden sm:inline">חפש קפה</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full space-y-12">
+        
+        <!-- Main Title & Intro Section -->
+        <div id="featured" class="border-b border-gray-200 pb-8">
+            <div class="flex items-center gap-2 mb-3 flex-wrap">
+                <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full">נבחרת בתי הקפה</span>
+                <span class="bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                    <i class="fa-solid fa-location-dot text-amber-500"></i>תל אביב-יפו
+                </span>
+                <span class="text-xs text-gray-400 font-medium">עודכן היום</span>
+            </div>
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 mb-3 tracking-tight">11 בתי הקפה הכי שווים בתל אביב</h1>
+                    <p class="text-gray-600 text-base md:text-lg max-w-2xl">מהבראנץ' המפנק בפלורנטין ועד לקפה הגלריה הרגוע בנווה צדק: הפינות המומלצות ביותר לקפה איכותי, אווירה ומאפים שנאפים במקום.</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                    <button onclick="shareWhatsApp('הנה המלצה על בתי הקפה הכי שווים בתל אביב: ')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition shadow-sm">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span>שלח בוואצאפ</span>
+                    </button>
+                    <button id="bookmarkBtn" onclick="toggleBookmark()" class="flex items-center gap-2 bg-white border border-gray-200 hover:border-amber-500 text-gray-700 hover:text-amber-600 px-4 py-2.5 rounded-xl font-medium text-sm transition shadow-sm">
+                        <i id="bookmarkIcon" class="fa-regular fa-bookmark text-amber-500"></i>
+                        <span id="bookmarkText">שמור רשימה</span>
+                    </button>
+                    <button onclick="shareRecommendation()" class="flex items-center gap-2 bg-white border border-gray-200 hover:border-amber-500 text-gray-700 hover:text-amber-600 px-3.5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm" title="העתק קישור">
+                        <i class="fa-solid fa-link text-gray-500"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Cafe Section (Detailed Review) -->
+        <section class="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md">המלצת השבוע ⭐</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mt-1">1. קפה גלריה - הבראנץ' הסודי בפלורנטין</h2>
+                </div>
+                <span class="text-amber-500 font-bold text-xl">4.9 ★</span>
+            </div>
+
+            <!-- Image Gallery Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-2xl overflow-hidden shadow-sm">
+                <div class="md:col-span-2 h-64 md:h-80 bg-gray-200 relative group cursor-pointer overflow-hidden rounded-2xl" onclick="openLightbox('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1000&q=80')">
+                    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1000&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="אווירת הקפה">
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center text-white font-medium gap-2">
+                        <i class="fa-solid fa-expand text-xl"></i>
+                        <span>הגדל תמונה</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-1 gap-4 h-64 md:h-80">
+                    <div class="h-full bg-gray-200 relative group cursor-pointer overflow-hidden rounded-2xl" onclick="openLightbox('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80')">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="מאפה">
+                    </div>
+                    <div class="h-full bg-gray-200 relative group cursor-pointer overflow-hidden rounded-2xl" onclick="openLightbox('https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80')">
+                        <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="קפה">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+                <div class="lg:col-span-2 space-y-4 text-gray-700 leading-relaxed">
+                    <p>
+                        אם אתם מחפשים מקום רגוע לברוח אליו מההמולה של העיר, אבל בלי להתפשר על איכות הקפה – זה המקום בשבילכם. מעוצב בסגנון כפרי-מודרני עם המון צמחייה, אור טבעי ומוזיקת רקע נעימה בווליום המדויק.
+                    </p>
+                    <h4 class="font-bold text-gray-900 text-lg">מה חובה להזמין?</h4>
+                    <ul class="list-disc list-inside space-y-1 text-sm pr-2">
+                        <li><strong class="text-gray-900">קרואסון המאירי וטימין:</strong> פריך, חמאתי ומשלב מליחות מעודנת.</li>
+                        <li><strong class="text-gray-900">קפה בחליטה קרה (Cold Brew):</strong> מרענן בטירוף מפולים בקלייה מקומית.</li>
+                    </ul>
+                    <div class="bg-amber-50 border-r-4 border-amber-500 p-4 rounded-xl">
+                        <span class="font-bold text-amber-900 text-sm block mb-1">💡 טיפ זהב:</span>
+                        <p class="text-amber-800 text-xs">השולחנות בחלק האחורי של החצר מצוידים בשקעי חשמל והם השקטים ביותר למי שמגיע לעבוד עם לפטופ.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-3 text-sm">
+                    <div class="flex items-center gap-2 font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                        <i class="fa-solid fa-circle-info text-amber-500"></i>
+                        <span>פרטים מהירים</span>
+                    </div>
+                    <div class="text-gray-600 space-y-1.5 text-xs">
+                        <p><strong class="text-gray-800">כתובת:</strong> הרצל 45, תל אביב</p>
+                        <p><strong class="text-gray-800">שעות:</strong> א'-ה': 07:30 - 20:00 | ו': 07:30 - 15:00</p>
+                        <p><strong class="text-gray-800">טווח מחירים:</strong> 40-70 ₪ למנה</p>
+                    </div>
+                    <div class="pt-2 flex flex-wrap gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-600 text-[11px] px-2 py-0.5 rounded-md">ידידותי לכלבים</span>
+                        <span class="bg-white border border-gray-200 text-gray-600 text-[11px] px-2 py-0.5 rounded-md">מתאים ללפטופים</span>
+                    </div>
+                    <div class="pt-2 grid grid-cols-2 gap-2">
+                        <a href="https://waze.com/ul?q=Herzl+45+Tel+Aviv" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-xl flex items-center justify-center gap-1.5 transition text-xs shadow-sm">
+                            <i class="fa-solid fa-location-arrow"></i> ניווט ב-Waze
+                        </a>
+                        <button onclick="shareWhatsApp('בוא ניפגש בקפה גלריה בפלורנטין! הרצל 45 תל אביב.')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 rounded-xl flex items-center justify-center gap-1.5 transition text-xs shadow-sm">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> שלח לחבר
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search & Filter Controls for the Full List -->
+        <div id="cafe-list" class="space-y-4 pt-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">גלה את 10 בתי הקפה הנוספים</h3>
+                    <p class="text-xs text-gray-500">סנן לפי האווירה והצורך שלך</p>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="relative w-full md:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input type="text" id="cafeSearchInput" onkeyup="filterCafes()" placeholder="חפש בית קפה או אזור..." class="w-full bg-gray-50 border border-gray-200 text-xs rounded-xl py-2 pr-9 pl-3 focus:outline-none focus:border-amber-500 transition">
+                </div>
+            </div>
+
+            <!-- Filter Categories -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
+                <button onclick="setFilter('all', this)" class="filter-btn active px-4 py-2 rounded-xl font-medium border border-gray-200 bg-white text-gray-700 hover:border-amber-500 transition shrink-0">הכל (11)</button>
+                <button onclick="setFilter('work', this)" class="filter-btn px-4 py-2 rounded-xl font-medium border border-gray-200 bg-white text-gray-700 hover:border-amber-500 transition shrink-0">💻 מתאים ללפטופ</button>
+                <button onclick="setFilter('bakery', this)" class="filter-btn px-4 py-2 rounded-xl font-medium border border-gray-200 bg-white text-gray-700 hover:border-amber-500 transition shrink-0">🥐 מאפים מושלמים</button>
+                <button onclick="setFilter('quiet', this)" class="filter-btn px-4 py-2 rounded-xl font-medium border border-gray-200 bg-white text-gray-700 hover:border-amber-500 transition shrink-0">🌿 חצר שקטה</button>
+                <button onclick="setFilter('specialty', this)" class="filter-btn px-4 py-2 rounded-xl font-medium border border-gray-200 bg-white text-gray-700 hover:border-amber-500 transition shrink-0">☕ קפה גל שלישי</button>
+            </div>
+        </div>
+
+        <!-- 10 Additional Cafes Grid -->
+        <div id="cafesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Cafe 2 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="work specialty" data-name="קפה נחת כיכר דיזנגוף">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="קפה נחת">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.8 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">כיכר דיזנגוף</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">2. קפה נחת (Nahat Coffee)</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">מרכז העיר</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        בית קלייה מקומי המשקיף הישר על כיכר דיזנגוף. המקום המושלם לחובבי קפה גל שלישי עם זני פולים ייחודיים מכל העולם, חליטות מיוחדות ואווירה תל אביבית קלאסית.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> קפוצ'ינו קורטאדו + עוגיית שוקולד צ'יפס מלח ימי.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> ריינס 1 (כיכר דיזנגוף)</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">💻 מתאים ללפטופ</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">☕ פולים במקום</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('שמעת על קפה נחת בכיכר דיזנגוף? מקום מעולה לקפה גל שלישי! ☕')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Reines+1+Tel+Aviv" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 3 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="bakery quiet" data-name="קפה מייזון קייזר רוטשילד">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="מייזון קייזר">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.7 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">שדרות רוטשילד</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">3. מייזון קייזר (Maison Kayser)</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">רוטשילד</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        המאפייה הפריזאית האיקונית הביאה לתל אביב את הקרואסונים הכי מדויקים בעיר. קפה עשיר לצד באגטים פריכים, טארטים צרפתיים מושלמים ואווירה אירופאית בשדרה.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> קרואסון שקדים או טארט לימון שרוף.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> שדרות רוטשילד 45</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🥐 מאפייה צרפתית</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🥖 באגטים טריים</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('בוא נלך לקרואסון במייזון קייזר ברוטשילד! 🥐☕')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Rothschild+45+Tel+Aviv" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 4 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="quiet work" data-name="קפה עמיתה יפו נווה צדק">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="עמיתה">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.9 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">גבול יפו / נווה צדק</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">4. עמיתה (Amida Bakery)</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">יפו</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        מאפיית קונדיטוריה של האופות מיכל בוטון ומיכל אפשטיין. מאפים עונתיים ייחודיים המשלבים טכניקות צרפתיות עם חומרי גלם מקומיים ים-תיכוניים.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> בורקס עלים בעבודת יד + פלאט ווייט.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> דרך שלמה 10, יפו</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🌿 חצר פנימית</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🥐 מאפי בוטיק</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('חייבים לטעום את המאפים של מאפיית עמיתה ביפו! 🥐✨')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Salame+10+Jaffa" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 5 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="work specialty" data-name="קפה תאית קסטל אבן גבירול">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="קפה תאית">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.8 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">אבן גבירול / הקסטל</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">5. קפה תאית (Mae Cafe)</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">צפון הישן</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        רשת קפה מתמחה שמייבאת את הפולים הישר מחוות פרטיות בקוסטה ריקה וגואטמלה. מקום מעולה לעבודה קצרה או לקפה מהיר ברמה הגבוהה ביותר.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> אספרסו זני כפול + סנדוויץ' מחמצת גאודה.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> אבן גבירול 161</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">☕ ייבוא ישיר</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">💻 ידידותי ללפטופ</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('קפה תאית באבן גבירול - אחד האספרסו הטובים בעיר! ☕')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Ibn+Gabirol+161+Tel+Aviv" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 6 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="quiet work" data-name="קפה תאחי תרצה יפו">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="קפה תאחי">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.6 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">שוק הפשפשים, יפו</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">6. קפה קאסטל / תאחי</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">שוק הפשפשים</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        פינה שקטה ופסטורלית בלב ההמולה של שוק הפשפשים. שולחנות עץ תחת כיפת השמיים, מוזיקה מרגיעה ואווירה יפואית מקסימה שכיף להעביר בה שעות.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> קפה קר על חלב שיבולת שועל + עוגת גזר אישית.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> תרצה 17, יפו</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🌿 ישיבה בחוץ</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🐶 ידידותי לכלבים</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('פינה מטורפת בשוק הפשפשים - קפה תאחי! 🌿')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Tirtza+17+Jaffa" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 7 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="bakery quiet" data-name="קפה משק ברזילי נווה צדק">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1497636577773-f1231844b336?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1497636577773-f1231844b336?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="משק ברזילי">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.7 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">נווה צדק</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">7. קפה המעורר (משק ברזילי)</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">נווה צדק</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        מעוז הבריאות והטבעונות של נווה צדק. קפה אורגני, חלבים מצמחים שנסחטים במקום, קעריות אסאי, מאפים ללא גלוטן וחצר מוצלת וירוקה.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> מאצ'ה לאטה אורגני + מוס שוקולד טבעוני.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> אחד העם 6, נווה צדק</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🌱 100% טבעוני</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🌾 ללא גלוטן</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('קפה המעורר בנווה צדק - מקום בריא וטבעוני מושלם! 🌱')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Ahad+HaAm+6+Tel+Aviv" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 8 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="specialty work" data-name="קפה שפירא דרום תל אביב">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="קפה שפירא">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.8 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">שכונת שפירא</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">8. קפה שפירא</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">דרום העיר</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        קפה שכונתי-קהילתי קסום במרכז שכונת שפירא. חצר קסומה תחת עצי פרי, מחירים הוגנים מאוד, הופעות חיות קטנות בערבים ואווירה ביתית במיוחד.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> סנדוויץ' סלק וגבינת עזים + קפה פילטר בטפטוף.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> ישראל מסלנט 31</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🏡 חצר ענקית</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">💰 מחירים נוחים</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('חצר קסומה ואווירה ביתית בקפה שפירא! 🏡☕')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Israel+Masalant+31+Tel+Aviv" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 9 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="bakery specialty" data-name="קפה רביצקי לב תל אביב">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="רביצקי">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.7 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">לב העיר</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">9. קפה רביצקי (Ravitzky)</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">מרכז</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        אספרסו בר עירוני קטן ומדויק. מקום מושלם לעצירה קצרה של אמצע היום, לקחת קפה מעולה ומאפה שוקולד נמס בפה ולשבת על הספסלים בחוץ.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> אמריקנו קר + רוגלך שוקולד חם.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> אחד העם 51</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">⚡ עצרת קפה מהירה</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🥐 רוגלך חם</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('קפה רביצקי באחד העם - האמריקנו הקר והרוגלך הכי טוב בעיר! ☕')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Ahad+HaAm+51+Tel+Aviv" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 10 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="work quiet" data-name="קפה אדמונד אלנבי">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="קפה אדמונד">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.9 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">אלנבי / יהודה הלוי</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">10. קפה אדמונד (Edmond)</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">סיטי</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        פסאז' נסתר בלב אלנבי שהפך לפינת חמד יפהפייה. מקום אהוב במיוחד על פרילנסרים בזכות שולחנות עבודה נוחים, אינטרנט מהיר וקפה מבית קלייה איכותי.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> הולד ברו + סנדוויץ' אבוקדו וביצה רכה.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> אלנבי 97</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">💻 גן עדן ללפטופים</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🔌 שקעים בשפע</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('בוא נעבוד ביחד מקפה אדמונד באלנבי! מקום מושלם ללפטופ 💻☕')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Allenby+97+Tel+Aviv" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe 11 -->
+            <div class="cafe-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition" data-tags="bakery quiet" data-name="קפה בייקרי כיכר המדינה">
+                <div class="relative h-48 bg-gray-200 overflow-hidden cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=800&q=80')">
+                    <img src="https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="בייקרי">
+                    <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2.5 py-1 rounded-lg">4.8 ★</span>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-md">כיכר המדינה</span>
+                </div>
+                <div class="p-5 flex-grow space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900">11. בייקרי (Bakery)</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded-md">צפון העיר</span>
+                    </div>
+                    <p class="text-gray-600 text-xs leading-relaxed">
+                        הסניף הקלאסי של קבוצת R2M. סטנדרט נורדי-אירופאי ללא פשרות, קפה מעולה, קינוחים אגדיים ואווירה שכונתית אלגנטית.
+                    </p>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1 border border-gray-100">
+                        <p><strong class="text-gray-800">מומלץ:</strong> עוגת סנטה נורה + קפוצ'ינו כפול.</p>
+                        <p><strong class="text-gray-800">כתובת:</strong> ויצמן 67</p>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex gap-1">
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">🍰 קינוחי עילית</span>
+                        <span class="bg-white border border-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded">✨ קלאסיקה</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareWhatsApp('רוצה לקפוץ לבייקרי בכיכר המדינה לקינוח וקפה? 🍰☕')" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1" title="שתף בוואצאפ">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                        <a href="https://waze.com/ul?q=Weizmann+67+Tel+Aviv" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1">
+                            <span>ניווט</span> <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- User Comments & Interaction Section -->
+        <div id="reviews" class="bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+            <h3 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <i class="fa-regular fa-comments text-amber-500"></i>
+                <span>חוות דעת של גולשים (<span id="commentsCount">2</span>)</span>
+            </h3>
+
+            <!-- Comments List -->
+            <div id="commentsList" class="space-y-4">
+                <div class="border-b border-gray-100 pb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-gray-800 text-sm">רוני כהן</span>
+                        <span class="text-xs text-amber-500">★★★★★</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">קפה נחת ואדמונד הם הקבועים שלי לעבודה. רשימה מעולה ומדויקת!</p>
+                </div>
+                <div class="border-b border-gray-100 pb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-gray-800 text-sm">דניאל לוי</span>
+                        <span class="text-xs text-amber-500">★★★★☆</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">הקרואסון במייזון קייזר פשוט חלום. ממליץ להגיע מוקדם בסופ"ש.</p>
+                </div>
+            </div>
+
+            <!-- Add Comment Form -->
+            <form onsubmit="handleAddComment(event)" class="space-y-4 pt-4 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                <h4 class="font-bold text-sm text-gray-800">יש לכם בית קפה אהוב להמליץ עליו? כיתבו לנו:</h4>
+                
+                <!-- Star Rating Selector -->
+                <div class="flex items-center gap-1 text-gray-300 star-rating" id="starRating">
+                    <i class="fa-solid fa-star text-lg" onclick="setRating(1)"></i>
+                    <i class="fa-solid fa-star text-lg" onclick="setRating(2)"></i>
+                    <i class="fa-solid fa-star text-lg" onclick="setRating(3)"></i>
+                    <i class="fa-solid fa-star text-lg" onclick="setRating(4)"></i>
+                    <i class="fa-solid fa-star text-lg" onclick="setRating(5)"></i>
+                    <span class="text-xs text-gray-500 mr-2" id="ratingText">5 מתוך 5 כוכבים</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" id="commentName" placeholder="שם מלא" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 bg-white">
+                </div>
+                <textarea id="commentText" rows="3" placeholder="על איזה בית קפה אתם ממליצים ומה חובה להזמין שם?" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 bg-white"></textarea>
+                
+                <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white font-medium px-6 py-2.5 rounded-xl text-sm transition shadow-sm">
+                    פרסם המלצה
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4" onclick="closeLightbox()">
+        <button onclick="closeLightbox()" class="absolute top-5 right-5 text-white text-3xl hover:text-gray-300 p-2">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <img id="lightboxImg" src="" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-100 mt-16 py-8 text-center text-xs text-gray-400">
+        <div class="max-w-6xl mx-auto px-4 space-y-2">
+            <p class="font-bold text-gray-600 text-sm">ביס קטן . המדריך הקולינרי שלך בתל אביב</p>
+            <p>© 2026 כל הזכויות שמורות - המלצות על בתי קפה, מסעדות ואוכל רחוב</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        let isBookmarked = false;
+        let selectedRating = 5;
+
+        // Toast Notification Helper
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = message;
+            toastIcon.className = isSuccess ? "fa-solid fa-circle-check text-emerald-400 text-lg" : "fa-solid fa-circle-info text-amber-400 text-lg";
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // WhatsApp Share Handler
+        function shareWhatsApp(customText) {
+            const currentUrl = window.location.href;
+            const fullText = encodeURIComponent(`${customText}\n${currentUrl}`);
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${fullText}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Bookmark Toggle
+        function toggleBookmark() {
+            isBookmarked = !isBookmarked;
+            const icon = document.getElementById('bookmarkIcon');
+            const text = document.getElementById('bookmarkText');
+            
+            if (isBookmarked) {
+                icon.className = 'fa-solid fa-bookmark text-amber-500';
+                text.textContent = 'הרשימה נשמרה';
+                showToast('רשימת בתי הקפה נשמרה בהצלחה!');
+            } else {
+                icon.className = 'fa-regular fa-bookmark text-amber-500';
+                text.textContent = 'שמור רשימה';
+                showToast('הרשימה הוסרה מהשמורים', false);
+            }
+        }
+
+        // Share functionality
+        function shareRecommendation() {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href);
+                showToast('הקישור לרשימה הועתק ללוח!');
+            } else {
+                showToast('מוכן לשיתוף!');
+            }
+        }
+
+        // Focus search input
+        function focusSearch() {
+            const input = document.getElementById('cafeSearchInput');
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => input.focus(), 400);
+        }
+
+        // Category Filter Function
+        function setFilter(category, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            const cards = document.querySelectorAll('.cafe-card');
+            cards.forEach(card => {
+                const tags = card.getAttribute('data-tags') || '';
+                if (category === 'all' || tags.includes(category)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Filter Function
+        function filterCafes() {
+            const query = document.getElementById('cafeSearchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.cafe-card');
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name').toLowerCase();
+                const text = card.textContent.toLowerCase();
+
+                if (name.includes(query) || text.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Lightbox Functions
+        function openLightbox(imgSrc) {
+            document.getElementById('lightboxImg').src = imgSrc;
+            document.getElementById('lightbox').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+        }
+
+        // Rating Selector Handler
+        function setRating(rating) {
+            selectedRating = rating;
+            const stars = document.querySelectorAll('#starRating .fa-star');
+            const ratingText = document.getElementById('ratingText');
+            
+            stars.forEach((star, idx) => {
+                if (idx < rating) {
+                    star.classList.add('text-amber-400');
+                    star.classList.remove('text-gray-300');
+                } else {
+                    star.classList.remove('text-amber-400');
+                    star.classList.add('text-gray-300');
+                }
+            });
+            ratingText.textContent = rating + ' מתוך 5 כוכבים';
+        }
+
+        // Comment Submission
+        function handleAddComment(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('commentName');
+            const textInput = document.getElementById('commentText');
+
+            if (!nameInput.value.trim() || !textInput.value.trim()) return;
+
+            const commentsList = document.getElementById('commentsList');
+            const newComment = document.createElement('div');
+            newComment.className = 'border-b border-gray-100 pb-4 animate-fade-in';
+            
+            let starsHtml = '★'.repeat(selectedRating) + '☆'.repeat(5 - selectedRating);
+
+            newComment.innerHTML = `
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-gray-800 text-sm">${escapeHtml(nameInput.value)}</span>
+                    <span class="text-xs text-amber-500">${starsHtml}</span>
+                </div>
+                <p class="text-gray-600 text-sm">${escapeHtml(textInput.value)}</p>
+            `;
+
+            commentsList.prepend(newComment);
+
+            // Update Count
+            const countElem = document.getElementById('commentsCount');
+            countElem.textContent = parseInt(countElem.textContent) + 1;
+
+            // Reset Form
+            nameInput.value = '';
+            textInput.value = '';
+            setRating(5);
+
+            showToast('תודות! ההמלצה שלך פורסמה בהצלחה');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Initialize default state
+        setRating(5);
+    </script>
+</body>
+</html>

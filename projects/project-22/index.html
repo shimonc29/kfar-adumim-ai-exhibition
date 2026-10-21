@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תרבות בביס - מערכת המלצות חכמה לבילויים ואוכל</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            dark: '#0f172a',
+                            accent: '#f59e0b',
+                            rose: '#f43f5e'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4ade80 0%, #3b82f6 50%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, #22c55e 0%, #06b6d4 100%);
+        }
+        .gradient-btn:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #0891b2 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <header class="sticky top-0 z-50 glass-nav transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('finder')">
+                <div class="w-11 h-11 rounded-2xl gradient-btn flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-black tracking-tight gradient-text">תרבות בביס</span>
+                    <span class="block text-xs text-slate-400 font-normal">מערכת המלצות חכמה לבילויים, אופנה, אטרקציות ואוכל</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center gap-2">
+                <button onclick="switchTab('finder')" id="nav-finder" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-brand-500 text-white shadow-md shadow-brand-500/20">
+                    <i class="fa-solid fa-wand-magic-sparkles ml-2"></i>מחולל ההמלצות
+                </button>
+                <button onclick="switchTab('explore')" id="nav-explore" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800">
+                    <i class="fa-solid fa-border-all ml-2"></i>עיון בקטלוג
+                </button>
+                <button onclick="switchTab('audiences')" id="nav-audiences" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800">
+                    <i class="fa-solid fa-users ml-2"></i>קהלי יעד ומערכות
+                </button>
+                <button onclick="switchTab('saved')" id="nav-saved" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800 relative">
+                    <i class="fa-solid fa-bookmark ml-2"></i>שמורים
+                    <span id="saved-count-badge" class="hidden absolute -top-1 -right-1 bg-brand-rose text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+            </nav>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="md:hidden">
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="p-2 text-slate-300 hover:text-white focus:outline-none">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2 border-t border-slate-800 bg-slate-900">
+            <button onclick="switchTab('finder'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl font-semibold text-white bg-slate-800">
+                <i class="fa-solid fa-wand-magic-sparkles ml-2"></i>מחולל ההמלצות
+            </button>
+            <button onclick="switchTab('explore'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl font-semibold text-slate-300 hover:bg-slate-800">
+                <i class="fa-solid fa-border-all ml-2"></i>עיון בקטלוג
+            </button>
+            <button onclick="switchTab('audiences'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl font-semibold text-slate-300 hover:bg-slate-800">
+                <i class="fa-solid fa-users ml-2"></i>קהלי יעד ומערכות
+            </button>
+            <button onclick="switchTab('saved'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl font-semibold text-slate-300 hover:bg-slate-800">
+                <i class="fa-solid fa-bookmark ml-2"></i>שמורים
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- ==================== TAB 1: RECOMMENDATION GENERATOR ==================== -->
+        <section id="tab-finder" class="space-y-8">
+            <!-- Hero Banner -->
+            <div class="text-center space-y-4 max-w-3xl mx-auto">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 text-xs font-semibold">
+                    <i class="fa-solid fa-bolt"></i> אלגוריתם המלצות חכם בזמן אמת
+                </span>
+                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">מה עושים היום? <br><span class="gradient-text">אטרקציות, שופינג, אוכל ובילויים בתקציב שלך</span></h1>
+                <p class="text-slate-400 text-base sm:text-lg">בחר את הפרמטרים שלך ותן למערכת שלנו להרכיב עבורך את הבילוי, האופנה והאווירה המדויקים ביותר.</p>
+            </div>
+
+            <!-- Wizard Filter Controls Form -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Audience Selection -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-300">
+                            <i class="fa-solid fa-user-group text-brand-500 ml-1"></i> קהל יעד / מי המבלים?
+                        </label>
+                        <select id="filter-audience" class="w-full bg-slate-900/80 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none transition-all text-slate-200">
+                            <option value="youth">צעירים ובני נוער (15–21)</option>
+                            <option value="students">סטודנטים וצעירים (22–30)</option>
+                            <option value="couples">זוגות לדייט קליל</option>
+                            <option value="families">משפחות ללא הוצאות כבדות</option>
+                        </select>
+                    </div>
+
+                    <!-- Budget Range Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-sm font-semibold text-slate-300">
+                                <i class="fa-solid fa-shekel-sign text-brand-500 ml-1"></i> תקציב לאדם
+                            </label>
+                            <span id="budget-value" class="text-brand-500 font-bold text-sm bg-brand-500/10 px-2 py-0.5 rounded-lg">עד 50 ₪</span>
+                        </div>
+                        <input type="range" id="filter-budget" min="0" max="250" step="10" value="50" oninput="updateBudgetDisplay(this.value)" class="w-full accent-brand-500 bg-slate-800 rounded-lg cursor-pointer h-2">
+                        <div class="flex justify-between text-xs text-slate-500">
+                            <span>חינם (0 ₪)</span>
+                            <span>100 ₪</span>
+                            <span>250+ ₪</span>
+                        </div>
+                    </div>
+
+                    <!-- Vibe / Activity Mood Selector -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-300">
+                            <i class="fa-solid fa-icons text-brand-500 ml-1"></i> סוג הבילוי / אווירה
+                        </label>
+                        <select id="filter-vibe" class="w-full bg-slate-900/80 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none transition-all text-slate-200">
+                            <option value="shopping">שופינג, אופנה ווינטג'</option>
+                            <option value="attraction">אטרקציות, אקשן ומשחקים</option>
+                            <option value="study">שקט ללימודים / עבודה (Wi-Fi + שקעים)</option>
+                            <option value="happyhour">אוכל, האפי האוור וקולינריה</option>
+                            <option value="chill">קליל בחוץ / טבע עירוני</option>
+                            <option value="romantic">רומנטי אך לא יקר</option>
+                            <option value="trendy">טרנדי ומצטלם לטיקטוק</option>
+                        </select>
+                    </div>
+
+                    <!-- Preferred Area -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-300">
+                            <i class="fa-solid fa-location-dot text-brand-500 ml-1"></i> אזור במדינה
+                        </label>
+                        <select id="filter-area" class="w-full bg-slate-900/80 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none transition-all text-slate-200">
+                            <option value="center">תל אביב והמרכז</option>
+                            <option value="north">חיפה והצפון</option>
+                            <option value="jerusalem">ירושלים והסביבה</option>
+                            <option value="south">באר שבע והדרום</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Custom Prompt & Action Bar -->
+                <div class="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="w-full sm:w-2/3">
+                        <input type="text" id="filter-custom" placeholder="תוספת חופשית (למשל: 'חנות יד שנייה', 'חדר בריחה מוזל', 'מקום פתוח בשבת')..." class="w-full bg-slate-900/60 border border-slate-700/80 rounded-2xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div class="w-full sm:w-auto flex gap-3">
+                        <button onclick="generateAIRecommendations()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-bold text-white gradient-btn shadow-lg shadow-brand-500/25 hover:opacity-95 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-sparkles"></i> מצא לי המלצות חכמות
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Output Container -->
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-brand-500"></i> תוצאות המלצה מותאמות אישית
+                    </h2>
+                    <span id="results-count" class="text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded-full">מציג 4 המלצות</span>
+                </div>
+
+                <!-- Loading State Spinner -->
+                <div id="ai-loading" class="hidden glass-card rounded-3xl p-12 text-center space-y-4">
+                    <div class="inline-block animate-spin text-brand-500 text-4xl mb-2">
+                        <i class="fa-solid fa-circle-notch"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-200">מפעיל את אלגוריתם הסינון...</h3>
+                    <p class="text-slate-400 text-sm max-w-md mx-auto">מצליב נתוני תקציב, קהלי יעד ואווירה מבוקשת ליצירת תוצאות אופטימליות עבורך.</p>
+                </div>
+
+                <!-- Grid of Recommendations Cards -->
+                <div id="recommendations-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Cards will be populated dynamically by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: EXPLORE CATALOG ==================== -->
+        <section id="tab-explore" class="hidden space-y-8">
+            <div class="space-y-3">
+                <h1 class="text-3xl font-extrabold text-slate-100">עיון בקטלוג ההמלצות המלא</h1>
+                <p class="text-slate-400 text-sm">סינון מהיר לפי קטגוריות אופנה, אטרקציות, אוכל ופנאי.</p>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="flex flex-wrap gap-2 pb-2 border-b border-slate-800">
+                <button onclick="filterCatalog('all')" class="catalog-tab-btn active px-4 py-2 rounded-xl text-sm font-semibold bg-brand-500 text-white">הכל</button>
+                <button onclick="filterCatalog('shopping')" class="catalog-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"><i class="fa-solid fa-shirt ml-1"></i> אופנה ושופינג</button>
+                <button onclick="filterCatalog('attractions')" class="catalog-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"><i class="fa-solid fa-ticket ml-1"></i> אטרקציות וחוויות</button>
+                <button onclick="filterCatalog('food')" class="catalog-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"><i class="fa-solid fa-utensils ml-1"></i> אוכל וקולינריה</button>
+                <button onclick="filterCatalog('study')" class="catalog-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"><i class="fa-solid fa-laptop ml-1"></i> פינות עבודה ולימודים</button>
+                <button onclick="filterCatalog('outdoors')" class="catalog-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"><i class="fa-solid fa-tree ml-1"></i> טבע ופנאי חינמי</button>
+            </div>
+
+            <!-- Catalog Items Grid -->
+            <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated dynamically via JavaScript -->
+            </div>
+        </section>
+
+<script>
+        const itemsDatabase = [
+            {
+                id: 'item-vintage-1',
+                title: 'בוטיק וינטג\' ויד שנייה "Vintage Vibes"',
+                category: 'shopping',
+                audience: 'youth',
+                vibe: 'shopping',
+                area: 'center',
+                budget: 40,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=600&q=80',
+                tags: ['בגדי מותגים מוזלים', 'וינטג\' 90s', 'אקולוגי', 'טרנדי'],
+                description: 'חנות יד שנייה מטרפת לחובבי אופנה ייחודית. ג\'קטים, ג\'ינסים ופריטי אספנות במחירים שבין 20 ₪ ל-60 ₪.',
+                recommendationReason: 'לבוש ייחודי במחיר מצחיק – מושלם לבני נוער וצעירים שמחפשים סטייל ללא הוצאה גדולה.'
+            },
+            {
+                id: 'item-attr-1',
+                title: 'מתחם טיפוס בולדערינג מוזל',
+                category: 'attractions',
+                audience: 'students',
+                vibe: 'attraction',
+                area: 'center',
+                budget: 55,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=600&q=80',
+                tags: ['כרטיסיית סטודנט', 'ספורט חברתי', 'ציוד כלול', 'אדרנלין'],
+                description: 'קיר טיפוס אורבני עם מסלולים לכל הרמות. הנחת סטודנט מיוחדת בימי חול ואווירה ספורטיבית ומדליקה.',
+                recommendationReason: 'אטרקציה אקטיבית וחברתית במחיר נגיש כולל השכרת נעליים.'
+            },
+            {
+                id: 'item-attr-2',
+                title: 'ערב סרטים ופופקורן בסינמטק',
+                category: 'attractions',
+                audience: 'couples',
+                vibe: 'romantic',
+                area: 'jerusalem',
+                budget: 30,
+                rating: 4.7,
+                image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80',
+                tags: ['קולנוע איכותי', 'כרטיס מוזל', 'דייט קלאסי', 'נוף'],
+                description: 'הקרנות סרטים עצמאיים וקלאסיקות קולנועיות במחיר מסובסד לצעירים ולסטודנטים, כולל תצפית קסומה.',
+                recommendationReason: 'דייט תרבותי ורומנטי במחיר של שליש מכרטיס קולנוע מסחרי.'
+            },
+            {
+                id: 'item-shop-2',
+                title: 'אאוטלט אופנת רחוב וסניקרס',
+                category: 'shopping',
+                audience: 'youth',
+                vibe: 'shopping',
+                area: 'north',
+                budget: 90,
+                rating: 4.6,
+                image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=600&q=80',
+                tags: ['סניקרס מוזלות', 'הנחות ענק', 'אופנת רחוב', 'מציאות'],
+                description: 'מתחם עודפים של מותגי ספורט ורחוב מובילים עם הנחות של עד 70% על דגמי עבר.',
+                recommendationReason: 'חנות חובה לחובבי סניקרס וביגוד ספורטיבי בתקציב שפויי.'
+            },
+            {
+                id: 'item-1',
+                title: 'קפה לימודים "הפינה השקטה"',
+                category: 'study',
+                audience: 'students',
+                vibe: 'study',
+                area: 'center',
+                budget: 35,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
+                tags: ['Wi-Fi מהיר', 'שקע ליד כל שולחן', 'קפה גל שני', 'שקט'],
+                description: 'בית קפה רגוע עם שולחנות עבודה רחבים, אווירה פסטורלית ואספרסו משובח. מקום מושלם ללמוד לבד או בזוג.',
+                recommendationReason: 'מתאים בדיוק לתקציב נמוך (35 ₪ לקפה ומאפה) ומספק סביבת עבודה אופטימלית.'
+            },
+            {
+                id: 'item-2',
+                title: 'בר פיצה "האפי האוור 1+1"',
+                category: 'food',
+                audience: 'youth',
+                vibe: 'happyhour',
+                area: 'center',
+                budget: 45,
+                rating: 4.7,
+                image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+                tags: ['1+1 בין 17:00-19:00', 'פיצה מחמצת', 'טרנדי', 'מוזיקה טובה'],
+                description: 'מקום צעיר ותוסס המציע פיצות שף אישיות במבצעי 1+1 מטורפים בשעות אחה"כ. מתאים בול ליציאה עם חברים.',
+                recommendationReason: 'מקסימום אוכל ואווירה במינימום מחיר לצעירים.'
+            },
+            {
+                id: 'item-3',
+                title: 'פיקניק שקיעה במצפור העירוני',
+                category: 'outdoors',
+                audience: 'couples',
+                vibe: 'romantic',
+                area: 'jerusalem',
+                budget: 0,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+                tags: ['חינם', 'נוף פנורמי', 'שקיעה', 'רומנטי'],
+                description: 'נקודת תצפית קסומה עם ספסלי עץ ומדשאות. מומלץ להביא מחצלת, גבינות ולחם מהבית לדייט רומנטי מושלם.',
+                recommendationReason: 'אפס הוצאות כספיות, 100% רומנטיקה ואווירה.'
+            },
+            {
+                id: 'item-4',
+                title: 'גלידריית בוטיק "סודית ומצטלמת"',
+                category: 'food',
+                audience: 'youth',
+                vibe: 'trendy',
+                area: 'north',
+                budget: 25,
+                rating: 4.6,
+                image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=600&q=80',
+                tags: ['ויראלי בטיקטוק', 'טעמים מטורפים', 'עיצוב ניאון'],
+                description: 'גלידרייה עם תאורת ניאון וקינוחים מושקעים שנועדו במיוחד לרשתות החברתיות. מנות ענקיות במחיר נוח.',
+                recommendationReason: 'פופולרי מאוד בקרב בני נוער, מחיר נגיש של 25 ₪ למנה.'
+            },
+            {
+                id: 'item-5',
+                title: 'סלון בירה קהילתי ומשחקי קופסה',
+                category: 'attractions',
+                audience: 'students',
+                vibe: 'chill',
+                area: 'south',
+                budget: 40,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1610882648335-ced8fc8fa6b6?auto=format&fit=crop&w=600&q=80',
+                tags: ['משחקי קופסה חינם', 'חצי בירה ב-22 ₪', 'אווירה ביתית'],
+                description: 'בר קהילתי קליל עם עשרות משחקי קופסה פתוחים לקהל, מחירים נמוכים ומלא חבר\'ה צעירים.',
+                recommendationReason: 'בילוי חברתי מהנה בלי לרוקן את הארנק.'
+            }
+        ];
+
+        let savedItems = JSON.parse(localStorage.getItem('bitesized_saved') || '[]');
+
+        window.onload = function() {
+            updateSavedBadge();
+            renderRecommendations(itemsDatabase);
+            renderCatalog('all');
+            renderSavedItems();
+        };
+
+        function switchTab(tabId) {
+            const tabs = ['finder', 'explore', 'audiences', 'saved'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (sec) sec.classList.add('hidden');
+                if (nav) {
+                    nav.classList.remove('bg-brand-500', 'text-white', 'shadow-md');
+                    nav.classList.add('text-slate-300');
+                }
+            });
+
+            const activeSec = document.getElementById(`tab-${tabId}`);
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeSec) activeSec.classList.remove('hidden');
+            if (activeNav) {
+                activeNav.classList.add('bg-brand-500', 'text-white', 'shadow-md');
+                activeNav.classList.remove('text-slate-300');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function updateBudgetDisplay(val) {
+            const label = document.getElementById('budget-value');
+            if (val == 0) {
+                label.textContent = 'חינם (0 ₪)';
+            } else if (val >= 250) {
+                label.textContent = '250+ ₪';
+            } else {
+                label.textContent = `עד ${val} ₪`;
+            }
+        }
+
+        async function generateAIRecommendations() {
+            const audience = document.getElementById('filter-audience').value;
+            const maxBudget = parseInt(document.getElementById('filter-budget').value);
+            const vibe = document.getElementById('filter-vibe').value;
+            const area = document.getElementById('filter-area').value;
+            const customQuery = document.getElementById('filter-custom').value.trim();
+
+            const loadingEl = document.getElementById('ai-loading');
+            const gridEl = document.getElementById('recommendations-grid');
+
+            loadingEl.classList.remove('hidden');
+            gridEl.classList.add('opacity-40');
+
+            // Simulate algorithmic processing delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // Filter static list based on selections
+            let filtered = itemsDatabase.filter(item => {
+                const matchBudget = maxBudget >= 250 || item.budget <= maxBudget;
+                const matchVibe = (vibe === 'shopping' && item.category === 'shopping') || 
+                                  (vibe === 'attraction' && item.category === 'attractions') || 
+                                  item.vibe === vibe || maxBudget > 100;
+                return matchBudget && matchVibe;
+            });
+
+            // Fallback if filters are overly strict
+            if (filtered.length === 0) {
+                filtered = itemsDatabase.slice(0, 4);
+            }
+
+            // If user typed a custom query, attempt to call Gemini API dynamically
+            if (customQuery !== "") {
+                try {
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                    
+                    const promptText = `פעל כמודל המלצות חכם לאתר הבילויים והפנאי 'תרבות בביס'.
+                    המשתמש מחפש המלצה מותאמת אישית הכוללת אוכל, אטרקציות, אופנה או שופינג בתקציב.
+                    פרטי המשתמש:
+                    - קהל יעד: ${audience}
+                    - תקציב מקסימלי: ${maxBudget} ש"ח
+                    - סוג/אווירה: ${vibe}
+                    - אזור: ${area}
+                    - בקשה מיוחדת: "${customQuery}"
+
+                    צור המלצה אחת מפורטת בעברית בצורת JSON עם השדות הבאים:
+                    title, category (shopping/attractions/food/study/outdoors), budget (מספר), rating (מספר 4.0-5.0), description, tags (מערך מילים), recommendationReason.`;
+
+                    const payload = {
+                        contents: [{ parts: [{ text: promptText }] }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (resultText) {
+                            const aiResult = JSON.parse(resultText);
+                            aiResult.id = 'ai-gen-' + Date.now();
+                            aiResult.image = aiResult.category === 'shopping' 
+                                ? 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80'
+                                : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80';
+                            aiResult.audience = audience;
+                            aiResult.vibe = vibe;
+                            aiResult.area = area;
+                            filtered.unshift(aiResult);
+                        }
+                    }
+                } catch (e) {
+                    console.log("Dynamic API call fallback used static logic", e);
+                }
+            }
+
+            loadingEl.classList.add('hidden');
+            gridEl.classList.remove('opacity-40');
+
+            document.getElementById('results-count').textContent = `מציג ${filtered.length} המלצות מותאמות`;
+            renderRecommendations(filtered);
+        }
+
+        function renderRecommendations(items) {
+            const grid = document.getElementById('recommendations-grid');
+            grid.innerHTML = '';
+
+            items.forEach(item => {
+                const isSaved = savedItems.some(s => s.id === item.id);
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-3xl overflow-hidden hover:border-slate-600 transition-all duration-300 flex flex-col justify-between group';
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                            
+                            <!-- Badges -->
+                            <div class="absolute top-3 right-3 flex gap-2">
+                                <span class="bg-slate-900/80 backdrop-blur-md text-slate-200 text-xs px-2.5 py-1 rounded-xl border border-slate-700/50 font-semibold">
+                                    ${item.budget === 0 ? 'חינם' : item.budget + ' ₪'}
+                                </span>
+                            </div>
+
+                            <button onclick="toggleSaveItem('${item.id}')" class="absolute top-3 left-3 w-9 h-9 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700/50 text-slate-300 hover:text-brand-rose flex items-center justify-center transition-all">
+                                <i class="${isSaved ? 'fa-solid text-brand-rose' : 'fa-regular'} fa-bookmark"></i>
+                            </button>
+
+                            <div class="absolute bottom-3 right-3 left-3 flex justify-between items-end">
+                                <span class="text-xs font-bold bg-brand-500/90 text-white px-2.5 py-0.5 rounded-lg flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-amber-300"></i> ${item.rating}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-5 space-y-3">
+                            <h3 class="text-xl font-bold text-slate-100 group-hover:text-brand-500 transition-colors">${item.title}</h3>
+                            <p class="text-slate-400 text-xs sm:text-sm line-clamp-2">${item.description}</p>
+                            
+                            <!-- AI Reason Note -->
+                            <div class="p-3 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-brand-500 text-xs space-y-1">
+                                <div class="font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-circle-check"></i> נימוק האלגוריתם:
+                                </div>
+                                <p class="text-slate-300">${item.recommendationReason || 'התאמה גבוהה לתקציב ולאווירה שנבחרו.'}</p>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                ${item.tags.map(t => `<span class="bg-slate-800/80 text-slate-400 text-xs px-2 py-0.5 rounded-md border border-slate-700/40">#${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 pt-0">
+                        <button onclick="shareRecommendation('${item.title}')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-share-nodes"></i> שיתוף עם חברים
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCatalog(category) {
+            document.querySelectorAll('.catalog-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-500', 'text-white');
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+            });
+            if (event && event.target) {
+                event.target.classList.add('bg-brand-500', 'text-white');
+                event.target.classList.remove('bg-slate-800', 'text-slate-300');
+            }
+
+            renderCatalog(category);
+        }
+
+        function renderCatalog(category) {
+            const grid = document.getElementById('catalog-grid');
+            grid.innerHTML = '';
+
+            const items = category === 'all' 
+                ? itemsDatabase 
+                : itemsDatabase.filter(i => i.category === category);
+
+            items.forEach(item => {
+                const isSaved = savedItems.some(s => s.id === item.id);
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-2xl p-4 space-y-3 flex flex-col justify-between border border-slate-800';
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-slate-100">${item.title}</h4>
+                            <span class="text-xs font-bold text-brand-500 bg-brand-500/10 px-2 py-0.5 rounded-lg">
+                                ${item.budget === 0 ? 'חינם' : item.budget + ' ₪'}
+                            </span>
+                        </div>
+                        <p class="text-slate-400 text-xs leading-relaxed">${item.description}</p>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-800/60">
+                        <span class="text-xs text-slate-500"><i class="fa-solid fa-star text-amber-400"></i> ${item.rating}</span>
+                        <button onclick="toggleSaveItem('${item.id}')" class="text-xs text-slate-400 hover:text-brand-rose">
+                            <i class="${isSaved ? 'fa-solid text-brand-rose' : 'fa-regular'} fa-bookmark ml-1"></i>
+                            ${isSaved ? 'שמור' : 'שמור במועדפים'}
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleSaveItem(id) {
+            const existingIndex = savedItems.findIndex(s => s.id === id);
+            if (existingIndex > -1) {
+                savedItems.splice(existingIndex, 1);
+            } else {
+                const item = itemsDatabase.find(i => i.id === id);
+                if (item) savedItems.push(item);
+            }
+            localStorage.setItem('bitesized_saved', JSON.stringify(savedItems));
+            updateSavedBadge();
+            
+            // Refresh views
+            const activeTab = document.querySelector('section:not(.hidden)').id;
+            if (activeTab === 'tab-finder') renderRecommendations(itemsDatabase);
+            if (activeTab === 'tab-explore') renderCatalog('all');
+            if (activeTab === 'tab-saved') renderSavedItems();
+        }
+
+        function updateSavedBadge() {
+            const badge = document.getElementById('saved-count-badge');
+            if (savedItems.length > 0) {
+                badge.textContent = savedItems.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderSavedItems() {
+            const grid = document.getElementById('saved-grid');
+            grid.innerHTML = '';
+
+            if (savedItems.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 glass-card rounded-3xl space-y-3">
+                        <i class="fa-regular fa-bookmark text-4xl text-slate-600"></i>
+                        <h3 class="text-lg font-bold text-slate-300">עדיין לא שמרת המלצות</h3>
+                        <p class="text-slate-500 text-xs">לחץ על האייקון השמירה בכל כרטיס המלצה כדי לשמור מקומות לבילוי הבא.</p>
+                        <button onclick="switchTab('finder')" class="px-4 py-2 rounded-xl gradient-btn text-white text-xs font-bold mt-2">
+                            עבור למחולל ההמלצות
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            savedItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-2xl p-5 space-y-3 flex flex-col justify-between';
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-slate-100">${item.title}</h4>
+                            <button onclick="toggleSaveItem('${item.id}')" class="text-slate-400 hover:text-brand-rose">
+                                <i class="fa-solid fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                        <p class="text-slate-400 text-xs">${item.description}</p>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs text-slate-400">
+                        <span>תקציב: ${item.budget === 0 ? 'חינם' : item.budget + ' ₪'}</span>
+                        <span class="text-brand-500 font-semibold">שמור בחשבון</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function clearSavedItems() {
+            savedItems = [];
+            localStorage.setItem('bitesized_saved', JSON.stringify(savedItems));
+            updateSavedBadge();
+            renderSavedItems();
+        }
+
+        function shareRecommendation(title) {
+            const text = `בדוק את ההמלצה הזו ב'תרבות בביס': ${title}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text);
+                alert('הקישור וההמלצה הועתקו ללוח!');
+            } else {
+                document.execCommand('copy');
+                alert('ההמלצה הועתקה!');
+            }
+        }
+    </script>
+</body>
+</html>

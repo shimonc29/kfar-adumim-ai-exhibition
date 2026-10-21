@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>איזה כלב מתאים לי? | חידון התאמה, כתבות, עמותות אימוץ ודירוג</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Rubik -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Rubik', 'sans-serif'],
+                    },
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                        },
+                        whatsapp: '#25D366',
+                        whatsappHover: '#128C7E'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #FAF6F0;
+            color: #2D3748;
+        }
+
+        .hero-pattern {
+            background-color: #fff8f0;
+            background-image: radial-gradient(#e5e7eb 0.75px, transparent 0.75px), radial-gradient(#e5e7eb 0.75px, #fff8f0 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0,15px 15px;
+        }
+
+        .custom-shadow {
+            box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px -5px rgba(0,0,0,0.1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .star-rating i {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+
+        /* Refinements: visual consistency, keyboard access and mobile comfort */
+        :root { color-scheme: light; }
+        body { line-height: 1.65; }
+        button, input, textarea, select, a { -webkit-tap-highlight-color: transparent; }
+        button, a, [role="button"] { touch-action: manipulation; }
+        :focus-visible { outline: 3px solid #b45309 !important; outline-offset: 3px; }
+        img { max-width: 100%; }
+        .card-hover { will-change: transform; }
+        .quiz-option { min-height: 76px; width: 100%; }
+        .quiz-option[aria-pressed="true"] { border-color: #d97706; background: #fffbeb; box-shadow: 0 0 0 2px rgba(245,158,11,.22); }
+        .quiz-option:focus-visible { outline-offset: 4px; }
+        .site-notice { border-inline-start: 4px solid #d97706; }
+        @media (max-width: 640px) {
+            section { scroll-margin-top: 5.5rem; }
+            .card-hover:hover { transform: none; }
+            #quiz-section .min-h-\[480px\] { min-height: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-amber-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    <div class="bg-amber-500 text-white p-3 rounded-2xl shadow-md text-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-dog"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black text-amber-700 tracking-tight block leading-none">הכלב שלי</span>
+                        <span class="text-xs text-amber-600 font-medium">התאמה, אימוץ, כתבות והמלצות</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-reverse space-x-1 lg:space-x-2">
+                    <button onclick="scrollToSection('quiz-section')" class="px-3 py-2 rounded-xl text-gray-700 hover:text-amber-600 hover:bg-amber-50 font-medium transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-clipboard-question text-amber-500"></i> חידון
+                    </button>
+                    <button onclick="scrollToSection('articles-section')" class="px-3 py-2 rounded-xl text-gray-700 hover:text-amber-600 hover:bg-amber-50 font-medium transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-newspaper text-blue-500"></i> כתבות
+                    </button>
+                    <button onclick="scrollToSection('organizations-section')" class="px-3 py-2 rounded-xl text-gray-700 hover:text-amber-600 hover:bg-amber-50 font-medium transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-heart text-red-500"></i> עמותות
+                    </button>
+                    <button onclick="scrollToSection('calculator-section')" class="px-3 py-2 rounded-xl text-gray-700 hover:text-amber-600 hover:bg-amber-50 font-medium transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-calculator text-emerald-500"></i> מחשבון
+                    </button>
+                    <button onclick="scrollToSection('reviews-section')" class="px-3 py-2 rounded-xl text-gray-700 hover:text-amber-600 hover:bg-amber-50 font-medium transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-star text-amber-400"></i> המלצות
+                    </button>
+                </nav>
+
+                <!-- Action Button -->
+                <div class="hidden sm:block">
+                    <button onclick="scrollToSection('quiz-section')" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-md shadow-amber-200 hover:shadow-lg flex items-center gap-2 text-sm">
+                        <span>מצא לי כלב</span>
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-gray-600 p-2 text-2xl focus:outline-none">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-amber-100 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="scrollToSection('quiz-section'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl text-gray-700 hover:bg-amber-50 font-medium flex items-center gap-3">
+                <i class="fa-solid fa-clipboard-question text-amber-500 text-lg"></i> חידון התאמה
+            </button>
+            <button onclick="scrollToSection('articles-section'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl text-gray-700 hover:bg-amber-50 font-medium flex items-center gap-3">
+                <i class="fa-solid fa-newspaper text-blue-500 text-lg"></i> כתבות ומאמרים
+            </button>
+            <button onclick="scrollToSection('organizations-section'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl text-gray-700 hover:bg-amber-50 font-medium flex items-center gap-3">
+                <i class="fa-solid fa-heart text-red-500 text-lg"></i> עמותות אימוץ
+            </button>
+            <button onclick="scrollToSection('calculator-section'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl text-gray-700 hover:bg-amber-50 font-medium flex items-center gap-3">
+                <i class="fa-solid fa-calculator text-emerald-500 text-lg"></i> מחשבון עלויות
+            </button>
+            <button onclick="scrollToSection('reviews-section'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl text-gray-700 hover:bg-amber-50 font-medium flex items-center gap-3">
+                <i class="fa-solid fa-star text-amber-400 text-lg"></i> דירוג והמלצות
+            </button>
+            <button onclick="scrollToSection('share-section'); toggleMobileMenu()" class="w-full text-right px-4 py-3 rounded-xl text-gray-700 hover:bg-amber-50 font-medium flex items-center gap-3">
+                <i class="fa-solid fa-share-nodes text-blue-500 text-lg"></i> שתף את האתר
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-pattern py-12 lg:py-20 border-b border-amber-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="text-right">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-semibold mb-4">
+                        <i class="fa-solid fa-paw"></i> מוצאים את החבר הכי טוב + קבלת תוצאות ב-WhatsApp
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 leading-tight mb-6">
+                        איזה כלב <span class="text-amber-600 underline decoration-amber-300">באמת מתאים</span> לאורח החיים שלך?
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        אימוץ כלב הוא התחייבות נפלאה. ענו על חידון ההתאמה המקיף (כולל התאמה מיוחדת למשפחות עם בני נוער!), קראו כתבות מדריך שימושיות, וקבלו תוצאות והמלצות ישירות ל-WhatsApp!
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="scrollToSection('quiz-section')" class="bg-amber-500 hover:bg-amber-600 text-white text-lg px-8 py-4 rounded-2xl font-bold shadow-lg shadow-amber-200 hover:shadow-xl transition flex items-center gap-3">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> להתחלת החידון
+                        </button>
+                        <button onclick="scrollToSection('articles-section')" class="bg-white border-2 border-amber-200 text-amber-800 hover:bg-amber-50 text-lg px-6 py-4 rounded-2xl font-bold transition flex items-center gap-2">
+                            <i class="fa-solid fa-newspaper text-blue-500"></i> קרא כתבות
+                        </button>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="relative mx-auto max-w-md lg:max-w-none">
+                        <img src="https://images.unsplash.com/photo-1534361960057-19889db98d18?auto=format&fit=crop&w=800&q=80" alt="כלב מאושר עם הבעלים" class="rounded-3xl shadow-2xl border-4 border-white object-cover h-[400px] w-full">
+                        <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-2xl shadow-xl border border-amber-100 flex items-center gap-4 max-w-xs">
+                            <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl text-2xl flex items-center justify-center">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">תוצאות ישר ל-WhatsApp!</h4>
+                                <p class="text-xs text-gray-500">שלחו לעצמכם או לעמותות בלחיצה</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz-section" class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <span class="text-amber-600 font-bold tracking-wider text-sm uppercase">שאלון התאמה מתקדם</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1">חידון התאמת כלב</h2>
+                <p class="text-gray-600 mt-2">ענו על השאלות ונגלה לכם איזה כלב יהיה בן הלוויה המושלם עבורכם</p>
+            </div>
+
+            <!-- Quiz Card Container -->
+            <div class="bg-[#FAF6F0] border border-amber-200/80 rounded-3xl p-6 sm:p-10 custom-shadow relative min-h-[480px] flex flex-col justify-between">
+                
+                <!-- Progress Bar -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-2">
+                        <span id="quiz-progress-text" class="text-xs font-bold text-amber-700">שאלה 1 מתוך 9</span>
+                        <span id="quiz-percentage" class="text-xs font-bold text-amber-600">11%</span>
+                    </div>
+                    <div class="w-full bg-amber-100 h-2.5 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 11%;"></div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Question Content -->
+                <div id="quiz-step-container" class="flex-grow flex flex-col justify-center">
+                    <!-- Javascript will inject question here -->
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex justify-between items-center mt-8 pt-6 border-t border-amber-200/60">
+                    <button id="quiz-prev-btn" onclick="prevQuestion()" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-600 font-semibold hover:bg-gray-100 transition hidden flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-right"></i> הקודם
+                    </button>
+                    <div id="quiz-counter" class="text-sm font-medium text-gray-500"></div>
+                    <button id="quiz-next-btn" onclick="nextQuestion()" disabled class="px-6 py-2.5 rounded-xl bg-amber-500 text-white font-bold opacity-50 cursor-not-allowed hover:bg-amber-600 transition flex items-center gap-2">
+                        הבא <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Results Container (Hidden initially) -->
+            <div id="quiz-results-container" class="hidden space-y-8">
+                <div class="text-center">
+                    <div class="inline-block p-4 bg-emerald-100 text-emerald-600 rounded-full text-3xl mb-3">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900">3 האפשרויות המתאימות ביותר עבורך</h2>
+                    <p class="text-gray-600 mt-2">דירגנו את שלוש האפשרויות לפי התשובות שלך — מההתאמה המובילה במקום הראשון ועד האפשרות השלישית שכדאי לבדוק.</p>
+                </div>
+
+                <!-- Send Results via WhatsApp Box -->
+                <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="text-right flex-1">
+                            <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full mb-2 inline-block">
+                                <i class="fa-brands fa-whatsapp ml-1"></i> שליחה ישירה ל-WhatsApp
+                            </span>
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">רוצה לשמור את תוצאות החידון ב-WhatsApp?</h3>
+                            <p class="text-xs text-gray-600">הזן את מספר הטלפון שלך וניצור עבורך הודעה מוכנה לווצאפ עם הסיכום המלא והמלצות האימוץ!</p>
+                        </div>
+                        <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+                            <input type="tel" id="quiz-phone-input" placeholder="050-0000000" class="px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm text-center font-bold tracking-wider">
+                            <button onclick="sendQuizResultsToWhatsApp()" class="bg-[#25D366] hover:bg-[#128C7E] text-white font-bold px-6 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                                <i class="fa-brands fa-whatsapp text-lg"></i>
+                                <span>שלח לי ל-WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="matches-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Dynamic Results inserted here -->
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
+                    <h3 class="font-bold text-amber-900 text-lg mb-2">💡 המלצה חמה: שקלו אימוץ כלב מעורב!</h3>
+                    <p class="text-amber-800 text-sm leading-relaxed mb-4">
+                        כלבים מעורבים מעמותות נהנים לרוב מבריאות איתנה, מגוון אופי ייחודי, והם יכירו לכם תודה לכל החיים. מתנדבי העמותות יוכלו להתאים לכם כלב מעורב ספציפי שעונה בדיוק על התכונות שיצאו לכם בחידון!
+                    </p>
+                    <div class="flex justify-center gap-4 flex-wrap">
+                        <button onclick="scrollToSection('organizations-section')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-2.5 rounded-xl transition">
+                            פנייה לעמותות אימוץ קרובות
+                        </button>
+                        <button onclick="restartQuiz()" class="bg-white border border-amber-300 text-amber-800 font-semibold px-6 py-2.5 rounded-xl hover:bg-amber-100 transition">
+                            <i class="fa-solid fa-rotate-right ml-1"></i> בצע חידון מחדש
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Articles & Content Section (NEW) -->
+    <section id="articles-section" class="py-16 bg-[#FAF6F0] border-t border-b border-amber-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-blue-600 font-bold tracking-wider text-sm uppercase">מאמרים ומדריכים</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1">כתבות וטיפים לגידול כלב</h2>
+                <p class="text-gray-600 mt-2">כל מה שצריך לדעת על גידול כלבים, שילוב בבית עם בני נוער והכנה נכונה לאימוץ</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Article 1 -->
+                <article class="bg-white rounded-3xl border border-amber-200/80 shadow-sm overflow-hidden card-hover flex flex-col justify-between">
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=600&q=80" alt="כלב עם בני נוער" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">משפחה וילדים</span>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">איך להפוך את בני הנוער לשותפים מלאים בגידול הכלב?</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                                גידול כלב בבית עם מתבגרים יכול להיות הזדמנות מצוינת לפיתוח אחריות, עצמאות וחיבור רגשי עמוק. טיפים לחלוקת תפקידים נכונה בבית.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="openArticleModal('teens')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                            <span>קרא את הכתבה המלאה</span>
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Article 2 -->
+                <article class="bg-white rounded-3xl border border-amber-200/80 shadow-sm overflow-hidden card-hover flex flex-col justify-between">
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80" alt="אימוץ כלב" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">מדריך אימוץ</span>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">הימים הראשונים בבית: כך תעברו את תקופת ההסתגלות בשלום</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                                הגעתו של כלב חדש לבית היא מרגשת אך מצריכה סבלנות. מה לעשות ביומיים הראשונים, איך מכינים את הבית ואיך מונעים תסכולים.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="openArticleModal('first_days')" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                            <span>קרא את הכתבה המלאה</span>
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Article 3 -->
+                <article class="bg-white rounded-3xl border border-amber-200/80 shadow-sm overflow-hidden card-hover flex flex-col justify-between">
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80" alt="בחירת גזע" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">בחירת כלב</span>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">כלב קטן, בינוני או גדול? מה מתאים באמת לבית שלכם?</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                                האם גודל הכלב קובע כמה מקום הוא צריך? מיתוסים מול עובדות על גודל הכלב, רמת האנרגיה בבית ועלויות התחזוקה.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="openArticleModal('dog_size')" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                            <span>קרא את הכתבה המלאה</span>
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Israeli Adoption Directory Section -->
+    <section id="organizations-section" class="py-16 bg-white border-b border-amber-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-amber-600 font-bold tracking-wider text-sm uppercase">אינדקס עמותות מורחב</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1">איפה מאמצים בישראל?</h2>
+                <p class="text-gray-600 mt-2">רשימת עמותות אימוץ מובילות בישראל. צרו קשר ישיר ב-WhatsApp, סננו לפי אזור או חפשו עמותה קרובה.</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 bg-[#FAF6F0] p-4 rounded-2xl border border-amber-200/70 shadow-sm">
+                <!-- Region Filter Buttons -->
+                <div class="flex flex-wrap gap-2 w-full md:w-auto" id="region-filters">
+                    <button onclick="filterOrganizations('all')" class="org-filter-btn px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-white transition">הכל</button>
+                    <button onclick="filterOrganizations('מרכז')" class="org-filter-btn px-4 py-2 rounded-xl text-sm font-medium bg-gray-100 text-gray-700 hover:bg-amber-100 transition">מרכז</button>
+                    <button onclick="filterOrganizations('צפון')" class="org-filter-btn px-4 py-2 rounded-xl text-sm font-medium bg-gray-100 text-gray-700 hover:bg-amber-100 transition">צפון</button>
+                    <button onclick="filterOrganizations('דרום')" class="org-filter-btn px-4 py-2 rounded-xl text-sm font-medium bg-gray-100 text-gray-700 hover:bg-amber-100 transition">דרום</button>
+                    <button onclick="filterOrganizations('ירושלים')" class="org-filter-btn px-4 py-2 rounded-xl text-sm font-medium bg-gray-100 text-gray-700 hover:bg-amber-100 transition">ירושלים והסביבה</button>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full md:w-72">
+                    <input type="text" id="org-search-input" onkeyup="searchOrganizations()" placeholder="חפש עמותה או עיר..." class="w-full pr-10 pl-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Organizations Cards Grid -->
+            <div id="organizations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamic cards populated via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Cost Calculator Section -->
+    <section id="calculator-section" class="py-16 bg-[#FAF6F0] border-b border-amber-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <span class="text-amber-600 font-bold tracking-wider text-sm uppercase">הכנה תקציבית</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1">מחשבון עלויות גידול כלב</h2>
+                <p class="text-gray-600 mt-2">כמה באמת עולה לגדל כלב בישראל? חשבו את העלויות הראשוניות והחודשיות המשוערות</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <!-- Controls / Selectors -->
+                <div class="lg:col-span-2 bg-white p-6 sm:p-8 rounded-3xl border border-amber-200/80 shadow-sm space-y-6">
+                    <div>
+                        <label class="block font-bold text-gray-800 mb-2">גודל הכלב המתוכנן:</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setCalcDogSize('small')" id="calc-size-small" class="calc-size-btn border-2 border-amber-500 bg-amber-50 text-amber-900 py-3 rounded-xl font-bold text-center text-sm transition">
+                                קטן<br><span class="text-xs font-normal text-gray-500">(עד 10 ק"ג)</span>
+                            </button>
+                            <button onclick="setCalcDogSize('medium')" id="calc-size-medium" class="calc-size-btn border-2 border-gray-200 bg-white text-gray-700 py-3 rounded-xl font-bold text-center text-sm hover:border-amber-300 transition">
+                                בינוני<br><span class="text-xs font-normal text-gray-500">(10 - 25 ק"ג)</span>
+                            </button>
+                            <button onclick="setCalcDogSize('large')" id="calc-size-large" class="calc-size-btn border-2 border-gray-200 bg-white text-gray-700 py-3 rounded-xl font-bold text-center text-sm hover:border-amber-300 transition">
+                                גדול<br><span class="text-xs font-normal text-gray-500">(25+ ק"ג)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Additional Options Checkboxes -->
+                    <div class="space-y-3 pt-4 border-t border-amber-200/60">
+                        <span class="block font-bold text-gray-800 mb-2">תוספות ושירותים מומלצים:</span>
+                        
+                        <label class="flex items-center gap-3 p-3 bg-amber-50/40 rounded-xl border border-gray-200 cursor-pointer hover:bg-amber-50">
+                            <input type="checkbox" id="calc-insurance" onchange="calculateCosts()" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500">
+                            <div>
+                                <span class="font-semibold text-gray-800 text-sm block">ביטוח רפואי לכלב</span>
+                                <span class="text-xs text-gray-500">כיסוי טיפולי חירום וניתוחים (~80-150 ₪ לחודש)</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-3 bg-amber-50/40 rounded-xl border border-gray-200 cursor-pointer hover:bg-amber-50">
+                            <input type="checkbox" id="calc-walker" onchange="calculateCosts()" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500">
+                            <div>
+                                <span class="font-semibold text-gray-800 text-sm block">דוג ווקר (טיולים באמצע היום)</span>
+                                <span class="text-xs text-gray-500">במידה ואתם מחוץ לבית שעות ארוכות (~400-800 ₪ לחודש)</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-3 bg-amber-50/40 rounded-xl border border-gray-200 cursor-pointer hover:bg-amber-50">
+                            <input type="checkbox" id="calc-grooming" onchange="calculateCosts()" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500">
+                            <div>
+                                <span class="font-semibold text-gray-800 text-sm block">מספרת כלבים קבועה</span>
+                                <span class="text-xs text-gray-500">נדרש בעיקר לגזעים ארוכי שיער (~150 ₪ ממוצע חודשי)</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-3 bg-amber-50/40 rounded-xl border border-gray-200 cursor-pointer hover:bg-amber-50">
+                            <input type="checkbox" id="calc-trainer" onchange="calculateCosts()" checked class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500">
+                            <div>
+                                <span class="font-semibold text-gray-800 text-sm block">אילוף ראשוני (חד פעמי)</span>
+                                <span class="text-xs text-gray-500">סדרת מפגשים לחינוך לגורים/כלבים חדשים (~1,200 ₪)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Cost Breakdown Card -->
+                <div class="bg-amber-600 text-white rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-xl font-bold mb-6 border-b border-amber-500 pb-4 flex items-center justify-between">
+                            <span>סיכום עלויות משוער</span>
+                            <i class="fa-solid fa-coins text-amber-300"></i>
+                        </h3>
+
+                        <div class="space-y-6">
+                            <div>
+                                <span class="text-amber-200 text-sm block mb-1">עלות ראשונית חד-פעמית:</span>
+                                <div class="text-3xl font-black" id="total-one-time">₪ 2,100</div>
+                                <span class="text-xs text-amber-200/80 block mt-1">(סל אימוץ, ציוד בסיסי, קעריות, מיטה, אילוף)</span>
+                            </div>
+
+                            <hr class="border-amber-500">
+
+                            <div>
+                                <span class="text-amber-200 text-sm block mb-1">עלות חודשית שוטפת:</span>
+                                <div class="text-4xl font-black text-amber-200" id="total-monthly">₪ 350</div>
+                                <span class="text-xs text-amber-200/80 block mt-1">(מזון איכותי, חיסונים/תולעים, הדברה, חטיפים)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-amber-700/60 p-4 rounded-2xl text-xs text-amber-100 leading-relaxed border border-amber-500">
+                        <i class="fa-solid fa-circle-info mb-1 block text-sm"></i>
+                        * העלויות הינן הערכה בלבד ועשויות להשתנות בהתאם לסוג המזון, מצבו הבריאותי של הכלב והרגלי הבעלים.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews, Testimonials and User Recommendations Section (UPDATED) -->
+    <section id="reviews-section" class="py-16 bg-white border-b border-amber-100">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-amber-600 font-bold tracking-wider text-sm uppercase">קהילת המאמצים וממליצים</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1">המלצות גולשים ודירוג האתר</h2>
+                <p class="text-gray-600 mt-2">חוות הדעת נשמרות בדפדפן הנוכחי בלבד. הדוגמאות הראשוניות מסומנות כדוגמאות ואינן ביקורות מאומתות.</p>
+            </div>
+
+            <div class="site-notice bg-amber-50 text-amber-900 rounded-xl px-4 py-3 text-sm mb-6" role="note">
+                <strong>שקיפות:</strong> ההמלצות שמופיעות כברירת מחדל הן תוכן הדגמה בלבד. חוות דעת שתוסיפו נשמרות במכשיר ובדפדפן שלכם, ואינן מתפרסמות אצל משתמשים אחרים.
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Summary Card -->
+                <div class="bg-[#FAF6F0] p-6 sm:p-8 rounded-3xl border border-amber-200 shadow-sm flex flex-col justify-between text-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">דירוג גולשים ממוצע</h3>
+                        <div class="text-5xl font-black text-amber-500 my-4" id="avg-rating-num">4.9</div>
+                        <div class="flex justify-center text-amber-400 text-xl gap-1 mb-2" id="avg-stars">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-xs text-gray-500" id="total-reviews-count">טוען חוות דעת…</span>
+                    </div>
+
+                    <button onclick="openReviewModal()" class="mt-6 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-comment-medical text-lg"></i>
+                        <span>כתיבת המלצה או חוות דעת</span>
+                    </button>
+                </div>
+
+                <!-- Reviews List Container -->
+                <div class="lg:col-span-2 space-y-4" id="reviews-list">
+                    <!-- Dynamic reviews inserted here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Share Hub Section -->
+    <section id="share-section" class="py-16 bg-[#FAF6F0] border-b border-amber-100">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-block p-4 bg-amber-100 text-amber-600 rounded-2xl text-3xl mb-4">
+                <i class="fa-solid fa-share-nodes"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-2">עזרו לאחרים למצוא את הכלב המתאים!</h2>
+            <p class="text-gray-600 max-w-xl mx-auto mb-8">שתפו את האתר והחידון עם חברים, משפחה וברשתות החברתיות כדי לעודד אימוץ אחראי בישראל 🐾</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                <button onclick="shareToPlatform('whatsapp')" class="bg-[#25D366] hover:bg-[#128C7E] text-white p-4 rounded-2xl font-bold transition flex flex-col items-center justify-center gap-2 shadow">
+                    <i class="fa-brands fa-whatsapp text-2xl"></i>
+                    <span class="text-xs">WhatsApp</span>
+                </button>
+
+                <button onclick="shareToPlatform('facebook')" class="bg-[#1877F2] hover:bg-[#0d65d9] text-white p-4 rounded-2xl font-bold transition flex flex-col items-center justify-center gap-2 shadow">
+                    <i class="fa-brands fa-facebook text-2xl"></i>
+                    <span class="text-xs">Facebook</span>
+                </button>
+
+                <button onclick="shareToPlatform('telegram')" class="bg-[#26A5E4] hover:bg-[#1e8dbd] text-white p-4 rounded-2xl font-bold transition flex flex-col items-center justify-center gap-2 shadow">
+                    <i class="fa-brands fa-telegram text-2xl"></i>
+                    <span class="text-xs">Telegram</span>
+                </button>
+
+                <button onclick="shareToPlatform('twitter')" class="bg-black hover:bg-gray-800 text-white p-4 rounded-2xl font-bold transition flex flex-col items-center justify-center gap-2 shadow">
+                    <i class="fa-brands fa-x-twitter text-2xl"></i>
+                    <span class="text-xs">X / Twitter</span>
+                </button>
+
+                <button onclick="shareToPlatform('linkedin')" class="bg-[#0A66C2] hover:bg-[#084e96] text-white p-4 rounded-2xl font-bold transition flex flex-col items-center justify-center gap-2 shadow">
+                    <i class="fa-brands fa-linkedin text-2xl"></i>
+                    <span class="text-xs">LinkedIn</span>
+                </button>
+
+                <button onclick="copySiteLink()" class="bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-2xl font-bold transition flex flex-col items-center justify-center gap-2 shadow relative">
+                    <i class="fa-solid fa-link text-2xl"></i>
+                    <span class="text-xs" id="copy-btn-text">העתק קישור</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Action Button for Quick Share & Rating -->
+    <div class="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+        <button onclick="scrollToSection('share-section')" class="bg-emerald-500 hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition hover:scale-110" title="שתף את האתר">
+            <i class="fa-brands fa-whatsapp"></i>
+        </button>
+        <button onclick="openReviewModal()" class="bg-amber-500 hover:bg-amber-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-xl transition hover:scale-110" title="דרג או המלץ על האתר">
+            <i class="fa-solid fa-star"></i>
+        </button>
+    </div>
+
+    <!-- Modals -->
+    <!-- Organization Detail Modal -->
+    <div id="org-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative animate-fade-in max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Article Modal (NEW) -->
+    <div id="article-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative animate-fade-in max-h-[90vh] overflow-y-auto text-right">
+            <button onclick="closeArticleModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div id="article-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Review Rating Modal -->
+    <div id="review-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative text-right">
+            <button onclick="closeReviewModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <h3 class="text-2xl font-black text-gray-900 mb-1">המלצה או חוות דעת</h3>
+            <p class="text-xs text-gray-500 mb-6">ספרו לנו על החוויה שלכם, האם מצאתם כלב, והמליצו לאחרים!</p>
+
+            <form onsubmit="submitReview(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-800 mb-2">בחרו דירוג בכוכבים:</label>
+                    <div class="flex justify-center text-3xl text-amber-300 gap-2 star-rating mb-2" id="star-input-container">
+                        <i class="fa-solid fa-star hover:text-amber-400" onclick="setFormRating(1)"></i>
+                        <i class="fa-solid fa-star hover:text-amber-400" onclick="setFormRating(2)"></i>
+                        <i class="fa-solid fa-star hover:text-amber-400" onclick="setFormRating(3)"></i>
+                        <i class="fa-solid fa-star hover:text-amber-400" onclick="setFormRating(4)"></i>
+                        <i class="fa-solid fa-star hover:text-amber-400" onclick="setFormRating(5)"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">שם מלא:</label>
+                    <input type="text" id="review-name" required placeholder="ישראל ישראלי" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">תפקיד / תיאור קצר:</label>
+                    <input type="text" id="review-role" placeholder="לדוגמה: אימצנו כלב מעורב / משפחה עם בני נוער" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ההמלצה או חוות הדעת שלך:</label>
+                    <textarea id="review-comment" required rows="3" placeholder="ספרו איך החידון או האתר עזר לכם..." class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition shadow">
+                    פרסם המלצה באתר
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-right">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-3 justify-center md:justify-start mb-4">
+                        <div class="bg-amber-500 text-white p-2 rounded-xl text-xl">
+                            <i class="fa-solid fa-dog"></i>
+                        </div>
+                        <span class="text-2xl font-black text-amber-500">הכלב שלי</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        מיזם אינפורמטיבי שמטרתו לעזור למשפחות בישראל למצוא את הכלב המתאים ביותר לאורח חייהם, ליצור קשר ב-WhatsApp ולעודד אימוץ אחראי מעמותות.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-amber-400 mb-4 text-lg">ניווט מהיר</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#quiz-section" class="hover:text-amber-400 transition">חידון התאמה</a></li>
+                        <li><a href="#articles-section" class="hover:text-amber-400 transition">כתבות ומאמרים</a></li>
+                        <li><a href="#organizations-section" class="hover:text-amber-400 transition">רשימת עמותות אימוץ</a></li>
+                        <li><a href="#calculator-section" class="hover:text-amber-400 transition">מחשבון עלויות</a></li>
+                        <li><a href="#reviews-section" class="hover:text-amber-400 transition">המלצות וחוות דעת</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-amber-400 mb-4 text-lg">אימוץ מציל חיים</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        מדי שנה אלפי כלבים מחכים לבית חם במקלטים בישראל. אימוץ כלב הוא לא רק מעשה אציל - הוא מעניק לכם חבר אמונים לחיים!
+                    </p>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-6 text-center text-xs text-gray-500">
+                © 2026 איזה כלב מתאים לי | נבנה באהבה עבור אוהבי הכלבים בישראל 🐾
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        /* ==================== 1. Quiz Data (Updated with Teen Option) ==================== */
+        const questions = [
+            {
+                id: 'living',
+                title: 'מהי סביבת המגורים שלך?',
+                subtitle: 'סוג הנכס משפיע על גודל ואופי הכלב המתאים',
+                options: [
+                    { label: 'דירה ללא מרפסת/חצר', icon: 'fa-building', value: 'apartment' },
+                    { label: 'דירה עם מרפסת', icon: 'fa-window-maximize', value: 'apartment_balcony' },
+                    { label: 'בית פרטי עם חצר מוגדרת', icon: 'fa-house-chimney-window', value: 'house_yard' },
+                    { label: 'אזור כפרי / מושב / קיבוץ', icon: 'fa-tree', value: 'rural' }
+                ]
+            },
+            {
+                id: 'energy',
+                title: 'מהי רמת האנרגיה והפעילות הגופנית שלך?',
+                subtitle: 'כלבים זקוקים לפריקת אנרגיה יומיומית בהתאם למזגם',
+                options: [
+                    { label: 'רגועה / מעדיף רביצה בבית', icon: 'fa-couch', value: 'low' },
+                    { label: 'בינונית / הליכות יומיות של כחצי שעה-שעה', icon: 'fa-person-walking', value: 'moderate' },
+                    { label: 'אקטיבית מאוד / ריצות, ספורט וטיולי טבע', icon: 'fa-person-running', value: 'high' }
+                ]
+            },
+            {
+                id: 'free_time',
+                title: 'כמה זמן פנוי יש לך ביום להקדיש לכלב?',
+                subtitle: 'כולל טיולים, משחק, צומי ואילוף',
+                options: [
+                    { label: 'עד שעה ביום', icon: 'fa-hourglass-start', value: 'minimal' },
+                    { label: 'שעה עד שעתיים ביום', icon: 'fa-hourglass-half', value: 'average' },
+                    { label: 'מעל שעתיים ביום', icon: 'fa-hourglass-end', value: 'plenty' }
+                ]
+            },
+            {
+                id: 'time_alone',
+                title: 'כמה זמן הכלב יישאר לבד בבית ביום טיפוסי?',
+                subtitle: 'חלק מהכלבים סובלים מחרדת נטישה אם נשארים לבד שעות רבות',
+                options: [
+                    { label: 'עובד מהבית / תמיד יש מישהו בבית', icon: 'fa-laptop-house', value: 'always_home' },
+                    { label: 'כ-5 עד 8 שעות ביום', icon: 'fa-briefcase', value: 'standard' },
+                    { label: 'מעל 9 שעות ביום', icon: 'fa-clock', value: 'long' }
+                ]
+            },
+            {
+                id: 'family',
+                title: 'מי מתגורר בבית?',
+                subtitle: 'חשוב להתאים כלב בעל מזג ידידותי להרכב המשפחה',
+                options: [
+                    { label: 'משפחה עם בני נוער (12+)', icon: 'fa-users', value: 'teens' },
+                    { label: 'משפחה עם ילדים קטנים / פעוטות', icon: 'fa-child-reaching', value: 'kids' },
+                    { label: 'מבוגרים בלבד / יחידים / זוגות', icon: 'fa-user-group', value: 'adults' },
+                    { label: 'אזרחים ותיקים / בני הגיל השלישי', icon: 'fa-person-cane', value: 'seniors' },
+                    { label: 'יש כבר חיות מחמד בבית (חתול/כלב)', icon: 'fa-cat', value: 'other_pets' }
+                ]
+            },
+            {
+                id: 'experience',
+                title: 'מהו הניסיון הקודם שלך בגידול כלבים?',
+                subtitle: 'גזעים מסוימים דורשים הנהגה ואילוף אסרטיבי יותר',
+                options: [
+                    { label: 'כלב ראשון שלי / ניסיון מועט', icon: 'fa-seedling', value: 'beginner' },
+                    { label: 'בעל ניסיון / גידלתי כלבים בעבר', icon: 'fa-award', value: 'experienced' }
+                ]
+            },
+            {
+                id: 'size',
+                title: 'מהו גודל הכלב המועדף עליך?',
+                subtitle: 'גודל הכלב משפיע על העלויות והנוחות בשינוע',
+                options: [
+                    { label: 'קטן (עד 10 ק"ג)', icon: 'fa-shield-cat', value: 'small' },
+                    { label: 'בינוני (10 - 25 ק"ג)', icon: 'fa-dog', value: 'medium' },
+                    { label: 'גדול (מעל 25 ק"ג)', icon: 'fa-shield-dog', value: 'large' },
+                    { label: 'אין העדפה / העיקר ההתאמה', icon: 'fa-heart', value: 'no_pref' }
+                ]
+            },
+            {
+                id: 'shedding',
+                title: 'מה היחס שלך לנשירת שיער וטיפוח?',
+                subtitle: 'חלק מהגזעים דורשים סירוק יומיומי או מספרה קבועה',
+                options: [
+                    { label: 'מעדיף מינימום נשירה (היפואלרגני/פרווה קצרה)', icon: 'fa-broom', value: 'low_shedding' },
+                    { label: 'אין בעיה עם נשירת שיער רגילה והברשה', icon: 'fa-scissors', value: 'ok_shedding' }
+                ]
+            },
+            {
+                id: 'budget',
+                title: 'מה התקציב החודשי המשוער לגידול הכלב?',
+                subtitle: 'כולל מזון, חיסונים, חטיפים והפתעות',
+                options: [
+                    { label: 'בסיסי (~250-400 ₪ לחודש)', icon: 'fa-coins', value: 'low_budget' },
+                    { label: 'רחב (500+ ₪ כולל ביטוח, דוגווקר ומספרה)', icon: 'fa-wallet', value: 'high_budget' }
+                ]
+            }
+        ];
+
+        // Database of Dog Profiles
+        const dogProfiles = [
+            {
+                id: 'mixed_mutt',
+                name: 'כלב מעורב מעמותה (Mutt / Rescue)',
+                tagline: 'הבחירה המומלצת ביותר! ייחודי, בריא ומלא תודה',
+                image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80',
+                size: 'משתנה (קטן עד גדול)',
+                exercise: 'משתנה בהתאם לכלב',
+                grooming: 'קלה עד בינונית',
+                kids: 'מעולה (ניתן לבחון בעמותה)',
+                description: 'כלבים מעורבים נהנים מחסינות בריאותית גבוהה, אופי מיוחד במינו והמון אהבה להעניק. בעמותות האימוץ ידעו להתאים לכם בדיוק את הכלב המעורב שעונה על כל דרישותיכם!'
+            },
+            {
+                id: 'golden_lab',
+                name: 'גולדן רטריבר / לברדור',
+                tagline: 'החבר המשפחתי האולטימטיבי - נחמד, חכם ואוהב אדם',
+                image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&q=80',
+                size: 'גדול (25-35 ק"ג)',
+                exercise: 'בינונית עד גבוהה',
+                grooming: 'בינונית (נשירה בעונות מעבר)',
+                kids: 'מושלם עם ילדים ובני נוער',
+                description: 'כלבים רגועים, חכמים מאוד וקלים לאילוף. מתאימים מאוד למשפחות עם ילדים ובני נוער ולכל אדם שפותח את הבית באהבה.'
+            },
+            {
+                id: 'border_collie_aussie',
+                name: 'בורדר קולי / רועה אוסטרלי',
+                tagline: 'חכם בלתי רגיל, אנרגטי ושותף מושלם לבני נוער אקטיביים',
+                image: 'https://images.unsplash.com/photo-1568572933382-74d440642117?auto=format&fit=crop&w=600&q=80',
+                size: 'בינוני (15-22 ק"ג)',
+                exercise: 'גבוהה מאוד (חובה משימות ופעילות)',
+                grooming: 'בינונית',
+                kids: 'מצוין (מושלם לבני נוער שאוהבים ריצה וספורט)',
+                description: 'גזעי עבודה אינטליגנטיים במיוחד. מדהימים למשפחות עם בני נוער אקטיביים שרצים, מטיילים בטבע ומעסיקים את מוחם של הכלבים במשחקים וטריקים.'
+            },
+            {
+                id: 'poodle_doodle',
+                name: 'פודל / דודל (מעורב היפואלרגני)',
+                tagline: 'חכם בלתי רגיל, חברותי וכמעט ללא נשירת שיער',
+                image: 'https://images.unsplash.com/photo-1591769225440-811ad7d6eab2?auto=format&fit=crop&w=600&q=80',
+                size: 'משתנה (זעיר עד גדול)',
+                exercise: 'בינונית',
+                grooming: 'מספרה קבועה וסירוק',
+                kids: 'מעולה',
+                description: 'הפודל והשילובים שלו נחשבים מהכלבים החכמים בעולם. פרוותם כמעט ואינה נושרת, מה שמקל על הסובלים מאלרגיות או מנשירה בבית.'
+            },
+            {
+                id: 'beagle_spaniel',
+                name: 'ביגל / קוקר ספניאל',
+                tagline: 'סקרן, חברותי, בעל עיניים כובשות ואנרגיה שמחה',
+                image: 'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=600&q=80',
+                size: 'בינוני (10-18 ק"ג)',
+                exercise: 'בינונית עד גבוהה',
+                grooming: 'בינונית',
+                kids: 'נהדר עם בני נוער וילדים',
+                description: 'כלבים שמחים ומלאי חיים שאוהבים לרחרח ולחקור. מתאימים למשפחות פעילות שיוצאות לטיולים יומיים מהנים.'
+            },
+            {
+                id: 'frenchie_pug',
+                name: 'בולדוג צרפתי / פאג',
+                tagline: 'קומפקטי, מצחיק ומתאים בול לחיים בדירה',
+                image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80',
+                size: 'קטן (8-13 ק"ג)',
+                exercise: 'נמוכה',
+                grooming: 'קל מאוד',
+                kids: 'טוב מאוד',
+                description: 'כלב אורבני קלאסי. אינו דורש ריצות ארוכות (סובל מחום בקיץ הישראלי), אוהב לרבוץ בספה ולהיות קרוב לבעלים.'
+            },
+            {
+                id: 'shih_tzu_maltese',
+                name: 'שיצו / מלטז',
+                tagline: 'חבר קטן, מתוק ומתאים במיוחד לדירות',
+                image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=600&q=80',
+                size: 'קטן (4-8 ק"ג)',
+                exercise: 'נמוכה עד בינונית',
+                grooming: 'דורש סירוק ומספרה קבועה',
+                kids: 'טוב מאוד',
+                description: 'גזעים אלו מושלמים לדירות ולמי שסובל מאלרגיות קלות. עדינים, אוהבים אדם ולא תופסים מקום רב.'
+            },
+            {
+                id: 'german_shepherd',
+                name: 'רועה גרמני / מלינואה',
+                tagline: 'כלב שמירה ונאמנות שאין שני לה - מגן וחכם',
+                image: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&w=600&q=80',
+                size: 'גדול (30-40 ק"ג)',
+                exercise: 'גבוהה',
+                grooming: 'בינונית (נשירה עונתית)',
+                kids: 'מצוין עם בני נוער ואילוף נכון',
+                description: 'כלבי עבודה עוצמתיים ונאמנים בטירוף. דורשים בעלים בעלי ניסיון/אילוף מסודר וזקוקים לאתגרים פיזיים ומחשבתיים.'
+            }
+        ];
+
+        // Safe helpers: local storage can be disabled or contain malformed data.
+        function safeGetStorage(key) {
+            try { return localStorage.getItem(key); } catch (error) { return null; }
+        }
+        function safeSetStorage(key, value) {
+            try { localStorage.setItem(key, value); return true; } catch (error) { return false; }
+        }
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[ch]));
+        }
+        function loadSavedAnswers() {
+            try {
+                const saved = JSON.parse(safeGetStorage('dog_app_quiz_answers') || '{}');
+                const valid = {};
+                questions.forEach(q => {
+                    const candidate = saved && saved[q.id];
+                    if (q.options.some(option => option.value === candidate)) valid[q.id] = candidate;
+                });
+                return valid;
+            } catch (error) { return {}; }
+        }
+        let currentQuestionIndex = 0;
+        let userAnswers = loadSavedAnswers();
+
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            const container = document.getElementById('quiz-step-container');
+            if (!q || !container) return;
+
+            const progressPct = Math.round(((currentQuestionIndex + 1) / questions.length) * 100);
+            document.getElementById('quiz-progress-bar').style.width = `${progressPct}%`;
+            document.getElementById('quiz-progress-text').innerText = `שאלה ${currentQuestionIndex + 1} מתוך ${questions.length}`;
+            document.getElementById('quiz-percentage').innerText = `${progressPct}%`;
+            document.getElementById('quiz-counter').innerText = `${Object.keys(userAnswers).length} מתוך ${questions.length} תשובות הושלמו`;
+
+            let html = `
+                <div class="mb-6 animate-fade-in text-right">
+                    <h3 id="current-question-title" class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">${escapeHtml(q.title)}</h3>
+                    <p class="text-gray-600 text-sm sm:text-base">${escapeHtml(q.subtitle)}</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" role="group" aria-labelledby="current-question-title">
+            `;
+            q.options.forEach(opt => {
+                const isSelected = userAnswers[q.id] === opt.value;
+                html += `
+                    <button type="button" class="quiz-option border-2 rounded-2xl p-4 sm:p-5 flex items-center justify-start text-right gap-4 transition-all ${isSelected ? 'border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-400' : 'border-gray-200 bg-white hover:border-amber-300 hover:bg-amber-50/30'}" onclick="selectOption('${q.id}', '${opt.value}')" aria-pressed="${isSelected}" aria-label="${escapeHtml(opt.label)}${isSelected ? ', נבחר' : ''}">
+                        <span class="w-12 h-12 rounded-2xl shrink-0 ${isSelected ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-600'} flex items-center justify-center text-xl" aria-hidden="true"><i class="fa-solid ${escapeHtml(opt.icon)}"></i></span>
+                        <span class="font-bold text-gray-800 text-base">${escapeHtml(opt.label)}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+
+            const prevBtn = document.getElementById('quiz-prev-btn');
+            const nextBtn = document.getElementById('quiz-next-btn');
+            prevBtn.classList.toggle('hidden', currentQuestionIndex === 0);
+            const hasAnswer = Boolean(userAnswers[q.id]);
+            nextBtn.disabled = !hasAnswer;
+            nextBtn.classList.toggle('opacity-50', !hasAnswer);
+            nextBtn.classList.toggle('cursor-not-allowed', !hasAnswer);
+            nextBtn.innerHTML = currentQuestionIndex === questions.length - 1
+                ? 'הצג תוצאות <i class="fa-solid fa-wand-magic-sparkles ml-1" aria-hidden="true"></i>'
+                : 'הבא <i class="fa-solid fa-chevron-left mr-1" aria-hidden="true"></i>';
+        }
+
+        function selectOption(qId, val) {
+            const question = questions.find(q => q.id === qId);
+            if (!question || !question.options.some(option => option.value === val)) return;
+            userAnswers[qId] = val;
+            safeSetStorage('dog_app_quiz_answers', JSON.stringify(userAnswers));
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (!userAnswers[questions[currentQuestionIndex].id]) return;
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        let topMatchesResult = [];
+
+        function scoreDogProfile(profile) {
+            const id = profile.id;
+            let score = 0;
+            let possible = 0;
+            const add = (points, condition) => { possible += points; if (condition) score += points; };
+
+            // Each of the nine quiz answers contributes to the ranking.
+            add(3, userAnswers.living === 'apartment' ? ['frenchie_pug','shih_tzu_maltese','poodle_doodle','mixed_mutt'].includes(id)
+                : userAnswers.living === 'apartment_balcony' ? ['frenchie_pug','shih_tzu_maltese','poodle_doodle','mixed_mutt','beagle_spaniel'].includes(id)
+                : userAnswers.living === 'house_yard' ? ['golden_lab','border_collie_aussie','beagle_spaniel','german_shepherd','mixed_mutt'].includes(id)
+                : ['border_collie_aussie','golden_lab','beagle_spaniel','german_shepherd','mixed_mutt'].includes(id));
+            add(3, userAnswers.energy === 'high' ? ['border_collie_aussie','golden_lab','beagle_spaniel','german_shepherd','mixed_mutt'].includes(id)
+                : userAnswers.energy === 'low' ? ['frenchie_pug','shih_tzu_maltese'].includes(id)
+                : ['golden_lab','poodle_doodle','beagle_spaniel','mixed_mutt','shih_tzu_maltese'].includes(id));
+            add(3, userAnswers.free_time === 'minimal' ? ['frenchie_pug','shih_tzu_maltese'].includes(id)
+                : userAnswers.free_time === 'average' ? ['golden_lab','poodle_doodle','beagle_spaniel','mixed_mutt','frenchie_pug','shih_tzu_maltese'].includes(id)
+                : ['border_collie_aussie','golden_lab','beagle_spaniel','german_shepherd','mixed_mutt'].includes(id));
+            add(3, userAnswers.time_alone === 'always_home' ? true
+                : userAnswers.time_alone === 'standard' ? ['golden_lab','beagle_spaniel','mixed_mutt','frenchie_pug','shih_tzu_maltese'].includes(id)
+                : ['frenchie_pug','shih_tzu_maltese'].includes(id));
+            add(3, userAnswers.family === 'kids' ? ['golden_lab','mixed_mutt','beagle_spaniel','poodle_doodle'].includes(id)
+                : userAnswers.family === 'teens' ? ['border_collie_aussie','golden_lab','beagle_spaniel','mixed_mutt'].includes(id)
+                : userAnswers.family === 'seniors' ? ['shih_tzu_maltese','frenchie_pug','poodle_doodle','mixed_mutt'].includes(id)
+                : userAnswers.family === 'other_pets' ? ['golden_lab','poodle_doodle','shih_tzu_maltese','mixed_mutt'].includes(id)
+                : ['golden_lab','poodle_doodle','shih_tzu_maltese','mixed_mutt','beagle_spaniel'].includes(id));
+            add(2, userAnswers.experience === 'beginner' ? ['golden_lab','poodle_doodle','shih_tzu_maltese','frenchie_pug','mixed_mutt'].includes(id)
+                : ['border_collie_aussie','german_shepherd','beagle_spaniel','golden_lab','mixed_mutt'].includes(id));
+            add(3, userAnswers.size === 'small' ? ['frenchie_pug','shih_tzu_maltese','poodle_doodle'].includes(id)
+                : userAnswers.size === 'medium' ? ['border_collie_aussie','beagle_spaniel','poodle_doodle','mixed_mutt'].includes(id)
+                : userAnswers.size === 'large' ? ['golden_lab','german_shepherd','mixed_mutt'].includes(id)
+                : true);
+            add(3, userAnswers.shedding === 'low_shedding' ? ['poodle_doodle','shih_tzu_maltese'].includes(id)
+                : ['golden_lab','beagle_spaniel','german_shepherd','mixed_mutt','frenchie_pug'].includes(id));
+            add(2, userAnswers.budget === 'low_budget' ? ['shih_tzu_maltese','mixed_mutt','beagle_spaniel'].includes(id)
+                : ['poodle_doodle','golden_lab','border_collie_aussie','german_shepherd','mixed_mutt'].includes(id));
+
+            // A few breed-specific cautions prevent a high-energy profile winning on activity alone.
+            if (userAnswers.free_time === 'minimal' && ['border_collie_aussie','german_shepherd'].includes(id)) score -= 3;
+            if (userAnswers.time_alone === 'long' && ['border_collie_aussie','golden_lab','beagle_spaniel'].includes(id)) score -= 2;
+            if (userAnswers.budget === 'low_budget' && ['poodle_doodle','german_shepherd'].includes(id)) score -= 1;
+            return { profile, score, possible };
+        }
+
+        function showQuizResults() {
+            const unanswered = questions.find(q => !userAnswers[q.id]);
+            if (unanswered) {
+                currentQuestionIndex = questions.indexOf(unanswered);
+                renderQuestion();
+                return;
+            }
+            document.getElementById('quiz-step-container').parentElement.classList.add('hidden');
+            const resultsContainer = document.getElementById('quiz-results-container');
+            resultsContainer.classList.remove('hidden');
+            const matchesList = document.getElementById('matches-list');
+            matchesList.innerHTML = '';
+
+            const scored = dogProfiles.map((profile, originalIndex) => ({ ...scoreDogProfile(profile), originalIndex }))
+                .sort((a, b) => (b.score - a.score) || (a.originalIndex - b.originalIndex));
+            topMatchesResult = scored.slice(0, 3);
+            topMatchesResult.forEach((item, index) => {
+                const dog = item.profile;
+                const matchLabel = index === 0 ? 'מקום 1 · ההתאמה המובילה' : index === 1 ? 'מקום 2 · התאמה שנייה' : 'מקום 3 · התאמה שלישית';
+                const scorePct = Math.max(0, Math.min(100, Math.round((item.score / Math.max(item.possible, 1)) * 100)));
+                matchesList.insertAdjacentHTML('beforeend', `
+                    <article class="bg-white rounded-3xl border-2 ${index === 0 ? 'border-amber-400 shadow-lg' : 'border-amber-100 shadow-md'} overflow-hidden flex flex-col justify-between card-hover" aria-label="מקום ${index + 1} בדירוג ההתאמה">
+                        <div>
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="${escapeHtml(dog.image)}" alt="${escapeHtml(dog.name)}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                <div class="absolute top-3 right-3 ${index === 0 ? 'bg-amber-500' : 'bg-gray-800'} text-white text-xs font-bold px-3 py-1 rounded-full shadow">${matchLabel}</div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-extrabold text-gray-900 mb-1">${escapeHtml(dog.name)}</h3>
+                                <p class="text-xs text-amber-700 font-semibold mb-4">${escapeHtml(dog.tagline)}</p>
+                                <div class="mb-4">
+                                    <div class="flex justify-between text-xs font-bold text-gray-600 mb-1"><span>מדד התאמה משוער</span><span>${scorePct}%</span></div>
+                                    <div class="h-2 rounded-full bg-amber-100 overflow-hidden" role="progressbar" aria-label="מדד התאמה משוער" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${scorePct}"><div class="h-full rounded-full bg-amber-500" style="width:${scorePct}%"></div></div>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-4 leading-relaxed">${escapeHtml(dog.description)}</p>
+                                <div class="space-y-2 border-t border-gray-100 pt-4 text-xs text-gray-700">
+                                    <div class="flex justify-between gap-3"><span class="font-bold text-gray-500"><i class="fa-solid fa-ruler-vertical ml-1 text-amber-500" aria-hidden="true"></i> גודל:</span><span>${escapeHtml(dog.size)}</span></div>
+                                    <div class="flex justify-between gap-3"><span class="font-bold text-gray-500"><i class="fa-solid fa-bolt ml-1 text-amber-500" aria-hidden="true"></i> אנרגיה:</span><span>${escapeHtml(dog.exercise)}</span></div>
+                                    <div class="flex justify-between gap-3"><span class="font-bold text-gray-500"><i class="fa-solid fa-child ml-1 text-amber-500" aria-hidden="true"></i> משפחה:</span><span>${escapeHtml(dog.kids)}</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 pt-0 space-y-2"><button onclick="scrollToSection('organizations-section')" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">מצא כלב כזה בעמותות <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button></div>
+                    </article>
+                `);
+            });
+            resultsContainer.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+        }
+
+        function sendQuizResultsToWhatsApp() {
+            const phoneInput = document.getElementById('quiz-phone-input').value.trim();
+            
+            let cleanPhone = phoneInput.replace(/[^0-9]/g, '');
+            if (cleanPhone.startsWith('00')) cleanPhone = cleanPhone.substring(2);
+            if (cleanPhone.startsWith('0')) cleanPhone = '972' + cleanPhone.substring(1);
+            if (cleanPhone && !/^9725\d{8}$/.test(cleanPhone)) {
+                alert('נא להזין מספר נייד ישראלי תקין, למשל 050-1234567, או להשאיר את השדה ריק כדי לשתף ללא מספר יעד.');
+                return;
+            }
+
+            const message = `שלום! עשיתי חידון התאמת כלב באתר "הכלב שלי" 🐾\n\nהכלבים שהכי מתאימים לאורח החיים שלי הם:\n- ${topMatchesResult.map(m => m.profile.name).join('\n- ')}\n\nאשמח לקבל פרטים נוספים על כלבים לאימוץ שמתאימים לפרופיל שלי!`;
+            
+            const encodedMsg = encodeURIComponent(message);
+            let waUrl = cleanPhone.length >= 10 ? `https://wa.me/${cleanPhone}?text=${encodedMsg}` : `https://wa.me/?text=${encodedMsg}`;
+
+            window.open(waUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        function restartQuiz() {
+            userAnswers = {};
+            currentQuestionIndex = 0;
+            try { localStorage.removeItem('dog_app_quiz_answers'); } catch (error) {}
+            document.getElementById('quiz-results-container').classList.add('hidden');
+            document.getElementById('quiz-step-container').parentElement.classList.remove('hidden');
+            renderQuestion();
+        }
+
+
+        /* ==================== 2. Articles Modal Logic (NEW) ==================== */
+        const articlesData = {
+            teens: {
+                title: "איך להפוך את בני הנוער לשותפים מלאים בגידול הכלב?",
+                category: "משפחה וילדים",
+                image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">בני נוער ומתגרים נמצאים בשלב בחיים שבו הם מחפשים עצמאות, קשר רגשי עמוק ותחושת משמעות. גידול כלב בבית עם בני נוער הוא הזדמנות נהדרת לחבר אותם לאחריות יומיומית ולאהבה ללא תנאי.</p>
+                    <h4 class="font-bold text-lg text-gray-900 mb-2">1. הגדרת אחריות ברורה מראש</h4>
+                    <p class="mb-4">כדי למנוע ויכוחים, מומלץ לחלק את המשימות מראש: מי אחראי על טיול הבוקר לפני בית הספר, מי מוריד את הכלב אחה"כ, ומי דואג לקערית מים קרים ואוכל בזמן. כשיש חלוקה ברורה, בני הנוער חשים בעלות על התפקיד.</p>
+                    <h4 class="font-bold text-lg text-gray-900 mb-2">2. חיבור לפעילויות משותפות</h4>
+                    <p class="mb-4">בני נוער אוהבים אקשן וספורט. שתפו אותם באימוני אילוף, לימוד טריקים (כמו לתת יד, להביא כדור), או יציאה לריצות וטיולים בטבע עם הכלב. גזעים כמו בורדר קולי, גולדן או כלבים מעורבים אנרגטיים יוצרים חיבור מיידי עם בני נוער.</p>
+                    <h4 class="font-bold text-lg text-gray-900 mb-2">3. תמיכה רגשית והפחתת מסכים</h4>
+                    <p class="mb-4">מחקרים מראים כי טיפול בכלב מוריד את רמת הלחץ והחרדה אצל מתגרים ומעודד אותם להתנתק לכמה שעות מהמסכים. הכלב הופך לחבר אמת שאינו שופט אותם וקשוב אליהם בכל עת.</p>
+                `
+            },
+            first_days: {
+                title: "הימים הראשונים בבית: כך תעברו את תקופת ההסתגלות בשלום",
+                category: "מדריך אימוץ",
+                image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">הבאת כלב חדש הביתה היא רגע מרגש במיוחד, אך עבור הכלב מדובר בשינוי סביבתי משמעותי שיכול לעורר חשש. הנה הצעדים הקריטיים להצלחה ביומיים הראשונים:</p>
+                    <h4 class="font-bold text-lg text-gray-900 mb-2">חוק ה-3-3-3 בגידול כלבים</h4>
+                    <ul class="list-disc pr-5 space-y-2 mb-4">
+                        <li><strong>3 הימים הראשונים:</strong> הכלב עלול להיות מוצף, לחוץ ולא לאכול היטב. תנו לו פינה שקטה, אל תציפו אותו באורחים והיו סבלניים.</li>
+                        <li><strong>3 השבועות הראשונים:</strong> הכלב מתחיל להתרגל לרוטינה היומית, לזהות את בני הבית וללמוד את חוקי הבית הבסיסיים.</li>
+                        <li><strong>3 החודשים הראשונים:</strong> הכלב מרגיש בבית לחלוטין, בונה ביטחון עצמי ומפתח את אישיותו האמיתית לצד המשפחה.</li>
+                    </ul>
+                `
+            },
+            dog_size: {
+                title: "כלב קטן, בינוני או גדול? מה מתאים באמת לבית שלכם?",
+                category: "בחירת כלב",
+                image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80",
+                content: `
+                    <p class="mb-4">אנשים רבים טועים לחשוב שכלב קטן מתאים רק לדירה וכלב גדול חייב חצר. בפועל, **רמת האנרגיה של הכלב** חשובה בהרבה מגודלו הפיזי!</p>
+                    <p class="mb-4">דוגמה קלאסית: דני ענק או בולדוג צרפתי יכולים להיות רגועים מאוד בדירה קטנה, בעוד שכלב בינוני כמו בורדר קולי או ג'ק ראסל דורש המון פריקת אנרגיה יומיומית בחוץ.</p>
+                `
+            }
+        };
+
+        function openArticleModal(articleKey) {
+            const art = articlesData[articleKey];
+            if (!art) return;
+
+            const container = document.getElementById('article-modal-content');
+            container.innerHTML = `
+                <div class="mb-4">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full inline-block mb-2">${art.category}</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">${art.title}</h2>
+                </div>
+                <img src="${art.image}" alt="${art.title}" class="w-full h-60 object-cover rounded-2xl mb-6 shadow">
+                <div class="text-gray-700 text-sm leading-relaxed space-y-3">
+                    ${art.content}
+                </div>
+                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <button onclick="scrollToSection('quiz-section'); closeArticleModal();" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2 rounded-xl text-sm transition">
+                        עבור לחידון ההתאמה <i class="fa-solid fa-arrow-left ml-1"></i>
+                    </button>
+                    <button onclick="closeArticleModal()" class="text-gray-500 hover:text-gray-700 text-sm font-semibold">
+                        סגור
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('article-modal').classList.remove('hidden');
+        }
+
+        function closeArticleModal() {
+            document.getElementById('article-modal').classList.add('hidden');
+        }
+
+
+        /* ==================== 3. Israeli Organizations Data ==================== */
+        const organizations = [
+            {
+                name: "אס.או.אס חיות (S.O.S Pets)",
+                region: "מרכז",
+                location: "תל אביב / הרצליה / רמת אביב",
+                phone: "03-7441010",
+                whatsappPhone: "972547441010",
+                website: "https://www.sospets.co.il",
+                adoptionDays: "ימי שישי ברמת אביב, ימי שבת בהרצליה",
+                description: "פועלת במתכונת ייחודית של בתי אומנה - הכלבים מתגוררים בבתי משפחות עד לאימוצם, מה שמבטיח אופי מוכר והסתגלות קלה.",
+                image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=500&q=80"
+            },
+            {
+                name: "תנו לחיות לחיות",
+                region: "מרכז",
+                location: "בית המחסה בכפר רות / רמת גן",
+                phone: "03-6241776",
+                whatsappPhone: "97236241776",
+                website: "https://www.letlive.org.il",
+                adoptionDays: "ימים א'-ה' 09:00-16:00, ימי שישי 09:00-13:00",
+                description: "העמותה הוותיקה בישראל להגנה על בעלי חיים. במקלט בכפר רות עשרות כלבים הממתינים לבית חם.",
+                image: "https://images.unsplash.com/photo-1596272875729-ed2ff7d6d9c5?auto=format&fit=crop&w=500&q=80"
+            },
+            {
+                name: "צער בעלי חיים בישראל (תל אביב)",
+                region: "מרכז",
+                location: "הרצל 159, תל אביב",
+                phone: "03-5136500",
+                whatsappPhone: "97235136500",
+                website: "https://spca.org.il",
+                adoptionDays: "א'-ה' 08:00-20:00, ו' 08:00-14:00, שבת 11:00-15:00",
+                description: "בית מחסה עירוני מרכזי בתל אביב המעניק טיפול רפואי, חיסונים ואימוץ אחראי לבעלי חיים.",
+                image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=500&q=80"
+            },
+            {
+                name: "חבר לי - בית מחסה לכלבים",
+                region: "מרכז",
+                location: "אזור לוד / מודיעין",
+                phone: "050-7548187",
+                whatsappPhone: "972507548187",
+                website: "https://www.chaverlee.org.il",
+                adoptionDays: "בתאום מראש באמצע השבוע ובימי שישי",
+                description: "בית מחסה חם ואוהב לכלבים שננטשו, המעניק טיפול מסור, שיקום התנהגותי וליווי צמוד למאמצים.",
+                image: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=500&q=80"
+            },
+            {
+                name: "גלבוע אוהבת חיות",
+                region: "צפון",
+                location: "אזור העמקים והצפון",
+                phone: "050-6539439",
+                whatsappPhone: "972506539439",
+                website: "https://www.gilboadogs.co.il",
+                adoptionDays: "בתאום טלפוני וימי אימוץ בצפון",
+                description: "עמותה צפונית הפועלת להצלת כלבים מכלביות הסגר באזור העמקים והצפון ומציאת בית חם.",
+                image: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=500&q=80"
+            },
+            {
+                name: "באר שבע אוהבת חיות",
+                region: "דרום",
+                location: "באר שבע והנגב",
+                phone: "050-2204481",
+                whatsappPhone: "972502204481",
+                website: "https://www.bshla.org.il",
+                adoptionDays: "ימי אימוץ בימי שישי בבאר שבע",
+                description: "עמותה הפועלת למען בעלי החיים הנטושים בנגב. מפעילה מערך אומנה וימי אימוץ קבועים.",
+                image: "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=500&q=80"
+            },
+            {
+                name: "צער בעלי חיים ירושלים",
+                region: "ירושלים",
+                location: "עטרות / ירושלים",
+                phone: "054-7700221",
+                whatsappPhone: "972547700221",
+                website: "https://www.jspca.org.il",
+                adoptionDays: "בתאום מראש בבית המחסה",
+                description: "עמותה הפועלת עשרות שנים באזור ירושלים, מחזיקה בית מחסה גדול לכלבים וחתולים מחוסרי בית.",
+                image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=500&q=80"
+            }
+        ];
+
+        let currentRegionFilter = 'all';
+
+        function renderOrganizations() {
+            const grid = document.getElementById('organizations-grid');
+            const searchVal = document.getElementById('org-search-input').value.toLowerCase();
+            grid.innerHTML = '';
+
+            const filtered = organizations.filter(org => {
+                const matchesRegion = currentRegionFilter === 'all' || org.region === currentRegionFilter;
+                const matchesSearch = org.name.toLowerCase().includes(searchVal) || 
+                                      org.location.toLowerCase().includes(searchVal) ||
+                                      org.description.toLowerCase().includes(searchVal);
+                return matchesRegion && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i class="fa-solid fa-shield-dog text-4xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500 font-medium">לא נמצאו עמותות התואמות את מונחי החיפוש שלך.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(org => {
+                const waMessage = encodeURIComponent(`שלום ${org.name}, הגעתי אליכם דרך אתר "הכלב שלי" ואני מעוניין/ת לקבל פרטים על כלבים לאימוץ! 🐾`);
+                const waDirectLink = `https://wa.me/${org.whatsappPhone}?text=${waMessage}`;
+
+                grid.innerHTML += `
+                    <div class="bg-white rounded-3xl border border-amber-200/80 shadow-sm overflow-hidden flex flex-col justify-between card-hover">
+                        <div>
+                            <div class="h-44 overflow-hidden relative">
+                                <img src="${org.image}" alt="${org.name}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-md text-amber-800 text-xs font-bold px-3 py-1 rounded-full shadow">
+                                    <i class="fa-solid fa-location-dot text-amber-500 ml-1"></i>${org.region}
+                                </span>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">${org.name}</h3>
+                                <p class="text-xs text-gray-500 mb-3 flex items-center gap-1">
+                                    <i class="fa-solid fa-map-pin text-amber-500"></i> ${org.location}
+                                </p>
+                                <p class="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">${org.description}</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6 pt-0 space-y-2">
+                            <a href="${waDirectLink}" target="_blank" class="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-brands fa-whatsapp text-lg"></i> יצירת קשר ב-WhatsApp
+                            </a>
+                            <button onclick="openOrgModal('${org.name}')" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-circle-info"></i> פרטים מלאים וימי אימוץ
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterOrganizations(region) {
+            currentRegionFilter = region;
+            const buttons = document.querySelectorAll('.org-filter-btn');
+            buttons.forEach(btn => {
+                if (btn.innerText.includes(region) || (region === 'all' && btn.innerText === 'הכל')) {
+                    btn.classList.add('bg-amber-500', 'text-white', 'font-bold');
+                    btn.classList.remove('bg-gray-100', 'text-gray-700');
+                } else {
+                    btn.classList.remove('bg-amber-500', 'text-white', 'font-bold');
+                    btn.classList.add('bg-gray-100', 'text-gray-700');
+                }
+            });
+            renderOrganizations();
+        }
+
+        function searchOrganizations() {
+            renderOrganizations();
+        }
+
+        function openOrgModal(orgName) {
+            const org = organizations.find(o => o.name === orgName);
+            if (!org) return;
+
+            const modalContent = document.getElementById('modal-content');
+            const waMessage = encodeURIComponent(`שלום ${org.name}, הגעתי דרך אתר "הכלב שלי" ואני מעוניין/ת בפרטים על כלבים לאימוץ! 🐾`);
+            const waDirectLink = `https://wa.me/${org.whatsappPhone}?text=${waMessage}`;
+
+            modalContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+                        <i class="fa-solid fa-house-chimney-medical"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900">${org.name}</h3>
+                    <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mt-1">אזור ${org.region}</span>
+                </div>
+
+                <div class="space-y-4 text-sm text-gray-700 mb-6 bg-amber-50/50 p-4 rounded-2xl border border-amber-100 text-right">
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-location-dot text-amber-600 text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-gray-900">מיקום וכתובת:</strong>
+                            <span>${org.location}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-phone text-amber-600 text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-gray-900">טלפון ליצירת קשר:</strong>
+                            <a href="tel:${org.phone}" class="text-amber-700 font-bold hover:underline">${org.phone}</a>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-calendar-days text-amber-600 text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-gray-900">זמני פעילות וימי אימוץ:</strong>
+                            <span>${org.adoptionDays}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-500 mb-6 leading-relaxed text-right">${org.description}</p>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="${waDirectLink}" target="_blank" class="flex-1 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-xl text-center transition flex items-center justify-center gap-2 text-sm shadow">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> פנייה ישירה ב-WhatsApp
+                    </a>
+                    <a href="${org.website}" target="_blank" rel="noopener" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-4 py-3 rounded-xl text-center transition text-sm flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-globe"></i> אתר
+                    </a>
+                </div>
+            `;
+
+            document.getElementById('org-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('org-modal').classList.add('hidden');
+        }
+
+
+        /* ==================== 4. Cost Calculator Logic ==================== */
+        let selectedSize = 'small';
+
+        function setCalcDogSize(size) {
+            selectedSize = size;
+            
+            ['small', 'medium', 'large'].forEach(s => {
+                const btn = document.getElementById(`calc-size-${s}`);
+                if (s === size) {
+                    btn.classList.add('border-amber-500', 'bg-amber-50', 'text-amber-900');
+                    btn.classList.remove('border-gray-200', 'bg-white', 'text-gray-700');
+                } else {
+                    btn.classList.remove('border-amber-500', 'bg-amber-50', 'text-amber-900');
+                    btn.classList.add('border-gray-200', 'bg-white', 'text-gray-700');
+                }
+            });
+
+            calculateCosts();
+        }
+
+        function calculateCosts() {
+            let baseOneTime = 900;
+            let baseMonthlyFoodVaccines = 250;
+
+            if (selectedSize === 'medium') {
+                baseMonthlyFoodVaccines += 100;
+            } else if (selectedSize === 'large') {
+                baseMonthlyFoodVaccines += 200;
+            }
+
+            const hasInsurance = document.getElementById('calc-insurance').checked;
+            const hasWalker = document.getElementById('calc-walker').checked;
+            const hasGrooming = document.getElementById('calc-grooming').checked;
+            const hasTrainer = document.getElementById('calc-trainer').checked;
+
+            if (hasInsurance) baseMonthlyFoodVaccines += 110;
+            if (hasWalker) baseMonthlyFoodVaccines += 500;
+            if (hasGrooming) baseMonthlyFoodVaccines += 120;
+            if (hasTrainer) baseOneTime += 1200;
+
+            baseOneTime += 300; 
+
+            document.getElementById('total-one-time').innerText = `₪ ${baseOneTime.toLocaleString()}`;
+            document.getElementById('total-monthly').innerText = `₪ ${baseMonthlyFoodVaccines.toLocaleString()}`;
+        }
+
+
+        /* ==================== 5. Reviews & Recommendation System ==================== */
+        let currentFormRating = 5;
+        let defaultReviews = [
+            { name: "משפחת גולן (עם שני מתבגרים)", role: "אימצו בורדר קולי מעורב", rating: 5, comment: "בחרנו באופציה של 'משפחה עם בני נוער' בחידון וזה פשוט קלע בול! הילדים בני 14 ו-16 לוקחים אותו לריצות בערב ולומדים להפגין אחריות מדהימה. אתר חובה!" },
+            { name: "מיכל ורועי דהן", role: "אימצו את 'טופי' מעמותת חבר לי", rating: 5, comment: "החידון דייק ב-100%! חיפשנו כלב שמתאים לדירה, והחידון המליץ לנו על גולדן/מעורב עדין. יצרנו קשר בווצאפ עם העמותה ותוך שבוע אימצנו!" },
+            { name: "דניאל קראוס", role: "אימץ כלב מעורב", rating: 5, comment: "החיבור לווצאפ פשוט גאוני. שלחתי לעצמי את התוצאות, פניתי לעמותה בשיחה ישירה וקיבלתי מענה מהיר. מומלץ בחום!" },
+            { name: "עדי לוי", role: "סטודנטית בתל אביב", rating: 4, comment: "מחשבון העלויות והכתבות עזרו לי להבין בדיוק לקראת מה אני הולכת מבחינה תקציבית. אתר מעולה ומאוד מונגש!" }
+        ];
+
+        function getReviews() {
+            const saved = safeGetStorage('dog_app_reviews');
+            if (!saved) return defaultReviews;
+            try {
+                const parsed = JSON.parse(saved);
+                if (!Array.isArray(parsed)) return defaultReviews;
+                return parsed.filter(r => r && typeof r.name === 'string' && typeof r.comment === 'string' && Number.isFinite(Number(r.rating)))
+                    .map(r => ({ name: r.name.slice(0, 80), role: String(r.role || 'גולש/ת באתר').slice(0, 100), comment: r.comment.slice(0, 700), rating: Math.max(1, Math.min(5, Math.round(Number(r.rating)))) }));
+            } catch (error) { return defaultReviews; }
+        }
+
+        function renderReviews() {
+            const isDemoReviews = !safeGetStorage('dog_app_reviews');
+            const reviews = getReviews();
+
+            const list = document.getElementById('reviews-list');
+            list.innerHTML = '';
+
+            let totalRating = 0;
+
+            if (!reviews.length) {
+                list.innerHTML = '<div class="bg-gray-50 p-6 rounded-2xl text-gray-600 text-sm">עדיין אין חוות דעת. אפשר להיות הראשונים ולשתף את החוויה שלכם.</div>';
+            }
+            reviews.forEach(r => {
+                totalRating += r.rating;
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<i class="fa-solid fa-star ${i <= r.rating ? 'text-amber-400' : 'text-gray-300'} text-xs"></i>`;
+                }
+
+                list.innerHTML += `
+                    <div class="bg-[#FAF6F0] p-5 rounded-2xl border border-amber-100 shadow-sm text-right">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="font-bold text-gray-900 text-sm">${escapeHtml(r.name)}</h4>
+                                <span class="text-xs text-amber-700 font-medium">${escapeHtml(r.role || 'גולש/ת באתר')}</span>
+                                ${isDemoReviews ? '<span class="inline-block mt-1 text-[10px] bg-amber-100 text-amber-800 rounded-full px-2 py-0.5">דוגמה להמחשה</span>' : ''}
+                            </div>
+                            <div class="flex gap-0.5">${starsHtml}</div>
+                        </div>
+                        <p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(r.comment)}</p>
+                    </div>
+                `;
+            });
+
+            const avg = reviews.length ? (totalRating / reviews.length).toFixed(1) : '—';
+            document.getElementById('avg-rating-num').innerText = avg;
+            document.getElementById('total-reviews-count').innerText = reviews.length ? `מבוסס על ${reviews.length} חוות דעת בדפדפן זה` : 'אין עדיין חוות דעת';
+        }
+
+        function setFormRating(stars) {
+            currentFormRating = stars;
+            const container = document.getElementById('star-input-container');
+            const icons = container.querySelectorAll('i');
+
+            icons.forEach((icon, idx) => {
+                if (idx < stars) {
+                    icon.classList.add('text-amber-400');
+                    icon.classList.remove('text-gray-300');
+                } else {
+                    icon.classList.remove('text-amber-400');
+                    icon.classList.add('text-gray-300');
+                }
+            });
+        }
+
+        function openReviewModal() {
+            setFormRating(5);
+            document.getElementById('review-modal').classList.remove('hidden');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('review-modal').classList.add('hidden');
+        }
+
+        function submitReview(e) {
+            e.preventDefault();
+            const name = document.getElementById('review-name').value.trim();
+            const role = document.getElementById('review-role').value.trim();
+            const comment = document.getElementById('review-comment').value.trim();
+
+            if (!name || !comment) return;
+
+            const reviews = safeGetStorage('dog_app_reviews') ? getReviews() : [];
+
+            reviews.unshift({
+                name,
+                role: role || 'גולש/ת באתר',
+                rating: currentFormRating,
+                comment
+            });
+
+            if (!safeSetStorage('dog_app_reviews', JSON.stringify(reviews))) {
+                alert('לא ניתן לשמור חוות דעת בדפדפן הזה. ייתכן שהשמירה המקומית חסומה.');
+                return;
+            }
+            renderReviews();
+            closeReviewModal();
+
+            // Clear form
+            document.getElementById('review-name').value = '';
+            document.getElementById('review-role').value = '';
+            document.getElementById('review-comment').value = '';
+        }
+
+
+        /* ==================== 6. Social Sharing Functions ==================== */
+        function shareToPlatform(platform) {
+            const siteUrl = window.location.href;
+            const text = encodeURIComponent("מצאו את הכלב המושלם עבורכם בחידון התאמה חכם + אינדקס עמותות אימוץ וכתבות בישראל! 🐾");
+            let url = '';
+
+            switch (platform) {
+                case 'whatsapp':
+                    url = `https://wa.me/?text=${text}%20${encodeURIComponent(siteUrl)}`;
+                    break;
+                case 'facebook':
+                    url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`;
+                    break;
+                case 'telegram':
+                    url = `https://t.me/share/url?url=${encodeURIComponent(siteUrl)}&text=${text}`;
+                    break;
+                case 'twitter':
+                    url = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(siteUrl)}`;
+                    break;
+                case 'linkedin':
+                    url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(siteUrl)}`;
+                    break;
+            }
+
+            if (navigator.share && platform === 'whatsapp' && /Android|iPhone/i.test(navigator.userAgent)) {
+                navigator.share({
+                    title: 'איזה כלב מתאים לי?',
+                    text: 'מצאו את הכלב המושלם עבורכם בחידון התאמה חכם 🐾',
+                    url: siteUrl,
+                }).catch(() => {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                });
+            } else {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+        }
+
+        function copySiteLink() {
+            const copyFallback = () => {
+                const tempInput = document.createElement('input');
+                tempInput.value = window.location.href;
+                tempInput.setAttribute('aria-label', 'קישור האתר');
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                let copied = false;
+                try { copied = document.execCommand('copy'); } catch (error) {}
+                document.body.removeChild(tempInput);
+                updateCopyButton(copied);
+            };
+            const updateCopyButton = copied => {
+                const btnText = document.getElementById('copy-btn-text');
+                if (!btnText) return;
+                const original = btnText.innerText;
+                btnText.innerText = copied ? 'הקישור הועתק! ✓' : 'לא הצלחנו להעתיק — העתיקו את הכתובת מהדפדפן';
+                setTimeout(() => { btnText.innerText = original; }, 2500);
+            };
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(window.location.href).then(() => updateCopyButton(true)).catch(copyFallback);
+            } else copyFallback();
+        }
+
+
+        /* ==================== 7. Utility Functions ==================== */
+        function scrollToSection(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        window.onload = function() {
+            const firstUnanswered = questions.findIndex(q => !userAnswers[q.id]);
+            currentQuestionIndex = firstUnanswered === -1 ? 0 : firstUnanswered;
+            renderQuestion();
+            renderOrganizations();
+            calculateCosts();
+            renderReviews();
+        };
+    </script>
+</body>
+</html>

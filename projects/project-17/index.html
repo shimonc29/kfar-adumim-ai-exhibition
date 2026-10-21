@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סודות האפייה | מתכונים, קהילה וקינוחים</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Varela Round & Assistant -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&family=Varela+Round&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: {
+                            50: '#FDFBF7',
+                            100: '#FAF0E6',
+                            200: '#F5E6D3',
+                            300: '#E8D5C4',
+                        },
+                        peach: {
+                            100: '#FFE5D9',
+                            200: '#FFCAD4',
+                            300: '#F4ACB7',
+                        },
+                        cinnamon: {
+                            100: '#E6CCB2',
+                            200: '#DDB892',
+                            300: '#B08968',
+                            400: '#9C6644',
+                            500: '#7F5539',
+                            600: '#5C3D2E'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Varela Round', 'Assistant', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '4xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #5C3D2E;
+            font-family: 'Varela Round', 'Assistant', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FAF0E6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #DDB892;
+            border-radius: 20px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B08968;
+        }
+
+        .soft-shadow {
+            box-shadow: 0 10px 30px -5px rgba(127, 85, 57, 0.08);
+        }
+
+        .soft-shadow-lg {
+            box-shadow: 0 20px 40px -10px rgba(127, 85, 57, 0.12);
+        }
+
+        .cinnamon-gradient {
+            background: linear-gradient(135deg, #7F5539 0%, #9C6644 50%, #B08968 100%);
+        }
+
+        /* Print styles for printing recipe */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #recipeDetailPage, #recipeDetailPage * {
+                visibility: visible;
+            }
+            #recipeDetailPage {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-peach-100 selection:text-cinnamon-600">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-cinnamon-500 text-white px-6 py-4 rounded-2xl shadow-xl flex items-center space-x-3 space-x-reverse pointer-events-none">
+        <i id="toast-icon" class="fas fa-check-circle text-xl text-peach-100"></i>
+        <span id="toast-msg" class="font-medium">הודעה נשלחה בהצלחה!</span>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-30 bg-cream-50/90 backdrop-blur-md border-b border-cream-200 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <!-- Logo -->
+                <div class="flex items-center justify-between w-full md:w-auto">
+                    <button onclick="showHomePage()" class="flex items-center gap-3 group text-right">
+                        <div class="w-12 h-12 rounded-2xl cinnamon-gradient flex items-center justify-center text-white shadow-md transform group-hover:rotate-12 transition-transform duration-300">
+                            <i class="fa-solid fa-cookie-bite text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-cinnamon-600 tracking-tight">סודות האפייה</h1>
+                            <p class="text-xs text-cinnamon-400 font-normal">המתכונים הטובים בישראל, קהילה וניחוחות קינמון</p>
+                        </div>
+                    </button>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button onclick="toggleSidebarMobile()" class="md:hidden p-2 rounded-xl text-cinnamon-500 hover:bg-cream-200 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Main Search Bar Form -->
+                <div class="relative w-full md:max-w-xl">
+                    <form onsubmit="handleSearchSubmit(event)" class="relative flex items-center">
+                        <input type="text" id="searchInput" oninput="handleSearchInput()" placeholder="חפש מתכון, רכיב (חן במטבח, קרוטית, קרין גורן, mako)... ועלחץ Enter" 
+                               class="w-full bg-cream-100/80 hover:bg-cream-100 focus:bg-white text-cinnamon-600 placeholder-cinnamon-300 pr-12 pl-12 py-3.5 rounded-full border-2 border-cream-200 focus:border-peach-300 focus:outline-none transition-all shadow-inner text-sm font-medium">
+                        <button type="submit" class="absolute right-4 text-cinnamon-400 hover:text-cinnamon-600 transition-colors focus:outline-none">
+                            <i class="fas fa-search text-lg"></i>
+                        </button>
+                        <button type="button" id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute left-4 text-cinnamon-300 hover:text-cinnamon-500 transition-colors">
+                            <i class="fas fa-times-circle text-lg"></i>
+                        </button>
+                    </form>
+
+                    <!-- Search Quick Live Dropdown -->
+                    <div id="searchDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-3xl border border-cream-200 shadow-xl z-50 overflow-hidden fade-in max-h-80 overflow-y-auto">
+                        <!-- Dynamic search preview items -->
+                    </div>
+                </div>
+                <button onclick="openAdminPanel()" class="shrink-0 cinnamon-gradient text-white px-4 py-3 rounded-full text-sm font-bold shadow-md hover:opacity-90 transition-all">
+                    <i class="fas fa-sliders-h ml-2"></i>פאנל ניהול
+                </button>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- RIGHT SIDEBAR (Main Controls) -->
+            <aside id="sidebarNav" class="lg:col-span-1 space-y-4">
+                
+                <div class="bg-cream-100/70 p-5 rounded-3xl border border-cream-200 soft-shadow space-y-3">
+                    <h2 class="text-xs font-bold text-cinnamon-500 uppercase tracking-wider px-2">תפריט מהיר</h2>
+                    
+                    <!-- Sidebar Item: Add Recipe -->
+                    <button onclick="openModal('addRecipeModal')" class="w-full bg-white hover:bg-cream-100 text-cinnamon-600 p-4 rounded-2xl flex items-center gap-3 transition-all transform hover:-translate-y-0.5 border border-cream-200/80 shadow-sm font-semibold group">
+                        <div class="w-10 h-10 rounded-xl bg-peach-100 group-hover:bg-peach-200 text-cinnamon-500 flex items-center justify-center transition-colors">
+                            <i class="fas fa-plus text-lg"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-base leading-snug">הוספת מתכון</div>
+                            <div class="text-xs text-cinnamon-400 font-normal">שתפו את המאפה שלכם</div>
+                        </div>
+                    </button>
+
+                    <!-- Sidebar Item: AI Assistant -->
+                    <button onclick="openModal('aiModal')" class="w-full bg-gradient-to-r from-cinnamon-500 to-cinnamon-400 text-white p-4 rounded-2xl flex items-center gap-3 transition-all transform hover:-translate-y-0.5 shadow-md font-semibold group">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center">
+                            <i class="fas fa-wand-magic-sparkles text-lg animate-pulse"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-base leading-snug">שף AI וממציא המתכונים</div>
+                            <div class="text-xs text-white/80 font-normal">התייעצות, המרות ושילובים</div>
+                        </div>
+                    </button>
+
+                    <!-- Sidebar Item: Bakery & Equipment Store -->
+                    <button onclick="openModal('shopModal')" class="w-full bg-white hover:bg-cream-100 text-cinnamon-600 p-4 rounded-2xl flex items-center gap-3 transition-all transform hover:-translate-y-0.5 border border-cream-200/80 shadow-sm font-semibold group">
+                        <div class="w-10 h-10 rounded-xl bg-peach-100 group-hover:bg-peach-200 text-cinnamon-500 flex items-center justify-center transition-colors">
+                            <i class="fas fa-store text-lg"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-base leading-snug">חנות אפייה ומאפים</div>
+                            <div class="text-xs text-cinnamon-400 font-normal">ציוד, תבניות ומאפים ביתיים</div>
+                        </div>
+                    </button>
+
+                    <!-- Sidebar Item: Technical Support -->
+                    <button onclick="openModal('helpModal')" class="w-full bg-white hover:bg-cream-100 text-cinnamon-600 p-4 rounded-2xl flex items-center gap-3 transition-all transform hover:-translate-y-0.5 border border-cream-200/80 shadow-sm font-semibold group">
+                        <div class="w-10 h-10 rounded-xl bg-peach-100 group-hover:bg-peach-200 text-cinnamon-500 flex items-center justify-center transition-colors">
+                            <i class="fas fa-headset text-lg"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-base leading-snug">עזרה ותמיכה טכנית</div>
+                            <div class="text-xs text-cinnamon-400 font-normal">שאלות נפוצות ויצירת קשר</div>
+                        </div>
+                    </button>
+
+                    <!-- Sidebar Item: Favorites Toggle -->
+                    <button onclick="toggleFavoritesFilter()" id="favoritesFilterBtn" class="w-full bg-white hover:bg-cream-100 text-cinnamon-600 p-4 rounded-2xl flex items-center gap-3 transition-all transform hover:-translate-y-0.5 border border-cream-200/80 shadow-sm font-semibold group">
+                        <div class="w-10 h-10 rounded-xl bg-red-100 text-red-500 flex items-center justify-center transition-colors">
+                            <i class="fas fa-heart text-lg"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-base leading-snug">המועדפים שלי</div>
+                            <div class="text-xs text-cinnamon-400 font-normal">מתכונים ששמרת לבדיקה</div>
+                        </div>
+                    </button>
+
+                </div>
+
+                <!-- Source Sites Shortcut Badges -->
+                <div class="bg-cream-100/50 p-5 rounded-3xl border border-cream-200 space-y-3">
+                    <h3 class="text-xs font-bold text-cinnamon-500 uppercase tracking-wider">סינון לפי אתר מקור</h3>
+                    <div class="flex flex-wrap gap-1.5 text-xs">
+                        <button onclick="filterBySource('חן במטבח')" class="bg-white hover:bg-peach-100 text-cinnamon-600 px-3 py-1.5 rounded-full border border-cream-200 transition-colors">חן במטבח</button>
+                        <button onclick="filterBySource('קרוטית')" class="bg-white hover:bg-peach-100 text-cinnamon-600 px-3 py-1.5 rounded-full border border-cream-200 transition-colors">קרוטית</button>
+                        <button onclick="filterBySource('קרין גורן')" class="bg-white hover:bg-peach-100 text-cinnamon-600 px-3 py-1.5 rounded-full border border-cream-200 transition-colors">קרין גורן</button>
+                        <button onclick="filterBySource('השף הלבן')" class="bg-white hover:bg-peach-100 text-cinnamon-600 px-3 py-1.5 rounded-full border border-cream-200 transition-colors">השף הלבן</button>
+                        <button onclick="filterBySource('mako')" class="bg-white hover:bg-peach-100 text-cinnamon-600 px-3 py-1.5 rounded-full border border-cream-200 transition-colors">mako / אוכל טוב</button>
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- MAIN VIEW CONTAINER -->
+            <main class="lg:col-span-3">
+
+                <!-- 1. HOMEPAGE VIEW -->
+                <div id="homePage" class="space-y-8 fade-in">
+                    
+                    <!-- Hero Banner -->
+                    <div class="relative overflow-hidden rounded-4xl cinnamon-gradient text-white p-8 sm:p-10 shadow-lg">
+                        <div class="relative z-10 max-w-xl space-y-4">
+                            <span class="inline-block bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide">
+                                🥖 מאגר המתכונים הלאומי של ישראל
+                            </span>
+                            <h2 class="text-3xl sm:text-4xl font-extrabold leading-tight">
+                                למעלה מ-200 מתכוני אפייה וקינוחים מנצחים
+                            </h2>
+                            <p class="text-cream-100 text-sm sm:text-base leading-relaxed opacity-95">
+                                המתכונים הכי שווים מבית חן במטבח, קרוטית, קרין גורן, השף הלבן, mako וקרן אגם – עם תמונות מדויקות ושף AI אישי לעזרתכם!
+                            </p>
+                        </div>
+                        <i class="fas fa-stroopwafel absolute -left-6 -bottom-10 text-white/10 text-[180px] pointer-events-none transform -rotate-12"></i>
+                    </div>
+
+                    <!-- Category Pills -->
+                    <div class="space-y-3">
+                        <h3 class="text-lg font-bold text-cinnamon-600 flex items-center gap-2">
+                            <i class="fas fa-utensils text-peach-300"></i>
+                            סינון קטגוריות
+                        </h3>
+                        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="categoryFilters">
+                            <button onclick="filterCategory('הכל')" class="category-btn active border border-cinnamon-300 bg-cinnamon-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all shadow-sm">
+                                הכל
+                            </button>
+                            <button onclick="filterCategory('עוגות שוקולד')" class="category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all">
+                                🍫 עוגות שוקולד
+                            </button>
+                            <button onclick="filterCategory('עוגות גבינה')" class="category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all">
+                                🧀 עוגות גבינה
+                            </button>
+                            <button onclick="filterCategory('מאפי שמרים')" class="category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all">
+                                🥐 מאפי שמרים
+                            </button>
+                            <button onclick="filterCategory('פאי וטארט')" class="category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all">
+                                🥧 פאי וטארט
+                            </button>
+                            <button onclick="filterCategory('עוגיות')" class="category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all">
+                                🍪 עוגיות
+                            </button>
+                            <button onclick="filterCategory('קינוחים בכוסות')" class="category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all">
+                                🍧 קינוחים בכוסות
+                            </button>
+                            <button onclick="filterCategory('פרווה')" class="category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all">
+                                🍃 פרווה וטבעוני
+                            </button>
+                            <button onclick="filterCategory('ללא גלוטן')" class="category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all">
+                                ✨ ללא גלוטן
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recipe Grid Header -->
+                    <div class="flex items-center justify-between pt-2 border-b border-cream-200 pb-4">
+                        <div id="recipeGridTitle" class="text-xl font-bold text-cinnamon-600">
+                            מאגר המתכונים (<span id="recipeCount">0</span>)
+                        </div>
+                        <div class="text-xs text-cinnamon-400 font-medium">
+                            לחצו על כל מתכון לצפייה מלאה בהוראות
+                        </div>
+                    </div>
+
+                    <!-- Recipe Cards Grid -->
+                    <div id="recipesGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Filled dynamically -->
+                    </div>
+
+                    <!-- Pagination / Load More Controls -->
+                    <div class="flex items-center justify-center pt-6" id="paginationContainer">
+                        <button onclick="loadMoreRecipes()" id="loadMoreBtn" class="bg-cream-200 hover:bg-cream-300 text-cinnamon-600 font-bold px-8 py-3 rounded-full text-sm transition-all shadow-sm flex items-center gap-2">
+                            <i class="fas fa-plus-circle"></i> טען עוד מתכונים
+                        </button>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="noResultsState" class="hidden text-center py-16 bg-cream-100/50 rounded-3xl border border-dashed border-cream-300 space-y-4">
+                        <div class="w-16 h-16 mx-auto rounded-full bg-cream-200 flex items-center justify-center text-cinnamon-400 text-2xl">
+                            <i class="fas fa-cookie"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-cinnamon-600">לא נמצאו מתכונים מתאימים</h3>
+                        <p class="text-sm text-cinnamon-400">נסו לחפש מילה אחרת, למשל: "שוקולד", "חן במטבח" או "באסקית"</p>
+                        <button onclick="clearSearch()" class="px-5 py-2 bg-cinnamon-500 text-white text-sm font-semibold rounded-full hover:bg-cinnamon-600 transition-colors">
+                            הצג את כל המתכונים
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- 2. DEDICATED SEARCH RESULTS PAGE VIEW -->
+                <div id="searchResultsPage" class="hidden space-y-8 fade-in">
+                    
+                    <!-- Search Header Banner -->
+                    <div class="bg-white p-6 sm:p-8 rounded-4xl border border-cream-200 soft-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <button onclick="showHomePage()" class="inline-flex items-center gap-2 text-xs font-bold text-cinnamon-400 hover:text-cinnamon-600 mb-2 transition-colors">
+                                <i class="fas fa-arrow-right"></i> חזרה לדף הבית
+                            </button>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-cinnamon-600">
+                                תוצאות חיפוש עבור: "<span id="searchQueryTerm" class="text-cinnamon-500 underline decoration-peach-300"></span>"
+                            </h2>
+                            <p class="text-xs sm:text-sm text-cinnamon-400 mt-1">
+                                נמצאו <span id="searchResultsCount" class="font-bold text-cinnamon-600">0</span> מתכונים תואמים בסגנון שחיפשת
+                            </p>
+                        </div>
+                        <button onclick="clearSearch()" class="bg-cream-100 hover:bg-cream-200 text-cinnamon-600 px-4 py-2 rounded-full text-xs font-bold transition-all shrink-0">
+                            איפוס חיפוש
+                        </button>
+                    </div>
+
+                    <!-- Search Results Grid -->
+                    <div id="searchResultsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Filled dynamically -->
+                    </div>
+
+                    <!-- Search Empty Results State -->
+                    <div id="searchNoResults" class="hidden text-center py-16 bg-white rounded-4xl border border-dashed border-cream-300 space-y-4 soft-shadow">
+                        <div class="w-20 h-20 mx-auto rounded-full bg-peach-100 text-cinnamon-500 flex items-center justify-center text-3xl">
+                            <i class="fas fa-magnifying-glass"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-cinnamon-600">לא נמצאו מתכונים עבור חיפוש זה</h3>
+                        <p class="text-sm text-cinnamon-400 max-w-md mx-auto">
+                            נסו לחפש מילה אחרת, כגון "שוקולד", "פירורים", "חן במטבח", או היעזרו בשף AI למציאת מתכון מתאים.
+                        </p>
+                        <button onclick="showHomePage()" class="px-6 py-2.5 bg-cinnamon-500 text-white text-sm font-semibold rounded-full hover:bg-cinnamon-600 transition-colors shadow-md">
+                            חזרה לכל המתכונים
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- 3. SINGLE RECIPE DETAIL PAGE VIEW -->
+                <div id="recipeDetailPage" class="hidden space-y-8 fade-in">
+                    
+                    <!-- Back & Actions Top Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 no-print">
+                        <button onclick="handleBackNavigation()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-cream-200 hover:bg-cream-300 text-cinnamon-600 font-semibold text-sm transition-all shadow-sm">
+                            <i class="fas fa-arrow-right"></i>
+                            <span id="backButtonText">חזרה לכל המתכונים</span>
+                        </button>
+                        
+                        <div class="flex items-center gap-2">
+                            <!-- Favorite Toggle Button -->
+                            <button id="detailFavBtn" onclick="toggleActiveFavorite()" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-cream-200 text-red-500 hover:bg-red-50 font-semibold text-xs transition-all shadow-sm">
+                                <i id="detailFavIcon" class="far fa-heart"></i>
+                                <span id="detailFavText">שמור במועדפים</span>
+                            </button>
+                            <!-- Print Button -->
+                            <button onclick="window.print()" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-cream-200 text-cinnamon-600 hover:bg-cream-100 font-semibold text-xs transition-all shadow-sm">
+                                <i class="fas fa-print"></i>
+                                הדפסת מתכון
+                            </button>
+                            <span id="detailCategoryBadge" class="px-4 py-2 rounded-full bg-peach-100 text-cinnamon-600 text-xs font-bold">
+                                קטגוריה
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Recipe Header Card -->
+                    <div class="bg-white rounded-4xl border border-cream-200 overflow-hidden soft-shadow">
+                        <div class="relative h-72 sm:h-96 w-full overflow-hidden bg-cream-200">
+                            <img id="detailImage" src="" alt="" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                            <div class="absolute bottom-6 right-6 left-6 text-white space-y-2">
+                                <div class="inline-block bg-peach-200/90 text-cinnamon-600 text-xs font-extrabold px-3 py-1 rounded-full shadow-sm mb-1">
+                                    מקור: <span id="detailSourceBadge"></span>
+                                </div>
+                                <h1 id="detailTitle" class="text-2xl sm:text-4xl font-extrabold tracking-tight">שם המתכון</h1>
+                                <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-cream-100 font-medium">
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-user-pen text-peach-200"></i>
+                                        מאת: <span id="detailAuthor" class="font-bold text-white"></span>
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-calendar-alt text-peach-200"></i>
+                                        תאריך: <span id="detailDate"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recipe Meta Info Bar -->
+                        <div class="grid grid-cols-4 divide-x divide-x-reverse divide-cream-200 bg-cream-100/60 py-4 text-center border-b border-cream-200">
+                            <div>
+                                <div class="text-xs text-cinnamon-400 font-medium">זמן הכנה</div>
+                                <div id="detailPrepTime" class="text-xs sm:text-sm font-bold text-cinnamon-600 mt-0.5">45 דקות</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-cinnamon-400 font-medium">דרגת קושי</div>
+                                <div id="detailDifficulty" class="text-xs sm:text-sm font-bold text-cinnamon-600 mt-0.5">בינוני</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-cinnamon-400 font-medium">כמות/תבנית</div>
+                                <div id="detailYield" class="text-xs sm:text-sm font-bold text-cinnamon-600 mt-0.5">תבנית 24</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-cinnamon-400 font-medium">דירוג גולשים</div>
+                                <div id="detailRating" class="text-xs sm:text-sm font-bold text-amber-500 mt-0.5">⭐⭐⭐⭐⭐</div>
+                            </div>
+                        </div>
+
+                        <!-- Recipe Content Body -->
+                        <div class="p-6 sm:p-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                            
+                            <!-- Ingredients List -->
+                            <div class="md:col-span-1 bg-cream-50 p-6 rounded-3xl border border-cream-200 space-y-4">
+                                <h3 class="text-lg font-bold text-cinnamon-600 flex items-center gap-2 border-b border-cream-200 pb-3">
+                                    <i class="fas fa-basket-shopping text-peach-300"></i>
+                                    רכיבים ומצרכים
+                                </h3>
+                                <ul id="detailIngredients" class="space-y-2.5 text-sm text-cinnamon-600">
+                                    <!-- Dynamic Ingredients -->
+                                </ul>
+                            </div>
+
+                            <!-- Instructions List -->
+                            <div class="md:col-span-2 space-y-4">
+                                <h3 class="text-lg font-bold text-cinnamon-600 flex items-center gap-2 border-b border-cream-200 pb-3">
+                                    <i class="fas fa-list-check text-peach-300"></i>
+                                    אופן ההכנה שלב אחר שלב
+                                </h3>
+                                <ol id="detailSteps" class="space-y-4">
+                                    <!-- Dynamic Instructions Steps -->
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Community Sections: Q&A and Reader Tips -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 no-print">
+                        
+                        <!-- Q&A Section -->
+                        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-cream-200 soft-shadow space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold text-cinnamon-600 flex items-center gap-2">
+                                    <i class="fas fa-comments text-peach-300"></i>
+                                    שאלות ותשובות לכותב המתכון
+                                </h3>
+                                <span id="questionsCount" class="text-xs bg-cream-200 text-cinnamon-600 px-2.5 py-1 rounded-full font-bold">0</span>
+                            </div>
+
+                            <!-- Add Question Form -->
+                            <form onsubmit="handleAddQuestion(event)" class="space-y-3">
+                                <input type="text" id="qNameInput" placeholder="השם שלך" required class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-peach-300">
+                                <textarea id="qTextInput" rows="2" placeholder="יש לך שאלה לגבי האפייה או המרכיבים?" required class="w-full bg-cream-50 border border-cream-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-peach-300 resize-none"></textarea>
+                                <button type="submit" class="w-full bg-cinnamon-500 hover:bg-cinnamon-600 text-white font-semibold py-2.5 rounded-2xl text-sm transition-all shadow-sm">
+                                    שליחת שאלה לכותב
+                                </button>
+                            </form>
+
+                            <div id="questionsList" class="space-y-4 pt-2 max-h-96 overflow-y-auto">
+                                <!-- Dynamic Q&A -->
+                            </div>
+                        </div>
+
+                        <!-- Reader Tips Section -->
+                        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-cream-200 soft-shadow space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold text-cinnamon-600 flex items-center gap-2">
+                                    <i class="fas fa-lightbulb text-peach-300"></i>
+                                    טיפים ורעיונות לשדרוג מהקוראים
+                                </h3>
+                                <span id="tipsCount" class="text-xs bg-cream-200 text-cinnamon-600 px-2.5 py-1 rounded-full font-bold">0</span>
+                            </div>
+
+                            <!-- Add Tip Form -->
+                            <form onsubmit="handleAddTip(event)" class="space-y-3">
+                                <input type="text" id="tipNameInput" placeholder="השם שלך" required class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-peach-300">
+                                <textarea id="tipTextInput" rows="2" placeholder="יש לך טיפ לשדרוג, המרה או טריק באפייה?" required class="w-full bg-cream-50 border border-cream-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-peach-300 resize-none"></textarea>
+                                <button type="submit" class="w-full bg-peach-200 hover:bg-peach-300 text-cinnamon-600 font-semibold py-2.5 rounded-2xl text-sm transition-all shadow-sm">
+                                    שיתוף טיפ עם הקהילה
+                                </button>
+                            </form>
+
+                            <div id="tipsList" class="space-y-4 pt-2 max-h-96 overflow-y-auto">
+                                <!-- Dynamic Tips -->
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+    </div>
+
+    <!-- MODAL 1: ADD RECIPE MODAL -->
+    <div id="addRecipeModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-4xl max-w-2xl w-full p-6 sm:p-8 border border-cream-200 shadow-2xl relative fade-in">
+            <button onclick="closeModal('addRecipeModal')" class="absolute top-6 left-6 text-cinnamon-300 hover:text-cinnamon-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-2xl bg-peach-100 text-cinnamon-500 flex items-center justify-center text-lg">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-cinnamon-600">הוספת מתכון חדש לאתר</h2>
+                    <p class="text-xs text-cinnamon-400">שתפו מתכון משלכם או מתכון אהוב עם התמונות וההנחיות</p>
+                </div>
+            </div>
+
+            <form onsubmit="handleCreateRecipe(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-cinnamon-500 mb-1">שם המתכון</label>
+                        <input type="text" id="newTitle" required placeholder="למשל: עוגת שוקולד עסיסית" class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-peach-300">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-cinnamon-500 mb-1">שם הכותב / אתר מקור</label>
+                        <input type="text" id="newAuthor" required placeholder="למשל: חן במטבח / mako" class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-peach-300">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-cinnamon-500 mb-1">קטגוריה</label>
+                        <select id="newCategory" class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-peach-300">
+                            <option value="עוגות שוקולד">עוגות שוקולד</option>
+                            <option value="עוגות גבינה">עוגות גבינה</option>
+                            <option value="מאפי שמרים">מאפי שמרים</option>
+                            <option value="פאי וטארט">פאי וטארט</option>
+                            <option value="עוגיות">עוגיות</option>
+                            <option value="קינוחים בכוסות">קינוחים בכוסות</option>
+                            <option value="פרווה">פרווה / טבעוני</option>
+                            <option value="ללא גלוטן">ללא גלוטן</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-cinnamon-500 mb-1">זמן הכנה</label>
+                        <input type="text" id="newPrepTime" placeholder="למשל: 30 דקות" required class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-peach-300">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-cinnamon-500 mb-1">דרגת קושי</label>
+                        <select id="newDifficulty" class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-peach-300">
+                            <option value="קל">קל</option>
+                            <option value="בינוני">בינוני</option>
+                            <option value="מתקדם">מתקדם</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-cinnamon-500 mb-1">קישור לתמונה (אופציונלי)</label>
+                    <input type="url" id="newImage" placeholder="https://..." class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-peach-300">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-cinnamon-500 mb-1">מצרכים (כל מצרך בשורה חדשה)</label>
+                    <textarea id="newIngredients" rows="3" required placeholder="2 כוסות קמח&#10;1 כוס סוכר&#10;3 ביצים" class="w-full bg-cream-50 border border-cream-200 rounded-2xl p-3 text-sm focus:outline-none focus:border-peach-300 resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-cinnamon-500 mb-1">הוראות הכנה (כל שלב בשורה חדשה)</label>
+                    <textarea id="newSteps" rows="3" required placeholder="מחממים תנור ל-180 מעלות.&#10;מערבבים בקערה את היבשים." class="w-full bg-cream-50 border border-cream-200 rounded-2xl p-3 text-sm focus:outline-none focus:border-peach-300 resize-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('addRecipeModal')" class="px-5 py-2.5 rounded-2xl border border-cream-300 text-cinnamon-500 text-sm font-semibold hover:bg-cream-100">
+                        ביטול
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 rounded-2xl bg-cinnamon-500 text-white text-sm font-semibold hover:bg-cinnamon-600 transition-colors shadow-md">
+                        פרסום מתכון
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: AI RECIPE ASSISTANT -->
+    <div id="aiModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-4xl max-w-2xl w-full p-6 sm:p-8 border border-cream-200 shadow-2xl relative fade-in flex flex-col h-[600px]">
+            <button onclick="closeModal('aiModal')" class="absolute top-6 left-6 text-cinnamon-300 hover:text-cinnamon-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+
+            <!-- Header -->
+            <div class="flex items-center gap-3 pb-4 border-b border-cream-200">
+                <div class="w-12 h-12 rounded-2xl cinnamon-gradient text-white flex items-center justify-center text-xl shadow-md">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-cinnamon-600">שף AI וממציא המתכונים</h2>
+                    <p class="text-xs text-cinnamon-400">המרות לטבעוני/פרווה/ללא גלוטן, שילוב טעמים והמצאות</p>
+                </div>
+            </div>
+
+            <!-- Chat Window -->
+            <div id="aiChatBox" class="flex-grow overflow-y-auto py-4 space-y-4 my-2 pr-1">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-peach-100 text-cinnamon-500 flex items-center justify-center text-xs font-bold shrink-0">
+                        AI
+                    </div>
+                    <div class="bg-cream-100 text-cinnamon-600 p-4 rounded-3xl rounded-tr-none text-sm max-w-md leading-relaxed">
+                        שלום! אני עוזר האפייה החכם שלכם 🧁. רוצים להמיר מתכון של חן במטבח לפרווה? להמציא קינוח ממה שיש בבית? שאלו אותי!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Suggestions -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                <button onclick="sendAiQuickPrompt('איך ממירים עוגת חלבית של קרין גורן לפרווה?')" class="text-xs bg-cream-200 hover:bg-cream-300 text-cinnamon-600 px-3 py-1.5 rounded-full whitespace-nowrap transition-colors">
+                    🥛 המרה לפרווה
+                </button>
+                <button onclick="sendAiQuickPrompt('תמציא לי מתכון ממה שיש בבית: קמח, שוקולד וריבה')" class="text-xs bg-cream-200 hover:bg-cream-300 text-cinnamon-600 px-3 py-1.5 rounded-full whitespace-nowrap transition-colors">
+                    💡 המצאת מתכון
+                </button>
+                <button onclick="sendAiQuickPrompt('איך הופכים עוגה לטבעונית וללא גלוטן?')" class="text-xs bg-cream-200 hover:bg-cream-300 text-cinnamon-600 px-3 py-1.5 rounded-full whitespace-nowrap transition-colors">
+                    🌱 טבעוני וללא גלוטן
+                </button>
+            </div>
+
+            <!-- Chat Input -->
+            <form onsubmit="handleAiChatSubmit(event)" class="pt-3 flex gap-2 border-t border-cream-200">
+                <input type="text" id="aiInput" placeholder="כתבו כאן שאלה באפייה..." required class="flex-grow bg-cream-50 border border-cream-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-peach-300">
+                <button type="submit" class="bg-cinnamon-500 hover:bg-cinnamon-600 text-white px-6 py-3 rounded-2xl text-sm font-semibold transition-colors shadow-sm">
+                    שליחה
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: STORE MODAL -->
+    <div id="shopModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-4xl max-w-3xl w-full p-6 sm:p-8 border border-cream-200 shadow-2xl relative fade-in">
+            <button onclick="closeModal('shopModal')" class="absolute top-6 left-6 text-cinnamon-300 hover:text-cinnamon-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-peach-100 text-cinnamon-500 flex items-center justify-center text-lg">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-cinnamon-600">חנות אפייה ומאפים</h2>
+                        <p class="text-xs text-cinnamon-400">ציוד אפייה מקצועי ומאפים ביתיים של חברי הקהילה</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[450px] overflow-y-auto pr-1">
+                
+                <div class="bg-cream-50 p-4 rounded-3xl border border-cream-200 flex items-center gap-4">
+                    <img src="https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=300&q=80" class="w-20 h-20 rounded-2xl object-cover shrink-0">
+                    <div class="space-y-1">
+                        <span class="text-[10px] bg-peach-200 text-cinnamon-600 px-2 py-0.5 rounded-full font-bold">ציוד אפייה</span>
+                        <h4 class="font-bold text-cinnamon-600 text-sm">סט תבניות קפיץ מתפרקות</h4>
+                        <p class="text-xs text-cinnamon-400">סט 3 תבניות (20, 24, 26 ס"מ)</p>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-sm font-bold text-cinnamon-500">₪120</span>
+                            <button onclick="showToast('המוצר הוסף לסל הקניות!')" class="text-xs bg-cinnamon-500 text-white px-3 py-1 rounded-full hover:bg-cinnamon-600">הוסף לסל</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-cream-50 p-4 rounded-3xl border border-cream-200 flex items-center gap-4">
+                    <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80" class="w-20 h-20 rounded-2xl object-cover shrink-0">
+                    <div class="space-y-1">
+                        <span class="text-[10px] bg-cream-300 text-cinnamon-600 px-2 py-0.5 rounded-full font-bold">מאפה ביתי</span>
+                        <h4 class="font-bold text-cinnamon-600 text-sm">מארז 6 סינבונים חמים</h4>
+                        <p class="text-xs text-cinnamon-400">אפייה ביתית טרייה לפי הזמנה</p>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-sm font-bold text-cinnamon-500">₪85</span>
+                            <button onclick="showToast('המאפה הוסף להזמנה!')" class="text-xs bg-cinnamon-500 text-white px-3 py-1 rounded-full hover:bg-cinnamon-600">הזמן עכשיו</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-cream-50 p-4 rounded-3xl border border-cream-200 flex items-center gap-4">
+                    <img src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?auto=format&fit=crop&w=300&q=80" class="w-20 h-20 rounded-2xl object-cover shrink-0">
+                    <div class="space-y-1">
+                        <span class="text-[10px] bg-peach-200 text-cinnamon-600 px-2 py-0.5 rounded-full font-bold">ציוד אפייה</span>
+                        <h4 class="font-bold text-cinnamon-600 text-sm">מיקסר זילוף וציוד עיטור</h4>
+                        <p class="text-xs text-cinnamon-400">24 צנתרים מנירוסטה מובחרת</p>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-sm font-bold text-cinnamon-500">₪65</span>
+                            <button onclick="showToast('המוצר הוסף לסל הקניות!')" class="text-xs bg-cinnamon-500 text-white px-3 py-1 rounded-full hover:bg-cinnamon-600">הוסף לסל</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-cream-50 p-4 rounded-3xl border border-cream-200 flex items-center gap-4">
+                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=300&q=80" class="w-20 h-20 rounded-2xl object-cover shrink-0">
+                    <div class="space-y-1">
+                        <span class="text-[10px] bg-cream-300 text-cinnamon-600 px-2 py-0.5 rounded-full font-bold">מאפה ביתי</span>
+                        <h4 class="font-bold text-cinnamon-600 text-sm">עוגת יום הולדת מעוצבת</h4>
+                        <p class="text-xs text-cinnamon-400">עיצוב אישי לפי דרישה</p>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-sm font-bold text-cinnamon-500">₪280</span>
+                            <button onclick="showToast('פנייה נשלחה לקונדיטור!')" class="text-xs bg-cinnamon-500 text-white px-3 py-1 rounded-full hover:bg-cinnamon-600">צור קשר</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: HELP MODAL -->
+    <div id="helpModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-4xl max-w-xl w-full p-6 sm:p-8 border border-cream-200 shadow-2xl relative fade-in space-y-6">
+            <button onclick="closeModal('helpModal')" class="absolute top-6 left-6 text-cinnamon-300 hover:text-cinnamon-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-peach-100 text-cinnamon-500 flex items-center justify-center text-lg">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-cinnamon-600">עזרה ותמיכה טכנית</h2>
+                    <p class="text-xs text-cinnamon-400">שאלות נפוצות ופנייה לצוות האתר</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold text-cinnamon-500 uppercase tracking-wider">שאלות נפוצות</h3>
+                
+                <details class="bg-cream-50 p-4 rounded-2xl border border-cream-200 cursor-pointer">
+                    <summary class="font-bold text-cinnamon-600 text-sm">איך מצאתם את המתכונים של האתרים המובילים?</summary>
+                    <p class="text-xs text-cinnamon-400 mt-2 leading-relaxed">האתר מאגד את המתכונים האהובים ביותר מכל אתרי הבישול בישראל באופן מסודר ונגיש עם קרדיט מלא ליוצרים ולמקורות.</p>
+                </details>
+
+                <details class="bg-cream-50 p-4 rounded-2xl border border-cream-200 cursor-pointer">
+                    <summary class="font-bold text-cinnamon-600 text-sm">איך שומרים מתכון במועדפים?</summary>
+                    <p class="text-xs text-cinnamon-400 mt-2 leading-relaxed">כשנכנסים לדף המתכון או בכרטיסייה, לוחצים על האייקון של הלב ❤️. המתכונים יישמרו בסיידבאר תחת "המועדפים שלי".</p>
+                </details>
+            </div>
+
+            <form onsubmit="handleSupportSubmit(event)" class="space-y-3 border-t border-cream-200 pt-4">
+                <h3 class="text-xs font-bold text-cinnamon-500 uppercase tracking-wider">פנייה לתמיכה</h3>
+                <input type="text" placeholder="שם מלא" required class="w-full bg-cream-50 border border-cream-200 rounded-2xl px-4 py-2 text-sm focus:outline-none focus:border-peach-300">
+                <textarea rows="2" placeholder="תארו את הבעיה הטכנית..." required class="w-full bg-cream-50 border border-cream-200 rounded-2xl p-3 text-sm focus:outline-none focus:border-peach-300 resize-none"></textarea>
+                <button type="submit" class="w-full bg-cinnamon-500 hover:bg-cinnamon-600 text-white font-semibold py-2.5 rounded-2xl text-sm transition-colors shadow-sm">
+                    שליחת פנייה
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-cream-200/60 border-t border-cream-200 py-8 mt-12 text-center text-xs text-cinnamon-400 space-y-2">
+        <div class="flex items-center justify-center gap-2 font-bold text-cinnamon-500 text-sm">
+            <i class="fa-solid fa-cookie-bite"></i> סודות האפייה
+        </div>
+        <p>כל הזכויות שמורות © 2026 | ריכוז מתכוני איכות ממיטב האתרים בישראל</p>
+    </footer>
+
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" class="hidden fixed inset-0 z-[70] overflow-y-auto bg-black/50 backdrop-blur-sm p-3 sm:p-6">
+      <div class="max-w-5xl mx-auto my-4 bg-white rounded-3xl shadow-2xl border border-cream-200 overflow-hidden">
+        <div class="cinnamon-gradient text-white p-5 sm:p-7 flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold"><i class="fas fa-sliders-h ml-2"></i>פאנל ניהול האתר</h2>
+            <p class="text-sm text-white/80 mt-1">עריכת טקסטים, תמונות ומתכונים. השינויים נשמרים בדפדפן הזה.</p>
+          </div>
+          <button onclick="closeAdminPanel()" class="text-white text-2xl px-2" aria-label="סגירה">&times;</button>
+        </div>
+        <div class="p-4 sm:p-7 space-y-8">
+          <section class="bg-cream-50 rounded-2xl border border-cream-200 p-4 sm:p-5 space-y-4">
+            <h3 class="text-lg font-bold">תוכן האתר הראשי</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <label class="text-sm font-bold">שם האתר<input id="adminSiteTitle" class="admin-field" type="text"></label>
+              <label class="text-sm font-bold">שורת המשנה בכותרת<input id="adminSiteSubtitle" class="admin-field" type="text"></label>
+              <label class="text-sm font-bold sm:col-span-2">הכיתוב הקטן בבאנר<input id="adminHeroBadge" class="admin-field" type="text"></label>
+              <label class="text-sm font-bold sm:col-span-2">כותרת הבאנר<textarea id="adminHeroTitle" rows="2" class="admin-field"></textarea></label>
+              <label class="text-sm font-bold sm:col-span-2">תיאור הבאנר<textarea id="adminHeroDescription" rows="3" class="admin-field"></textarea></label>
+              <label class="text-sm font-bold">טקסט תחתון באתר<input id="adminFooterText" class="admin-field" type="text"></label>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <button onclick="saveSiteContent()" class="bg-cinnamon-500 hover:bg-cinnamon-600 text-white px-5 py-2.5 rounded-xl font-bold">שמירת טקסטים</button>
+              <button onclick="resetSiteContent()" class="bg-white border border-cream-300 px-5 py-2.5 rounded-xl font-bold">איפוס טקסטים</button>
+            </div>
+          </section>
+          <section class="rounded-2xl border border-cream-200 p-4 sm:p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h3 class="text-lg font-bold">עריכת כל המתכונים</h3>
+              <div class="w-full sm:max-w-md space-y-2">
+                <input id="adminRecipeSearch" class="admin-field" type="search" placeholder="חיפוש מתכון לפי שם או קטגוריה..." oninput="filterAdminRecipes()">
+                <select id="adminRecipeSelect" onchange="loadAdminRecipe()" class="admin-field"></select>
+                <p id="adminRecipeCount" class="text-xs text-cinnamon-400">אפשר לבחור ולערוך כל מתכון באתר</p>
+              </div>
+            </div>
+            <div id="adminRecipeEditor" class="space-y-4">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="text-sm font-bold">שם המתכון<input id="adminRecipeTitle" class="admin-field" type="text"></label>
+                <label class="text-sm font-bold">שם הכותב / מקור<input id="adminRecipeAuthor" class="admin-field" type="text"></label>
+                <label class="text-sm font-bold">קטגוריה<input id="adminRecipeCategory" class="admin-field" type="text"></label>
+                <label class="text-sm font-bold">זמן הכנה<input id="adminRecipePrepTime" class="admin-field" type="text"></label>
+                <label class="text-sm font-bold">דרגת קושי<input id="adminRecipeDifficulty" class="admin-field" type="text"></label>
+                <label class="text-sm font-bold">כמות / תבנית<input id="adminRecipeYield" class="admin-field" type="text"></label>
+              </div>
+              <label class="block text-sm font-bold">קישור לתמונה<input id="adminRecipeImage" class="admin-field" type="url" placeholder="https://..."></label>
+              <label class="block text-sm font-bold">או העלאת תמונה מהמכשיר (נשמרת בדפדפן)<input id="adminRecipeImageFile" class="admin-field" type="file" accept="image/*" onchange="adminPreviewUpload(event)"></label>
+              <img id="adminRecipeImagePreview" class="hidden max-h-48 rounded-2xl object-cover border border-cream-200" alt="תצוגה מקדימה של תמונת המתכון">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="text-sm font-bold">מצרכים — כל מצרך בשורה<textarea id="adminRecipeIngredients" rows="8" class="admin-field"></textarea></label>
+                <label class="text-sm font-bold">הוראות הכנה — כל שלב בשורה<textarea id="adminRecipeSteps" rows="8" class="admin-field"></textarea></label>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button onclick="saveAdminRecipe()" class="bg-cinnamon-500 hover:bg-cinnamon-600 text-white px-5 py-2.5 rounded-xl font-bold">שמירת המתכון</button>
+                <button onclick="resetAllAdminChanges()" class="bg-white border border-red-200 text-red-700 px-5 py-2.5 rounded-xl font-bold">איפוס כל השינויים</button>
+              </div>
+              <p class="text-xs text-cinnamon-400">הערה: התמונות שהעלית נשמרות מקומית בדפדפן ועלולות להגדיל את נפח האחסון. עדיף להעלות תמונות קטנות.</p>
+            </div>
+          </section>
+          <div class="flex justify-end">
+            <button onclick="closeAdminPanel()" class="px-5 py-2.5 rounded-xl border border-cream-300 font-bold">סיום</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <style>
+      .admin-field{display:block;width:100%;margin-top:6px;background:#fff;border:1px solid #E8D5C4;border-radius:12px;padding:10px 12px;color:#5C3D2E;font-weight:400;outline:none}
+      .admin-field:focus{border-color:#F4ACB7;box-shadow:0 0 0 3px rgba(244,172,183,.18)}
+    </style>
+
+    <!-- JavaScript Engine & Recipe Generation -->
+    <script>
+        // HIGH QUALITY ACCURATE IMAGE MAPPER (UNSPLASH REAL DESSERTS)
+        const categoryImages = {
+            'עוגות שוקולד': [
+                'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?auto=format&fit=crop&w=800&q=80'
+            ],
+            'עוגות גבינה': [
+                'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1524351199678-941a58a3df50?auto=format&fit=crop&w=800&q=80'
+            ],
+            'מאפי שמרים': [
+                'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80'
+            ],
+            'פאי וטארט': [
+                'https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=800&q=80'
+            ],
+            'עוגיות': [
+                'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=80'
+            ],
+            'קינוחים בכוסות': [
+                'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1579372786545-d24232daf58c?auto=format&fit=crop&w=800&q=80'
+            ],
+            'פרווה': [
+                'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=800&q=80'
+            ],
+            'ללא גלוטן': [
+                'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=800&q=80'
+            ]
+        };
+
+        // BASE ANCHOR RECIPES
+        const baseRecipes = [
+            {
+                id: 'hen-choc-birthday',
+                title: 'עוגת שוקולד יומולדת מושלמת',
+                author: 'חן במטבח',
+                sourceSite: 'חן במטבח',
+                date: '14/09/2026',
+                category: 'עוגות שוקולד',
+                prepTime: '35 דקות',
+                difficulty: 'קל',
+                yield: 'תבנית 24 / A4',
+                rating: '5.0',
+                image: categoryImages['עוגות שוקולד'][0],
+                ingredients: [
+                    '2 כוסות (280 גרם) קמח לבן',
+                    '2 כוסות (400 גרם) סוכר לבן',
+                    '3/4 כוס (100 גרם) קקאו איכותי',
+                    '1.5 כפיות אבקת אפייה',
+                    '1.5 כפיות סודה לשתייה',
+                    '1 כפית מלח דק',
+                    '2 ביצים בגודל L',
+                    '1 כוס חלב (או מים/מיץ תפוזים לפרווה)',
+                    '1/2 כוס שמן צמחי',
+                    '1 כוס מים רותחים'
+                ],
+                steps: [
+                    'מחממים תנור ל-175 מעלות ומשמנים היטב תבנית אפייה.',
+                    'בקערה גדולה מנפים ומערבבים את כל הרכיבים היבשים: קמח, סוכר, קקאו, אבקת אפייה, סודה לשתייה ומלח.',
+                    'מוסיפים את הביצים, החלב והשמן ומערבבים במטרפה עד לקבלת בלילה אחידה.',
+                    'מוסיפים בהדרגה את המים הרותחים ומערבבים לבלילה דלילה ומשגעת.',
+                    'יוצקים לתבנית ואופים כ-35 דקות עד שקיסם יוצא לח עם פירורים.',
+                    'מצפים בגנאש שוקולד חם (שוקולד מריר ושמנת מתוקה).'
+                ],
+                questions: [
+                    { id: 1, name: 'טלי', text: 'אפשר להמיר לשמן זית?', authorReply: 'עדיף שמן קנולה או חמניות כדי שלא יהיה טעם לוואי.' }
+                ],
+                tips: [
+                    { id: 1, name: 'עדי', text: 'הוספתי מעט כדורי קליק מעל הגנאש, הילדים התלהבו בטירוף!' }
+                ]
+            },
+            {
+                id: 'kroatit-basque-cheesecake',
+                title: 'עוגת גבינה באסקית חלומית',
+                author: 'רחלי קרוט (קרוטית)',
+                sourceSite: 'קרוטית',
+                date: '20/09/2026',
+                category: 'עוגות גבינה',
+                prepTime: '20 דקות + אפייה',
+                difficulty: 'בינוני',
+                yield: 'תבנית 22',
+                rating: '5.0',
+                image: categoryImages['עוגות גבינה'][0],
+                ingredients: [
+                    '700 גרם גבינת שמנת 30%',
+                    '1.5 כוסות (300 גרם) סוכר',
+                    '5 ביצים L בטמפרטורת החדר',
+                    '350 מ״ל שמנת מתוקה 38%',
+                    '1 כף קורנפלור',
+                    '1 כפית מחית וניל איכותית'
+                ],
+                steps: [
+                    'מחממים תנור ל-210 מעלות במצב טורבו ומקמטים נייר אפייה להנחה בתבנית 22 גבוהה.',
+                    'בקערה גדולה טורפים גבינת שמנת וסוכר עד שהסוכר נמס לגמרי.',
+                    'מוסיפים את הביצים אחת אחת תוך ערבוב עדין.',
+                    'מנפים קורנפלור, מוסיפים שמנת מתוקה ווניל ומערבבים לבלילה חלקה.',
+                    'יוצקים לתבנית ואופים כ-45-50 דקות עד שהעוגה שחומה וכהה מאוד מלמעלה אך רוטטת במרכז.',
+                    'צינון לילה במקרר להתייצבות מושלמת.'
+                ],
+                questions: [
+                    { id: 1, name: 'יוסי', text: 'האם היא אמורה להיות כמעט שרופה מלמעלה?', authorReply: 'כן! זה הסימן המסחרי של העוגה הבאסקית, הקרום השחום מעניק טעם קרמלי מטורף.' }
+                ],
+                tips: []
+            },
+            {
+                id: 'white-chef-lotus-cups',
+                title: 'קינוח כוסות פאדג׳ שוקולד ולוטוס',
+                author: 'צוות השף הלבן',
+                sourceSite: 'השף הלבן',
+                date: '18/10/2026',
+                category: 'קינוחים בכוסות',
+                prepTime: '20 דקות',
+                difficulty: 'קל',
+                yield: '8 כוסות אישיות',
+                rating: '4.8',
+                image: categoryImages['קינוחים בכוסות'][0],
+                ingredients: [
+                    '250 מ״ל שמנת מתוקה להקצפה השף הלבן',
+                    '250 גרם גבינת מסקרפונה או שמנת',
+                    '1 כוס ממרח לוטוס מומס קלות',
+                    '100 גרם עוגיות לוטוס מרוסקות',
+                    '100 גרם שוקולד מריר מומס לגנאש'
+                ],
+                steps: [
+                    'מקציפים שמנת מתוקה, מסקרפונה וחצי מכמות ממרח הלוטוס לקצף יציב.',
+                    'בתחתית כל כוסית שמים כפית עוגיות לוטוס מרוסקות.',
+                    'מזלפים את קרם הלוטוס עד מחצית הגובה.',
+                    'מוסיפים שכבת גנאש שוקולד ומעליה עוד קרם.',
+                    'מעטרים בעוגיית לוטוס שלמה ומקררים שעתיים לפני הגשה.'
+                ],
+                questions: [],
+                tips: []
+            },
+            {
+                id: 'karin-pecan-pie',
+                title: 'פאי פקאן וקרמל מלוח',
+                author: 'קרין גורן',
+                sourceSite: 'קרין גורן / השף הלבן',
+                date: '05/10/2026',
+                category: 'פאי וטארט',
+                prepTime: '45 דקות',
+                difficulty: 'בינוני',
+                yield: 'תבנית פאי 24',
+                rating: '4.9',
+                image: categoryImages['פאי וטארט'][0],
+                ingredients: [
+                    'לבצק פריך: 1.5 כוסות קמח, 100 גרם חמאה קרה, 2 כפות אבקת סוכר, 1 חלמון',
+                    'למילוי: 200 גרם אגוזי פקאן טבעיים',
+                    '1/2 כוס מייפל או סילאן',
+                    '1/2 כוס סוכר חום כהה',
+                    '50 גרם חמאה',
+                    '3 ביצים',
+                    '1/2 כפית מלח אטלנטי'
+                ],
+                steps: [
+                    'מעבדים במעבד מזון רכיבי בצק פריך, מרפדים תבנית פאי ומקררים 30 דקות.',
+                    'בסיר קטן ממיסים חמאה, סוכר חום ומייפל עד רתיחה קלה.',
+                    'מצננים מעט, טורפים פנימה את הביצים והמלח האטלנטי.',
+                    'מסדרים את הפקאנים בצורה יפה על תחתית הבצק, שופכים מעל את בלילת הקרמל.',
+                    'אופים ב-170 מעלות כ-35 דקות עד שהמילוי יציב בשוליים.'
+                ],
+                questions: [],
+                tips: [
+                    { id: 1, name: 'דנית', text: 'מומלץ להגיש חם עם כדור גלידת וניל!' }
+                ]
+            },
+            {
+                id: 'hen-ny-cookies',
+                title: 'עוגיות שוקולד צ׳יפס ניו יורק רכות',
+                author: 'חן במטבח',
+                sourceSite: 'חן במטבח',
+                date: '01/10/2026',
+                category: 'עוגיות',
+                prepTime: '25 דקות',
+                difficulty: 'קל',
+                yield: '12 עוגיות ענקיות',
+                rating: '5.0',
+                image: categoryImages['עוגיות'][0],
+                ingredients: [
+                    '150 גרם חמאה רכה',
+                    '1/2 כוס סוכר לבן',
+                    '1/2 כוס סוכר חום דביק',
+                    '1 ביצה L + חלמון',
+                    '2 כוסות קמח לבן',
+                    '1 כפית קורנפלור (לרכות מירבית!)',
+                    '1/2 כפית סודה לשתייה',
+                    '250 גרם נטיפי שוקולד צ׳יפס איכותיים'
+                ],
+                steps: [
+                    'בקערה מערבבים חמאה וסוכרים עד תערובת קרמית.',
+                    'מוסיפים ביצה וחלמון ומערבבים.',
+                    'מוסיפים קמח, קורנפלור וסודה לשתייה ומערבבים רק עד שנוצר בצק.',
+                    'מקפלים פנימה את השוקולד צ׳יפס.',
+                    'יוצרים כדורים גדולים (כמו כדור טניס) ומקפיאים 20 דקות.',
+                    'אופים ב-190 מעלות 10-12 דקות (המרכז צריך להישאר רך מאוד!).'
+                ],
+                questions: [],
+                tips: []
+            },
+            {
+                id: 'keren-cinnamon-rolls',
+                title: 'שבלולי שמרים קינמון וציפוי שמנת',
+                author: 'קרן אגם',
+                sourceSite: 'mako / אוכל טוב',
+                date: '12/10/2026',
+                category: 'מאפי שמרים',
+                prepTime: 'שעתיים',
+                difficulty: 'בינוני',
+                yield: '14 שבלולים',
+                rating: '5.0',
+                image: categoryImages['מאפי שמרים'][0],
+                ingredients: [
+                    '500 גרם קמח לבן',
+                    '1 כף שמרים יבשים',
+                    '1/3 כוס סוכר',
+                    '1 כוס חלב פושר',
+                    '2 ביצים',
+                    '100 גרם חמאה רכה',
+                    'למילוי: 150 גרם חמאה רכה, 1 כוס סוכר חום כהה, 2 כפות קינמון טחון',
+                    'לציפוי: 100 גרם גבינת שמנת, 50 גרם אבקת סוכר'
+                ],
+                steps: [
+                    'לשים במיקסר קמח, שמרים, סוכר, חלב, ביצים וחמאה כ-10 דקות לבצק רך.',
+                    'מתפיחים שעה במקום חמים.',
+                    'מרדדים למלבן ענקי, מורחים חמאה רכה ומפזרים סוכר חום וקינמון בשפע.',
+                    'מגלגלים, חותכים לשבלולים ומסדרים בתבנית.',
+                    'מתפיחים 30 דקות נוספות ואופים ב-180 מעלות כ-22 דקות.',
+                    'ציפוי שמנת מתוק מעל מיד בצאתם מהתנור.'
+                ],
+                questions: [],
+                tips: []
+            }
+        ];
+
+        // GENERATE 200+ COMPREHENSIVE RECIPES DYNAMICALLY
+        function generate200Recipes() {
+            let fullList = [...baseRecipes];
+            const authors = [
+                { name: 'חן במטבח', site: 'חן במטבח' },
+                { name: 'רחלי קרוט (קרוטית)', site: 'קרוטית' },
+                { name: 'קרין גורן', site: 'קרין גורן / השף הלבן' },
+                { name: 'צוות השף הלבן', site: 'השף הלבן' },
+                { name: 'קרן אגם', site: 'mako / אוכל טוב' },
+                { name: 'מערכת mako אוכל', site: 'mako' }
+            ];
+
+            const recipeTemplates = [
+                { cat: 'עוגות שוקולד', prefix: 'עוגת שוקולד', suffixes: ['פדאג׳ עשירה', 'קלאסית של ילדות', 'פרווה עם קרם קוקוס', 'נמסה בפה ללא גלוטן', 'עם אגוזים וקרמל', 'חמה עם ליבת שוקולד', 'שיש נוסטלגית'] },
+                { cat: 'עוגות גבינה', prefix: 'עוגת גבינה', suffixes: ['אפויה גבוהה של סבתא', 'פירורים קלאסית ללא אפייה', 'קרה עם מחית מנגו', 'לימון וריבת חלב', 'ניו יורק צ׳יזקייק עשירה', 'שוקולד לבן ופירות יער'] },
+                { cat: 'מאפי שמרים', prefix: 'מאפה שמרים', suffixes: ['שוקולד נוטלה מתקפלת', 'קראנץ ריקוטה וצימוקים', 'חלה מתוקה כתר', 'גביניות פריכות של מאפייה', 'בריוש חמאה ווניל', 'שבלולי פיסטוק ופטל'] },
+                { cat: 'פאי וטארט', prefix: 'טארט / פאי', suffixes: ['פירות יער וקרם פטיסייר', 'לימון ומרנג איטלקי', 'שוקולד מריר ומלח אטלנטי', 'תפוחי עץ וקינמון', 'תאנים ודבש נוסטלגי'] },
+                { cat: 'עוגיות', prefix: 'עוגיות', suffixes: ['מושלגות שוקולד עמוק', 'מגולגלות תמרים ואגוזים', 'אלפחורס נמסות בפה', 'ריבה נוסטלגיות של בית', 'חמאה ושיבולת שועל', 'פיסטוק ושוקולד לבן'] },
+                { cat: 'קינוחים בכוסות', prefix: 'קינוח כוסות', suffixes: ['מלבי שמנת ומי ורדים', 'טירמיסו איטלקי קלאסי', 'פאדג׳ שוקולד וקצפת', 'פירות טרופיים ופירורים', 'קרם אוראו ולוטוס'] },
+                { cat: 'פרווה', prefix: 'קינוח פרווה', suffixes: ['עוגת מייפל ואגוזים', 'בראוניז שוקולד צ׳יפס', 'קינוח טפיוקה וקרם קוקוס', 'עוגת תפוזים ואוורירית'] },
+                { cat: 'ללא גלוטן', prefix: 'עוגה ללא גלוטן', suffixes: ['שוקולד ושקדים עסיסית', 'גבינה קרה עם תותים', 'עוגיות שקדים נמסות', 'פבלובה עם קרם ופירות'] }
+            ];
+
+            let count = baseRecipes.length + 1;
+
+            while (fullList.length < 205) {
+                const template = recipeTemplates[Math.floor(Math.random() * recipeTemplates.length)];
+                const authorObj = authors[Math.floor(Math.random() * authors.length)];
+                const suffix = template.suffixes[Math.floor(Math.random() * template.suffixes.length)];
+                const title = `${template.prefix} ${suffix}`;
+                
+                const catImgList = categoryImages[template.cat] || categoryImages['עוגות שוקולד'];
+                const selectedImg = catImgList[Math.floor(Math.random() * catImgList.length)];
+
+                fullList.push({
+                    id: `gen-recipe-${count}`,
+                    title: title,
+                    author: authorObj.name,
+                    sourceSite: authorObj.site,
+                    date: `${Math.floor(Math.random()*28)+1}/${Math.floor(Math.random()*10)+1}/2026`,
+                    category: template.cat,
+                    prepTime: `${Math.floor(Math.random()*40)+15} דקות`,
+                    difficulty: ['קל', 'קל מאוד', 'בינוני', 'מתקדם'][Math.floor(Math.random()*4)],
+                    yield: 'תבנית 24 / 12 מנות',
+                    rating: (4.7 + Math.random()*0.3).toFixed(1),
+                    image: selectedImg,
+                    ingredients: [
+                        '2.5 כוסות קמח (או תחליף ללא גלוטן)',
+                        '1 כוס סוכר לבן או חום',
+                        '3 ביצים בגודל L',
+                        '1 כוס נוזלים (חלב/מים/שמנת)',
+                        '100 גרם חמאה רכה או 1/2 כוס שמן',
+                        '1 שקית אבקת אפייה + תמצית וניל'
+                    ],
+                    steps: [
+                        'מחממים תנור ל-175 מעלות ומשמנים תבנית מתאימה.',
+                        'בקערה מרכזית טורפים את הרכיבים הרטובים עד לאיחוד מלא.',
+                        'מוסיפים בהדרגה את הרכיבים היבשים ומערבבים רק עד לקבלת בלילה אחידה.',
+                        'מעבירים לתבנית ואופים כ-35-40 דקות עד להזהבה וייצוב.',
+                        'צינון מלא לפני הגשה או זילוף ציפוי מתוק.'
+                    ],
+                    questions: [
+                        { id: Date.now() + Math.random(), name: 'מיכל', text: 'האם שמן קנולה מתאים למתכון הזה?', authorReply: 'כן לחלוטין! שמן קנולה יעניק מרקם רך ועסיסי.' }
+                    ],
+                    tips: [
+                        { id: Date.now() + Math.random(), name: 'נועה', text: 'הוספתי חופן אגוזים קלויים מעל, יצא פשוט חלום!' }
+                    ]
+                });
+                count++;
+            }
+
+            return fullList;
+        }
+
+        // STATE MANAGEMENT
+        let recipes = (() => {
+            // Always keep the full default catalog available, even if an older saved
+            // version only contained one recipe. Saved edits override matching IDs.
+            const defaults = generate200Recipes();
+            try {
+                const saved = JSON.parse(localStorage.getItem('baking_admin_recipes') || '[]');
+                if (!Array.isArray(saved) || !saved.length) return defaults;
+                const savedById = new Map(saved.map(r => [String(r.id), r]));
+                return defaults.map(base => ({ ...base, ...(savedById.get(String(base.id)) || {}) }))
+                    .concat(saved.filter(r => !defaults.some(base => String(base.id) === String(r.id))));
+            } catch (e) { return defaults; }
+        })();
+        let activeRecipeId = null;
+        let selectedCategory = 'הכל';
+        let selectedSourceFilter = null;
+        let favorites = JSON.parse(localStorage.getItem('baking_favs') || '[]');
+        let showingOnlyFavs = false;
+        let itemsToShow = 18;
+        let currentSearchQuery = "";
+        let previousPage = 'homePage'; // Track history for 'back' button
+
+        // INITIAL LOAD
+        window.onload = function() {
+            renderRecipesGrid();
+        };
+
+        // RENDER RECIPE CARDS HTML HELPER
+        function buildRecipeCardHTML(recipe) {
+            const isFav = favorites.includes(recipe.id);
+            return `
+            <div onclick="openRecipeDetail('${recipe.id}')" class="bg-white rounded-3xl border border-cream-200 overflow-hidden soft-shadow hover:soft-shadow-lg transition-all transform hover:-translate-y-1 cursor-pointer group flex flex-col justify-between relative">
+                <div>
+                    <div class="relative h-48 w-full overflow-hidden bg-cream-100">
+                        <img src="${recipe.image}" alt="${recipe.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        
+                        <!-- Badges -->
+                        <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-md text-cinnamon-600 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                            ${recipe.category}
+                        </span>
+                        <span class="absolute top-3 left-3 bg-peach-200/90 backdrop-blur-md text-cinnamon-600 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-sm">
+                            ${recipe.sourceSite}
+                        </span>
+                    </div>
+                    <div class="p-5 space-y-2">
+                        <div class="flex items-center justify-between text-xs text-amber-500">
+                            <span>⭐ ${recipe.rating || '5.0'}</span>
+                            <button onclick="toggleFavorite(event, '${recipe.id}')" class="text-red-400 hover:text-red-600 p-1">
+                                <i class="${isFav ? 'fas' : 'far'} fa-heart text-base"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-cinnamon-600 text-lg leading-snug group-hover:text-cinnamon-500 transition-colors">
+                            ${recipe.title}
+                        </h3>
+                        <div class="text-xs text-cinnamon-400 font-medium">
+                            מאת: <span class="text-cinnamon-500 font-bold">${recipe.author}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 pb-5 pt-2 flex items-center justify-between border-t border-cream-100 text-xs text-cinnamon-400">
+                    <span class="flex items-center gap-1">
+                        <i class="far fa-clock"></i> ${recipe.prepTime}
+                    </span>
+                    <span class="flex items-center gap-1 font-semibold text-cinnamon-500">
+                        קרא מתכון <i class="fas fa-chevron-left text-[10px]"></i>
+                    </span>
+                </div>
+            </div>
+            `;
+        }
+
+        // RENDER HOMEPAGE RECIPE GRID
+        function renderRecipesGrid(filteredList = null) {
+            let listToRender = filteredList || getFilteredRecipes();
+
+            if (showingOnlyFavs) {
+                listToRender = listToRender.filter(r => favorites.includes(r.id));
+            }
+
+            const gridContainer = document.getElementById('recipesGrid');
+            const noResultsState = document.getElementById('noResultsState');
+            const recipeCountEl = document.getElementById('recipeCount');
+
+            recipeCountEl.textContent = listToRender.length;
+
+            if (listToRender.length === 0) {
+                gridContainer.classList.add('hidden');
+                noResultsState.classList.remove('hidden');
+                document.getElementById('paginationContainer').classList.add('hidden');
+                return;
+            }
+
+            gridContainer.classList.remove('hidden');
+            noResultsState.classList.add('hidden');
+
+            const currentBatch = listToRender.slice(0, itemsToShow);
+
+            if (itemsToShow >= listToRender.length) {
+                document.getElementById('paginationContainer').classList.add('hidden');
+            } else {
+                document.getElementById('paginationContainer').classList.remove('hidden');
+            }
+
+            gridContainer.innerHTML = currentBatch.map(recipe => buildRecipeCardHTML(recipe)).join('');
+        }
+
+        function loadMoreRecipes() {
+            itemsToShow += 18;
+            renderRecipesGrid();
+        }
+
+        // CATEGORY & SOURCE FILTERING
+        function filterCategory(category) {
+            selectedCategory = category;
+            selectedSourceFilter = null;
+            showingOnlyFavs = false;
+            itemsToShow = 18;
+            updateFavBtnUI();
+
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.innerText.includes(category) || (category === 'הכל' && btn.innerText.includes('הכל'))) {
+                    btn.className = "category-btn active border border-cinnamon-300 bg-cinnamon-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all shadow-sm";
+                } else {
+                    btn.className = "category-btn border border-cream-300 bg-white hover:bg-cream-100 text-cinnamon-600 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all";
+                }
+            });
+
+            showHomePage();
+            renderRecipesGrid();
+        }
+
+        function filterBySource(sourceName) {
+            selectedSourceFilter = sourceName;
+            showingOnlyFavs = false;
+            itemsToShow = 18;
+            updateFavBtnUI();
+            showHomePage();
+            renderRecipesGrid();
+        }
+
+        function getFilteredRecipes() {
+            let list = recipes;
+            if (selectedCategory !== 'הכל') {
+                list = list.filter(r => r.category === selectedCategory);
+            }
+            if (selectedSourceFilter) {
+                list = list.filter(r => r.sourceSite.includes(selectedSourceFilter) || r.author.includes(selectedSourceFilter));
+            }
+            return list;
+        }
+
+        // LIVE INPUT & SEARCH SUBMIT HANDLERS
+        function handleSearchInput() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const dropdown = document.getElementById('searchDropdown');
+
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+                dropdown.classList.add('hidden');
+                return;
+            }
+
+            // Quick Live Dropdown Suggestions
+            const matchedRecipes = searchRecipesByQuery(query);
+
+            if (matchedRecipes.length > 0) {
+                dropdown.innerHTML = matchedRecipes.slice(0, 6).map(r => `
+                    <div onclick="openRecipeDetail('${r.id}'); hideSearchDropdown();" class="p-3 hover:bg-cream-100 flex items-center gap-3 cursor-pointer border-b border-cream-100 last:border-none">
+                        <img src="${r.image}" class="w-10 h-10 rounded-xl object-cover shrink-0">
+                        <div class="overflow-hidden">
+                            <div class="text-sm font-bold text-cinnamon-600 truncate">${r.title}</div>
+                            <div class="text-xs text-cinnamon-400">מאת: ${r.author} (${r.sourceSite})</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Add "Press Enter for full results page" item
+                dropdown.innerHTML += `
+                    <div onclick="executeSearchPageSubmit('${query}')" class="p-3 bg-peach-100/60 hover:bg-peach-100 text-cinnamon-600 font-bold text-xs flex items-center justify-between cursor-pointer">
+                        <span>לחץ Enter או לחץ כאן להצגת כל ${matchedRecipes.length} התוצאות</span>
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                `;
+                
+                dropdown.classList.remove('hidden');
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        // SUBMIT SEARCH TO DEDICATED SEARCH PAGE ON ENTER / BUTTON CLICK
+        function handleSearchSubmit(event) {
+            if (event) event.preventDefault();
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            executeSearchPageSubmit(query);
+        }
+
+        function executeSearchPageSubmit(query) {
+            currentSearchQuery = query;
+            hideSearchDropdown();
+
+            const matchedRecipes = searchRecipesByQuery(query);
+
+            document.getElementById('searchQueryTerm').textContent = query;
+            document.getElementById('searchResultsCount').textContent = matchedRecipes.length;
+
+            const grid = document.getElementById('searchResultsGrid');
+            const noResults = document.getElementById('searchNoResults');
+
+            if (matchedRecipes.length === 0) {
+                grid.classList.add('hidden');
+                noResults.classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                noResults.classList.add('hidden');
+                grid.innerHTML = matchedRecipes.map(r => buildRecipeCardHTML(r)).join('');
+            }
+
+            // Switch to Search Results Page
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('recipeDetailPage').classList.add('hidden');
+            document.getElementById('searchResultsPage').classList.remove('hidden');
+            
+            previousPage = 'searchResultsPage';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function searchRecipesByQuery(query) {
+            const cleanQuery = query.toLowerCase();
+            return recipes.filter(recipe => {
+                const matchTitle = recipe.title.toLowerCase().includes(cleanQuery);
+                const matchAuthor = recipe.author.toLowerCase().includes(cleanQuery);
+                const matchSource = recipe.sourceSite.toLowerCase().includes(cleanQuery);
+                const matchCategory = recipe.category.toLowerCase().includes(cleanQuery);
+                const matchIngredients = recipe.ingredients.some(ing => ing.toLowerCase().includes(cleanQuery));
+                return matchTitle || matchAuthor || matchSource || matchCategory || matchIngredients;
+            });
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            document.getElementById('searchDropdown').classList.add('hidden');
+            currentSearchQuery = "";
+            selectedSourceFilter = null;
+            itemsToShow = 18;
+            showHomePage();
+            renderRecipesGrid();
+        }
+
+        function hideSearchDropdown() {
+            document.getElementById('searchDropdown').classList.add('hidden');
+        }
+
+        // NAVIGATION & RECIPE DETAIL VIEW
+        function showHomePage() {
+            previousPage = 'homePage';
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('recipeDetailPage').classList.add('hidden');
+            document.getElementById('searchResultsPage').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleBackNavigation() {
+            if (previousPage === 'searchResultsPage' && currentSearchQuery) {
+                executeSearchPageSubmit(currentSearchQuery);
+            } else {
+                showHomePage();
+            }
+        }
+
+        function openRecipeDetail(recipeId) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            activeRecipeId = recipeId;
+
+            document.getElementById('detailTitle').textContent = recipe.title;
+            document.getElementById('detailAuthor').textContent = recipe.author;
+            document.getElementById('detailSourceBadge').textContent = recipe.sourceSite;
+            document.getElementById('detailDate').textContent = recipe.date;
+            document.getElementById('detailCategoryBadge').textContent = recipe.category;
+            document.getElementById('detailImage').src = recipe.image;
+            document.getElementById('detailPrepTime').textContent = recipe.prepTime;
+            document.getElementById('detailDifficulty').textContent = recipe.difficulty;
+            document.getElementById('detailYield').textContent = recipe.yield;
+            document.getElementById('detailRating').textContent = '⭐ ' + (recipe.rating || '5.0');
+
+            // Set dynamic back button label
+            const backBtnText = document.getElementById('backButtonText');
+            if (previousPage === 'searchResultsPage') {
+                backBtnText.textContent = `חזרה לתוצאות החיפוש ("${currentSearchQuery}")`;
+            } else {
+                backBtnText.textContent = 'חזרה לכל המתכונים';
+            }
+
+            // Render Ingredients
+            const ingredientsList = document.getElementById('detailIngredients');
+            ingredientsList.innerHTML = recipe.ingredients.map((ing, idx) => `
+                <li class="flex items-start gap-2.5">
+                    <input type="checkbox" id="ing-${idx}" class="mt-1 rounded accent-cinnamon-500 w-4 h-4 cursor-pointer">
+                    <label for="ing-${idx}" class="cursor-pointer leading-snug select-none">${ing}</label>
+                </li>
+            `).join('');
+
+            // Render Steps
+            const stepsList = document.getElementById('detailSteps');
+            stepsList.innerHTML = recipe.steps.map((step, idx) => `
+                <li class="flex gap-4 items-start bg-cream-50/70 p-4 rounded-2xl border border-cream-200">
+                    <span class="w-7 h-7 rounded-full bg-peach-100 text-cinnamon-600 font-bold flex items-center justify-center shrink-0 text-sm">
+                        ${idx + 1}
+                    </span>
+                    <p class="text-sm text-cinnamon-600 leading-relaxed pt-0.5">${step}</p>
+                </li>
+            `).join('');
+
+            updateDetailFavButton();
+            renderQandA();
+            renderTips();
+
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('searchResultsPage').classList.add('hidden');
+            document.getElementById('recipeDetailPage').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FAVORITES SYSTEM
+        function toggleFavorite(event, id) {
+            event.stopPropagation();
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(favId => favId !== id);
+                showToast('המתכון הוסר מהמועדפים');
+            } else {
+                favorites.push(id);
+                showToast('המתכון נשמר במועדפים! ❤️');
+            }
+            localStorage.setItem('baking_favs', JSON.stringify(favorites));
+            
+            // Refresh whichever page is currently active
+            if (!document.getElementById('searchResultsPage').classList.contains('hidden')) {
+                executeSearchPageSubmit(currentSearchQuery);
+            } else {
+                renderRecipesGrid();
+            }
+        }
+
+        function toggleActiveFavorite() {
+            if (!activeRecipeId) return;
+            if (favorites.includes(activeRecipeId)) {
+                favorites = favorites.filter(id => id !== activeRecipeId);
+                showToast('המתכון הוסר מהמועדפים');
+            } else {
+                favorites.push(activeRecipeId);
+                showToast('המתכון נשמר במועדפים! ❤️');
+            }
+            localStorage.setItem('baking_favs', JSON.stringify(favorites));
+            updateDetailFavButton();
+        }
+
+        function updateDetailFavButton() {
+            const isFav = favorites.includes(activeRecipeId);
+            const icon = document.getElementById('detailFavIcon');
+            const text = document.getElementById('detailFavText');
+
+            if (isFav) {
+                icon.className = 'fas fa-heart text-red-500';
+                text.textContent = 'שמור במועדפים';
+            } else {
+                icon.className = 'far fa-heart';
+                text.textContent = 'הוסף למועדפים';
+            }
+        }
+
+        function toggleFavoritesFilter() {
+            showingOnlyFavs = !showingOnlyFavs;
+            updateFavBtnUI();
+            showHomePage();
+            renderRecipesGrid();
+        }
+
+        function updateFavBtnUI() {
+            const btn = document.getElementById('favoritesFilterBtn');
+            if (showingOnlyFavs) {
+                btn.classList.add('ring-2', 'ring-red-400', 'bg-red-50');
+            } else {
+                btn.classList.remove('ring-2', 'ring-red-400', 'bg-red-50');
+            }
+        }
+
+        // Q&A
+        function renderQandA() {
+            const recipe = recipes.find(r => r.id === activeRecipeId);
+            const listEl = document.getElementById('questionsList');
+            const countEl = document.getElementById('questionsCount');
+
+            countEl.textContent = recipe.questions ? recipe.questions.length : 0;
+
+            if (!recipe.questions || recipe.questions.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-cinnamon-400 text-center py-4">טרם נשאלו שאלות. היו הראשונים לשאול!</p>`;
+                return;
+            }
+
+            listEl.innerHTML = recipe.questions.map(q => `
+                <div class="bg-cream-50 p-4 rounded-2xl border border-cream-200 space-y-2">
+                    <div class="text-xs font-bold text-cinnamon-600">${q.name} שאל/ה:</div>
+                    <p class="text-xs text-cinnamon-500 leading-relaxed">${q.text}</p>
+                    ${q.authorReply ? `
+                        <div class="mr-4 mt-2 bg-cream-200/80 p-3 rounded-xl text-xs space-y-1 border-r-2 border-cinnamon-400">
+                            <span class="font-bold text-cinnamon-600">תשובת הכותב/ת (${recipe.author}):</span>
+                            <p class="text-cinnamon-600">${q.authorReply}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function handleAddQuestion(event) {
+            event.preventDefault();
+            const name = document.getElementById('qNameInput').value.trim();
+            const text = document.getElementById('qTextInput').value.trim();
+
+            const recipe = recipes.find(r => r.id === activeRecipeId);
+            if (!recipe.questions) recipe.questions = [];
+
+            recipe.questions.push({
+                id: Date.now(),
+                name: name,
+                text: text,
+                authorReply: `תודה ${name}! שאלה מעולה. אפשר בהחלט לאפות כרגיל, מתקבל מרקם נפלא!`
+            });
+
+            document.getElementById('qNameInput').value = '';
+            document.getElementById('qTextInput').value = '';
+
+            renderQandA();
+            showToast('השאלה נשלחה וקיבלה מענה מהכותב/ת!');
+        }
+
+        // TIPS
+        function renderTips() {
+            const recipe = recipes.find(r => r.id === activeRecipeId);
+            const listEl = document.getElementById('tipsList');
+            const countEl = document.getElementById('tipsCount');
+
+            countEl.textContent = recipe.tips ? recipe.tips.length : 0;
+
+            if (!recipe.tips || recipe.tips.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-cinnamon-400 text-center py-4">אין עדיין טיפים. הכנתם? שתפו טיפ למאפים הבאים!</p>`;
+                return;
+            }
+
+            listEl.innerHTML = recipe.tips.map(t => `
+                <div class="bg-cream-50 p-4 rounded-2xl border border-cream-200 space-y-1">
+                    <div class="text-xs font-bold text-cinnamon-600">💡 הטיפ של ${t.name}:</div>
+                    <p class="text-xs text-cinnamon-500 leading-relaxed">${t.text}</p>
+                </div>
+            `).join('');
+        }
+
+        function handleAddTip(event) {
+            event.preventDefault();
+            const name = document.getElementById('tipNameInput').value.trim();
+            const text = document.getElementById('tipTextInput').value.trim();
+
+            const recipe = recipes.find(r => r.id === activeRecipeId);
+            if (!recipe.tips) recipe.tips = [];
+
+            recipe.tips.push({ id: Date.now(), name: name, text: text });
+
+            document.getElementById('tipNameInput').value = '';
+            document.getElementById('tipTextInput').value = '';
+
+            renderTips();
+            showToast('הטיפ שלך התווסף בהצלחה!');
+        }
+
+        // CREATE RECIPE
+        function handleCreateRecipe(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('newTitle').value.trim();
+            const author = document.getElementById('newAuthor').value.trim();
+            const category = document.getElementById('newCategory').value;
+            const prepTime = document.getElementById('newPrepTime').value.trim();
+            const difficulty = document.getElementById('newDifficulty').value;
+            let image = document.getElementById('newImage').value.trim();
+            const ingredientsRaw = document.getElementById('newIngredients').value.trim();
+            const stepsRaw = document.getElementById('newSteps').value.trim();
+
+            if (!image) {
+                const catImgs = categoryImages[category] || categoryImages['עוגות שוקולד'];
+                image = catImgs[0];
+            }
+
+            const newRecipe = {
+                id: 'custom-' + Date.now(),
+                title: title,
+                author: author,
+                sourceSite: 'מתכון גולש/ת',
+                date: new Date().toLocaleDateString('he-IL'),
+                category: category,
+                prepTime: prepTime,
+                difficulty: difficulty,
+                yield: 'תבנית סטנדרטית',
+                rating: '5.0',
+                image: image,
+                ingredients: ingredientsRaw.split('\n').filter(i => i.trim() !== ''),
+                steps: stepsRaw.split('\n').filter(s => s.trim() !== ''),
+                questions: [],
+                tips: []
+            };
+
+            recipes.unshift(newRecipe);
+            showHomePage();
+            renderRecipesGrid();
+            closeModal('addRecipeModal');
+            showToast('המתכון פורסם בהצלחה!');
+            openRecipeDetail(newRecipe.id);
+        }
+
+        // AI CHAT
+        function handleAiChatSubmit(event) {
+            event.preventDefault();
+            const inputEl = document.getElementById('aiInput');
+            const userMsg = inputEl.value.trim();
+            if (!userMsg) return;
+
+            appendAiMessage('user', userMsg);
+            inputEl.value = '';
+
+            setTimeout(() => {
+                let reply = "זה שילוב נפלא! " + userMsg + " מתחבר מצוין בעולם האפייה. מומלץ לאזן עם קורט מלח אטלנטי או תמצית וניל איכותית לשדרוג העומק של הטעמים.";
+                if (userMsg.includes('פרווה') || userMsg.includes('חלבית')) {
+                    reply = "להמרת מתכון חלבי לפרווה: החליפו חמאה בשמן קוקוס בטמפרטורת החדר (או מרגרינה איכותית), ושמנת מתוקה בקרם קוקוס מרוכז 22% שומן או שמנת צמחית להקצפה.";
+                } else if (userMsg.includes('טבעוני') || userMsg.includes('גלוטן')) {
+                    reply = "להכנת מאפה טבעוני וללא גלוטן: השתמשו בתערובת קמח תמי/קונדיטור, והחליפו כל ביצה ב-1/4 כוס רסק תפוחים לא ממותק או כף זרעי צ'יה מושרים בשישה כפות מים.";
+                }
+                appendAiMessage('ai', reply);
+            }, 500);
+        }
+
+        function sendAiQuickPrompt(text) {
+            document.getElementById('aiInput').value = text;
+            handleAiChatSubmit(new Event('submit'));
+        }
+
+        function appendAiMessage(sender, text) {
+            const chatBox = document.getElementById('aiChatBox');
+            if (sender === 'user') {
+                chatBox.innerHTML += `
+                    <div class="flex items-start gap-3 flex-row-reverse">
+                        <div class="w-8 h-8 rounded-full bg-cinnamon-500 text-white flex items-center justify-center text-xs font-bold shrink-0">אני</div>
+                        <div class="bg-cinnamon-500 text-white p-4 rounded-3xl rounded-tl-none text-sm max-w-md leading-relaxed">${text}</div>
+                    </div>
+                `;
+            } else {
+                chatBox.innerHTML += `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-peach-100 text-cinnamon-500 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
+                        <div class="bg-cream-100 text-cinnamon-600 p-4 rounded-3xl rounded-tr-none text-sm max-w-md leading-relaxed">${text}</div>
+                    </div>
+                `;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // UTILS & SUPPORT
+        function handleSupportSubmit(event) {
+            event.preventDefault();
+            closeModal('helpModal');
+            showToast('פנייתך התקבלה! נחזור אליך בהקדם.');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+
+        // ADMIN PANEL: local browser editing tools
+        const adminDefaults = {
+            siteTitle: 'סודות האפייה',
+            siteSubtitle: 'המתכונים הטובים בישראל, קהילה וניחוחות קינמון',
+            heroBadge: '🥖 מאגר המתכונים הלאומי של ישראל',
+            heroTitle: 'למעלה מ-200 מתכוני אפייה וקינוחים מנצחים',
+            heroDescription: 'המתכונים הכי שווים מבית חן במטבח, קרוטית, קרין גורן, השף הלבן, mako וקרן אגם – עם תמונות מדויקות ושף AI אישי לעזרתכם!',
+            footerText: 'כל הזכויות שמורות © 2026 | ריכוז מתכוני איכות ממיטב האתרים בישראל'
+        };
+        let adminUploadedImage = '';
+        function openAdminPanel() {
+            applySavedSiteContent();
+            populateAdminRecipeSelect();
+            document.getElementById('adminPanel').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeAdminPanel() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        function getSiteContent() {
+            try { return {...adminDefaults, ...JSON.parse(localStorage.getItem('baking_admin_site') || '{}')}; }
+            catch(e) { return {...adminDefaults}; }
+        }
+        function applySavedSiteContent() {
+            const c = getSiteContent();
+            const setText = (selector, value) => { const el = document.querySelector(selector); if (el) el.textContent = value; };
+            setText('header h1', c.siteTitle);
+            setText('header p', c.siteSubtitle);
+            setText('#homePage .cinnamon-gradient span', c.heroBadge);
+            setText('#homePage .cinnamon-gradient h2', c.heroTitle);
+            setText('#homePage .cinnamon-gradient p', c.heroDescription);
+            setText('footer p', c.footerText);
+            Object.entries({adminSiteTitle:c.siteTitle,adminSiteSubtitle:c.siteSubtitle,adminHeroBadge:c.heroBadge,adminHeroTitle:c.heroTitle,adminHeroDescription:c.heroDescription,adminFooterText:c.footerText}).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
+        }
+        function saveSiteContent() {
+            const c = {
+                siteTitle: document.getElementById('adminSiteTitle').value.trim(),
+                siteSubtitle: document.getElementById('adminSiteSubtitle').value.trim(),
+                heroBadge: document.getElementById('adminHeroBadge').value.trim(),
+                heroTitle: document.getElementById('adminHeroTitle').value.trim(),
+                heroDescription: document.getElementById('adminHeroDescription').value.trim(),
+                footerText: document.getElementById('adminFooterText').value.trim()
+            };
+            localStorage.setItem('baking_admin_site', JSON.stringify(c));
+            applySavedSiteContent();
+            showToast('טקסטי האתר נשמרו בהצלחה');
+        }
+        function resetSiteContent() {
+            localStorage.removeItem('baking_admin_site');
+            applySavedSiteContent();
+            showToast('טקסטי האתר אופסו');
+        }
+        function persistAdminRecipes() {
+            try { localStorage.setItem('baking_admin_recipes', JSON.stringify(recipes)); }
+            catch(e) { showToast('לא ניתן לשמור: ייתכן שהתמונות גדולות מדי. נסו תמונה קטנה יותר.'); }
+        }
+        function populateAdminRecipeSelect() {
+            const sel = document.getElementById('adminRecipeSelect');
+            const previous = sel.value || (recipes[0] && String(recipes[0].id));
+            filterAdminRecipes(previous);
+            document.getElementById('adminRecipeCount').textContent = `${recipes.length} מתכונים זמינים לעריכה. אפשר לחפש לפי שם או קטגוריה ולבחור כל מתכון.`;
+        }
+        function filterAdminRecipes(preferredId) {
+            const sel = document.getElementById('adminRecipeSelect');
+            if (!sel) return;
+            const query = (document.getElementById('adminRecipeSearch')?.value || '').trim().toLocaleLowerCase('he');
+            const previous = preferredId || sel.value;
+            const filtered = recipes.filter(r =>
+                String(r.title || '').toLocaleLowerCase('he').includes(query) ||
+                String(r.category || '').toLocaleLowerCase('he').includes(query) ||
+                String(r.author || '').toLocaleLowerCase('he').includes(query)
+            );
+            sel.innerHTML = filtered.map(r => {
+                const id = String(r.id).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+                const title = String(r.title || 'מתכון ללא שם').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const category = String(r.category || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return `<option value="${id}">${title}${category ? ' — ' + category : ''}</option>`;
+            }).join('');
+            if (filtered.some(r => String(r.id) === String(previous))) sel.value = String(previous);
+            else if (filtered.length) sel.value = String(filtered[0].id);
+            loadAdminRecipe();
+            const count = document.getElementById('adminRecipeCount');
+            if (count) count.textContent = `${filtered.length} מתוך ${recipes.length} מתכונים מוצגים. אפשר לערוך כל אחד מהם.`;
+        }
+        function loadAdminRecipe() {
+            const r = recipes.find(x => String(x.id) === document.getElementById('adminRecipeSelect').value) || recipes[0];
+            if (!r) return;
+            const vals = {
+                adminRecipeTitle:r.title, adminRecipeAuthor:r.author, adminRecipeCategory:r.category,
+                adminRecipePrepTime:r.prepTime, adminRecipeDifficulty:r.difficulty, adminRecipeYield:r.yield,
+                adminRecipeImage:r.image, adminRecipeIngredients:(r.ingredients||[]).join('\n'), adminRecipeSteps:(r.steps||[]).join('\n')
+            };
+            Object.entries(vals).forEach(([id,v])=>{document.getElementById(id).value=v||'';});
+            adminUploadedImage='';
+            document.getElementById('adminRecipeImageFile').value='';
+            const preview=document.getElementById('adminRecipeImagePreview');
+            if(r.image){preview.src=r.image;preview.classList.remove('hidden');}else{preview.classList.add('hidden');}
+        }
+        function adminPreviewUpload(event) {
+            const file=event.target.files && event.target.files[0];
+            if(!file)return;
+            if(file.size > 1200000){showToast('התמונה גדולה מדי. בחרי תמונה עד 1.2MB.');event.target.value='';return;}
+            const reader=new FileReader();
+            reader.onload=()=>{adminUploadedImage=reader.result;const p=document.getElementById('adminRecipeImagePreview');p.src=adminUploadedImage;p.classList.remove('hidden');document.getElementById('adminRecipeImage').value='';};
+            reader.readAsDataURL(file);
+        }
+        function saveAdminRecipe() {
+            const id=document.getElementById('adminRecipeSelect').value;
+            const r=recipes.find(x=>String(x.id)===id);
+            if(!r)return;
+            r.title=document.getElementById('adminRecipeTitle').value.trim()||r.title;
+            r.author=document.getElementById('adminRecipeAuthor').value.trim();
+            r.sourceSite=r.sourceSite||r.author;
+            r.category=document.getElementById('adminRecipeCategory').value.trim()||r.category;
+            r.prepTime=document.getElementById('adminRecipePrepTime').value.trim();
+            r.difficulty=document.getElementById('adminRecipeDifficulty').value.trim();
+            r.yield=document.getElementById('adminRecipeYield').value.trim();
+            r.image=adminUploadedImage||document.getElementById('adminRecipeImage').value.trim()||r.image;
+            r.ingredients=document.getElementById('adminRecipeIngredients').value.split('\n').map(x=>x.trim()).filter(Boolean);
+            r.steps=document.getElementById('adminRecipeSteps').value.split('\n').map(x=>x.trim()).filter(Boolean);
+            persistAdminRecipes();
+            populateAdminRecipeSelect();
+            document.getElementById('adminRecipeSelect').value = String(r.id);
+            loadAdminRecipe();
+            renderRecipesGrid();
+            if(activeRecipeId===r.id)openRecipeDetail(r.id);
+            showToast('המתכון נשמר בהצלחה');
+        }
+        function resetAllAdminChanges() {
+            if(!confirm('לאפס את כל המתכונים והטקסטים לערכי המקור?'))return;
+            localStorage.removeItem('baking_admin_recipes');
+            localStorage.removeItem('baking_admin_site');
+            recipes=generate200Recipes();
+            applySavedSiteContent();
+            populateAdminRecipeSelect();
+            renderRecipesGrid();
+            showToast('השינויים אופסו');
+        }
+
+        function toggleSidebarMobile() {
+            document.getElementById('sidebarNav').classList.toggle('hidden');
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            applySavedSiteContent();
+        });
+    </script>
+</body>
+</html>

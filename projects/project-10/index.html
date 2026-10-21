@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeatMatch - אתר המלצות השירים החכם שלך</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Heebo -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f3ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            accent: '#ec4899',
+                            glow: '#8b5cf6'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'wave-bar': 'wave 1.2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        wave: {
+                            '0%': { height: '10%' },
+                            '100%': { height: '100%' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            font-family: 'Heebo', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Glassmorphic Styling */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-nav {
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-button {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-button:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(236, 72, 153, 0.4));
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .glass-pill.active {
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+        }
+
+        /* Glow Effects */
+        .glow-bg-1 {
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-bg-2 {
+            position: absolute;
+            bottom: 10%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative">
+
+    <!-- Glowing Background Orbs -->
+    <div class="glow-bg-1"></div>
+    <div class="glow-bg-2"></div>
+
+    <!-- Navigation Header -->
+    <header class="glass-nav sticky top-0 z-40 px-4 lg:px-8 py-3 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Logo & Brand -->
+            <div class="flex items-center justify-between w-full md:w-auto">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <i class="fa-solid font-bold text-white text-xl fa-compact-disc animate-spin-slow"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-pink-400 to-purple-400">
+                            BeatMatch
+                        </h1>
+                        <p class="text-xs text-gray-400">מנוע המלצות המוזיקה שלך</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Toggle / Badges -->
+                <button onclick="toggleFavoritesModal()" class="md:hidden glass-pill px-3 py-1.5 rounded-full flex items-center gap-2 text-sm text-pink-400">
+                    <i class="fa-solid fa-heart"></i>
+                    <span id="favCountMobile">0</span>
+                </button>
+            </div>
+
+            <!-- Global Search Bar -->
+            <div class="relative w-full md:w-96">
+                <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" oninput="handleGlobalSearch(this.value)"
+                    placeholder="חפש שיר, זמר, ג'אנר או אווירה..."
+                    class="w-full bg-slate-900/80 text-sm text-white placeholder-gray-400 rounded-full py-2.5 pr-11 pl-4 border border-white/10 focus:outline-none focus:border-indigo-500 transition-all shadow-inner">
+                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="hidden md:flex items-center gap-4">
+                <button onclick="switchTab('finder')" id="navFinderTab" class="glass-pill active px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i>
+                    מנוע ההמלצות
+                </button>
+                <button onclick="toggleFavoritesModal()" class="glass-pill px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:text-pink-400">
+                    <i class="fa-solid fa-heart text-pink-500"></i>
+                    הפלייליסט שלי
+                    <span id="favCount" class="bg-pink-500/20 text-pink-300 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- Banner / Hero Section -->
+        <section class="mb-10 text-center relative py-6">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 mb-3">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+                מערכת המלצות מוזיקלית חכמה
+            </span>
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">
+                גלה את השיר הבא <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">שאתה הולך לאהוב</span>
+            </h2>
+            <p class="text-gray-400 text-base md:text-lg max-w-2xl mx-auto">
+                בחר ג'אנר, סגנון ואמן מועדף – המערכת שלנו תתאים לך תוכן מדויק המבוסס על העדפות המוזיקה שלך.
+            </p>
+        </section>
+
+        <!-- Dynamic Content Area -->
+        <div id="mainFinderView" class="space-y-10">
+
+            <!-- FILTER STEPPERS CONTAINER -->
+            <div class="glass-card rounded-3xl p-6 md:p-8 space-y-8">
+                
+                <!-- STEP 1: GENRE SELECTION -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-sm font-black border border-indigo-500/30">1</span>
+                            בחר ג'אנר מוזיקלי (Genre)
+                        </h3>
+                        <span class="text-xs text-gray-400" id="selectedGenreCount">הכל מוצג</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2.5" id="genreContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <hr class="border-white/5">
+
+                <!-- STEP 2: VIBE / MOOD SELECTION -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-pink-600/30 text-pink-400 flex items-center justify-center text-sm font-black border border-pink-500/30">2</span>
+                            בחר אווירה / סגנון (Vibe)
+                        </h3>
+                        <span class="text-xs text-gray-400" id="selectedVibeLabel">כל האווירות</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3" id="vibeContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <hr class="border-white/5">
+
+                <!-- STEP 3: ARTIST FILTER & SELECTION -->
+                <div>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-purple-600/30 text-purple-400 flex items-center justify-center text-sm font-black border border-purple-500/30">3</span>
+                            בחר אמן / זמר (Artist)
+                        </h3>
+                        
+                        <!-- Artist Search inside selector -->
+                        <div class="relative w-full md:w-64">
+                            <i class="fa-solid fa-filter absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" id="artistFilterInput" oninput="filterArtistsInList(this.value)"
+                                placeholder="סינון אמן ברשימה..." 
+                                class="w-full bg-black/40 text-xs text-white placeholder-gray-500 rounded-xl py-2 pr-9 pl-3 border border-white/10 focus:outline-none focus:border-purple-500">
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Artist Pills Grid -->
+                    <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-1" id="artistContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS BAR -->
+                <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/5">
+                    <button onclick="resetFilters()" class="text-gray-400 hover:text-white text-sm flex items-center gap-2 px-4 py-2 rounded-xl transition-all">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        איפוס מסננים
+                    </button>
+
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <button onclick="triggerSurpriseMe()" class="glass-button w-full sm:w-auto px-6 py-3 rounded-2xl font-bold text-sm text-pink-300 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-dice text-pink-400 animate-bounce"></i>
+                            הפתע אותי!
+                        </button>
+
+                        <button onclick="generateRecommendations()" class="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white font-bold px-8 py-3 rounded-2xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all transform hover:scale-105">
+                            <i class="fa-solid fa-sparkles"></i>
+                            קבל המלצות שירים
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RECOMMENDATIONS SECTION -->
+            <div>
+                <!-- Section Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-2xl font-black text-white flex items-center gap-3">
+                            <i class="fa-solid fa-headphones text-indigo-400"></i>
+                            המלצות במיוחד עבורך
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-1" id="resultsCountLabel">מציג המלצות מובילות להתאמה שלכם</p>
+                    </div>
+
+                    <!-- Visualizer Audio Wave Graphic -->
+                    <div class="hidden sm:flex items-center gap-1 h-8 px-3 py-1 bg-indigo-950/40 rounded-xl border border-indigo-500/20">
+                        <span class="w-1 bg-indigo-500 rounded-full h-3 animate-pulse"></span>
+                        <span class="w-1 bg-pink-500 rounded-full h-6 animate-pulse" style="animation-delay: 0.2s"></span>
+                        <span class="w-1 bg-purple-500 rounded-full h-4 animate-pulse" style="animation-delay: 0.4s"></span>
+                        <span class="w-1 bg-indigo-400 rounded-full h-7 animate-pulse" style="animation-delay: 0.1s"></span>
+                        <span class="w-1 bg-pink-400 rounded-full h-2 animate-pulse" style="animation-delay: 0.3s"></span>
+                    </div>
+                </div>
+
+                <!-- Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="recommendationsGrid">
+                    <!-- Song Cards injected via Javascript -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden glass-card rounded-3xl p-12 text-center">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-white/5 flex items-center justify-center text-gray-500 text-3xl mb-4">
+                        <i class="fa-solid fa-compact-disc"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-2">לא נמצאו שירים תואמים</h4>
+                    <p class="text-gray-400 text-sm max-w-md mx-auto mb-6">לא מצאנו שירים בדיוק בשילוב המסננים שבחרת. נסה להרחיב את ה-Genre או להחליף אמן.</p>
+                    <button onclick="resetFilters()" class="glass-button px-6 py-2.5 rounded-xl text-sm font-semibold text-white">
+                        אפס מסננים והצג הכל
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER PLAYER BAR (Interactive Audio Synthesizer / Audio Playing Preview) -->
+    <div id="stickyAudioPlayer" class="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-white/10 px-4 py-3 transform translate-y-full transition-transform duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            
+            <!-- Song Info -->
+            <div class="flex items-center gap-3 w-1/3">
+                <img id="playerCover" src="" class="w-12 h-12 rounded-xl object-cover border border-white/10" alt="Cover">
+                <div class="truncate">
+                    <h5 id="playerTitle" class="text-sm font-bold text-white truncate">שם השיר</h5>
+                    <p id="playerArtist" class="text-xs text-gray-400 truncate">שם הזמר</p>
+                </div>
+            </div>
+
+            <!-- Controls & Equalizer -->
+            <div class="flex flex-col items-center gap-1 w-1/3">
+                <div class="flex items-center gap-4">
+                    <button onclick="stopAudioPreview()" class="text-gray-400 hover:text-white text-xs">
+                        <i class="fa-solid fa-stop"></i>
+                    </button>
+                    <button onclick="togglePlayPauseAudio()" id="playerPlayBtn" class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-pink-500 flex items-center justify-center text-white shadow-lg">
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
+                    <span class="text-xs text-pink-400 font-mono" id="playerTimer">0:00</span>
+                </div>
+                <!-- Animated Waves -->
+                <div class="flex items-center gap-1 h-3" id="playerWave">
+                    <span class="w-0.5 bg-pink-500 h-full animate-bounce"></span>
+                    <span class="w-0.5 bg-indigo-500 h-2/3 animate-bounce" style="animation-delay:0.1s"></span>
+                    <span class="w-0.5 bg-purple-500 h-4/5 animate-bounce" style="animation-delay:0.2s"></span>
+                    <span class="w-0.5 bg-pink-400 h-1/2 animate-bounce" style="animation-delay:0.3s"></span>
+                </div>
+            </div>
+
+            <!-- Extra Action Buttons -->
+            <div class="flex items-center justify-end gap-3 w-1/3">
+                <button id="playerYoutubeBtn" onclick="" target="_blank" class="text-red-500 hover:text-red-400 text-lg p-2">
+                    <i class="fa-brands fa-youtube"></i>
+                </button>
+                <button id="playerSpotifyBtn" onclick="" target="_blank" class="text-emerald-500 hover:text-emerald-400 text-lg p-2">
+                    <i class="fa-brands fa-spotify"></i>
+                </button>
+                <button onclick="stopAudioPreview()" class="text-gray-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAVORITES MODAL -->
+    <div id="favoritesModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-card w-full max-w-2xl rounded-3xl p-6 max-h-[85vh] flex flex-col justify-between border border-white/20">
+            
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+                    <h3 class="text-xl font-black text-white flex items-center gap-2">
+                        <i class="fa-solid fa-heart text-pink-500"></i>
+                        הפלייליסט השמור שלי
+                    </h3>
+                    <button onclick="toggleFavoritesModal()" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <div id="favoritesList" class="space-y-3 overflow-y-auto max-h-[50vh] pr-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-white/10 flex items-center justify-between mt-4">
+                <button onclick="clearAllFavorites()" class="text-xs text-red-400 hover:text-red-300 flex items-center gap-1">
+                    <i class="fa-solid fa-trash"></i>
+                    נקה את כל המועדפים
+                </button>
+                <button onclick="toggleFavoritesModal()" class="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl text-sm font-bold text-white">
+                    סגור
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LYRICS / DETAILS MODAL -->
+    <div id="lyricsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-card w-full max-w-lg rounded-3xl p-6 border border-white/20 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <img id="lyricsModalCover" src="" class="w-12 h-12 rounded-xl object-cover" alt="Song">
+                    <div>
+                        <h4 id="lyricsModalTitle" class="font-bold text-white text-base">שיר</h4>
+                        <p id="lyricsModalArtist" class="text-xs text-gray-400">זמר</p>
+                    </div>
+                </div>
+                <button onclick="closeLyricsModal()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2">
+                <span class="text-xs font-semibold text-pink-400 uppercase tracking-wider">ציטוט / מילים בולטות</span>
+                <p id="lyricsModalText" class="text-gray-200 text-sm bg-black/40 p-4 rounded-2xl border border-white/5 italic leading-relaxed">
+                    "..."
+                </p>
+            </div>
+
+            <div class="space-y-2">
+                <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">למה השיר הזה הומלץ לך?</span>
+                <p id="lyricsModalReason" class="text-xs text-gray-300 bg-indigo-950/30 p-3 rounded-xl border border-indigo-500/20">
+                    ...
+                </p>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="closeLyricsModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl text-sm">
+                    הבנתי, תודה!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 border-t border-white/5 text-center text-xs text-gray-500">
+        <p>© 2026 BeatMatch. כל הזכויות שמורות. אתר המלצות מוזיקה חכם בעברית.</p>
+    </footer>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // ==========================================
+        // DATASET: RICH MULTI-GENRE & ARTISTS SYSTEM
+        // ==========================================
+
+        const GENRES = [
+            { id: 'all', name: 'הכל', icon: 'fa-globe' },
+            { id: 'afrobeat', name: 'אפרוביט (Afrobeat)', icon: 'fa-drum' },
+            { id: 'rnb', name: 'R&B & Soul', icon: 'fa-heart-pulse' },
+            { id: 'mizrahi', name: 'מזרחית / ים תיכונית', icon: 'fa-guitar' },
+            { id: 'pop', name: 'פופ (Pop)', icon: 'fa-bolt' },
+            { id: 'hiphop', name: 'היפ-הופ וראפ', icon: 'fa-microphone' },
+            { id: 'rock', name: 'רוק ואינדי', icon: 'fa-compact-disc' },
+            { id: 'edm', name: 'אלקטרוני / EDM', icon: 'fa-sliders' }
+        ];
+
+        const VIBES = [
+            { id: 'upbeat', name: 'קצבי / מסיבה', icon: 'fa-fire', color: 'from-amber-500 to-red-500' },
+            { id: 'chill', name: 'רגוע / צ\'יל', icon: 'fa-couch', color: 'from-blue-500 to-teal-500' },
+            { id: 'sad', name: 'מרגש / עצוב', icon: 'fa-cloud-rain', color: 'from-indigo-600 to-slate-700' },
+            { id: 'workout', name: 'אנרגטי / אימון', icon: 'fa-dumbbell', color: 'from-orange-500 to-amber-600' },
+            { id: 'romantic', name: 'רומנטי', icon: 'fa-heart', color: 'from-pink-500 to-rose-600' },
+            { id: 'focus', name: 'ריכוז / למידה', icon: 'fa-brain', color: 'from-purple-500 to-indigo-600' }
+        ];
+
+        const ARTISTS = [
+            // Afrobeat
+            { id: 'burna_boy', name: 'Burna Boy', genre: 'afrobeat', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300' },
+            { id: 'wizkid', name: 'Wizkid', genre: 'afrobeat', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300' },
+            { id: 'tems', name: 'Tems', genre: 'afrobeat', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300' },
+            
+            // R&B
+            { id: 'the_weeknd', name: 'The Weeknd', genre: 'rnb', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=300' },
+            { id: 'sza', name: 'SZA', genre: 'rnb', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300' },
+            { id: 'bruno_mars', name: 'Bruno Mars', genre: 'rnb', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1511735111819-9a3f7709049c?w=300' },
+
+            // Mizrahi / Mediterranean
+            { id: 'eyal_golan', name: 'אייל גולן', genre: 'mizrahi', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300' },
+            { id: 'omer_adam', name: 'עומר אדם', genre: 'mizrahi', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=300' },
+            { id: 'eden_hasson', name: 'עדן חסון', genre: 'mizrahi', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=300' },
+            { id: 'peer_tasi', name: 'פאר טסי', genre: 'mizrahi', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=300' },
+
+            // Israeli Pop & Rock / HipHop
+            { id: 'tuna', name: 'טונה (Tuna)', genre: 'hiphop', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=300' },
+            { id: 'ravid_plotnik', name: 'רביד פלוטניק', genre: 'hiphop', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300' },
+            { id: 'noa_kirel', name: 'נועה קירל', genre: 'pop', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1526478806334-5fd488fcaabc?w=300' },
+            { id: 'hanan_ben_ari', name: 'חנן בן ארי', genre: 'pop', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1442504028989-ab58b5f29a4a?w=300' },
+            { id: 'idan_raichel', name: 'עידן רייכל', genre: 'pop', origin: 'ישראל', img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300' },
+
+            // Global Pop / Hip-hop / Rock
+            { id: 'drake', name: 'Drake', genre: 'hiphop', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=300' },
+            { id: 'taylor_swift', name: 'Taylor Swift', genre: 'pop', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300' },
+            { id: 'kendrick_lamar', name: 'Kendrick Lamar', genre: 'hiphop', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300' },
+            { id: 'coldplay', name: 'Coldplay', genre: 'rock', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=300' },
+            { id: 'dua_lipa', name: 'Dua Lipa', genre: 'pop', origin: 'גלובלי', img: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=300' }
+        ];
+
+        const SONGS_DATABASE = [
+            // Afrobeat
+            {
+                id: 's1',
+                title: 'Last Last',
+                artistId: 'burna_boy',
+                artistName: 'Burna Boy',
+                genre: 'afrobeat',
+                vibe: 'upbeat',
+                cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500',
+                lyricsQuote: 'E dey make me cry, I need igbo and shayo...',
+                ytQuery: 'Burna Boy Last Last official music video',
+                spotifyUrl: 'https://open.spotify.com/search/Burna%20Boy%20Last%20Last',
+                bpm: 125,
+                freq: 320
+            },
+            {
+                id: 's2',
+                title: 'It\'s Plenty',
+                artistId: 'burna_boy',
+                artistName: 'Burna Boy',
+                genre: 'afrobeat',
+                vibe: 'workout',
+                cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500',
+                lyricsQuote: 'I don\'t want to waste no time, I just want to celebrate life...',
+                ytQuery: 'Burna Boy Its Plenty official video',
+                spotifyUrl: 'https://open.spotify.com/search/Burna%20Boy%20Its%20Plenty',
+                bpm: 128,
+                freq: 350
+            },
+            {
+                id: 's3',
+                title: 'Essence',
+                artistId: 'wizkid',
+                artistName: 'Wizkid ft. Tems',
+                genre: 'afrobeat',
+                vibe: 'chill',
+                cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500',
+                lyricsQuote: 'You don\'t need no other body, Only you can hold my body...',
+                ytQuery: 'Wizkid Essence video',
+                spotifyUrl: 'https://open.spotify.com/search/Wizkid%20Essence',
+                bpm: 104,
+                freq: 280
+            },
+            {
+                id: 's4',
+                title: 'Free Mind',
+                artistId: 'tems',
+                artistName: 'Tems',
+                genre: 'afrobeat',
+                vibe: 'chill',
+                cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500',
+                lyricsQuote: 'I might be falling, I need a free mind now...',
+                ytQuery: 'Tems Free Mind official video',
+                spotifyUrl: 'https://open.spotify.com/search/Tems%20Free%20Mind',
+                bpm: 98,
+                freq: 220
+            },
+
+            // R&B
+            {
+                id: 's5',
+                title: 'Blinding Lights',
+                artistId: 'the_weeknd',
+                artistName: 'The Weeknd',
+                genre: 'rnb',
+                vibe: 'upbeat',
+                cover: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500',
+                lyricsQuote: 'I said, ooh, I\'m blinded by the lights...',
+                ytQuery: 'The Weeknd Blinding Lights',
+                spotifyUrl: 'https://open.spotify.com/search/The%20Weeknd%20Blinding%20Lights',
+                bpm: 171,
+                freq: 440
+            },
+            {
+                id: 's6',
+                title: 'Die For You',
+                artistId: 'the_weeknd',
+                artistName: 'The Weeknd',
+                genre: 'rnb',
+                vibe: 'romantic',
+                cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500',
+                lyricsQuote: 'I\'m findin\' it hard to let you go, Even though you\'re terms of endearment...',
+                ytQuery: 'The Weeknd Die For You',
+                spotifyUrl: 'https://open.spotify.com/search/The%20Weeknd%20Die%20For%20You',
+                bpm: 133,
+                freq: 310
+            },
+            {
+                id: 's7',
+                title: 'Kill Bill',
+                artistId: 'sza',
+                artistName: 'SZA',
+                genre: 'rnb',
+                vibe: 'sad',
+                cover: 'https://images.unsplash.com/photo-1511735111819-9a3f7709049c?w=500',
+                lyricsQuote: 'I might kill my ex, not the best idea...',
+                ytQuery: 'SZA Kill Bill video',
+                spotifyUrl: 'https://open.spotify.com/search/SZA%20Kill%20Bill',
+                bpm: 89,
+                freq: 260
+            },
+            {
+                id: 's8',
+                title: 'Leave The Door Open',
+                artistId: 'bruno_mars',
+                artistName: 'Bruno Mars & Silk Sonic',
+                genre: 'rnb',
+                vibe: 'romantic',
+                cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500',
+                lyricsQuote: 'I\'m ima leave the door open, hoping that you feel the way I feel...',
+                ytQuery: 'Silk Sonic Leave the Door Open',
+                spotifyUrl: 'https://open.spotify.com/search/Silk%20Sonic%20Leave%20The%20Door%20Open',
+                bpm: 100,
+                freq: 290
+            },
+
+            // Mizrahi
+            {
+                id: 's9',
+                title: 'צליל מיתר',
+                artistId: 'eyal_golan',
+                artistName: 'אייל גולן',
+                genre: 'mizrahi',
+                vibe: 'romantic',
+                cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=500',
+                lyricsQuote: 'נגני לי צליל מיתר, שיר ישן ומוכר...',
+                ytQuery: 'אייל גולן צליל מיתר',
+                spotifyUrl: 'https://open.spotify.com/search/%D7%90%D7%99%D7%99%D7%9C%20%D7%92%D7%95%D7%9C%D7%9F%20%D7%A6%D7%9C%D7%99%D7%9C%20%D7%9E%D7%99%D7%AA%D7%A8',
+                bpm: 85,
+                freq: 200
+            },
+            {
+                id: 's10',
+                title: 'שני משוגעים',
+                artistId: 'omer_adam',
+                artistName: 'עומר אדם',
+                genre: 'mizrahi',
+                vibe: 'upbeat',
+                cover: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=500',
+                lyricsQuote: 'היינו שני משוגעים בתוך המהומה...',
+                ytQuery: 'עומר אדם שני משוגעים',
+                spotifyUrl: 'https://open.spotify.com/search/%D7%A2%D7%95%D7%9E%D7%A8%20%D7%90%D7%93%D7%9D%20%D7%A9%D7%A0%D7%99%D7%9D%20%D7%9E%D7%A9%D7%95%D7%92%D7%A2%D7%99%D7%9D',
+                bpm: 128,
+                freq: 380
+            },
+            {
+                id: 's11',
+                title: 'שקיעות אדומות',
+                artistId: 'eden_hasson',
+                artistName: 'עדן חסון',
+                genre: 'mizrahi',
+                vibe: 'romantic',
+                cover: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=500',
+                lyricsQuote: 'שקיעות אדומות על הים, מזכירות לי איך הכל התחיל...',
+                ytQuery: 'עדן חסון שקיעות אדומות',
+                spotifyUrl: 'https://open.spotify.com/search/%D7%A2%D7%93%D7%9F%20%D7%97%D7%A1%D7%95%D7%9F%20%D7%A9%D7%A7%D7%99%D7%A2%D7%95%D7%AA%20%D7%90%D7%93%D7%95%D7%9E%D7%95%D7%AA',
+                bpm: 110,
+                freq: 270
+            },
+            {
+                id: 's12',
+                title: 'אהבה חולה',
+                artistId: 'peer_tasi',
+                artistName: 'פאר טסי',
+                genre: 'mizrahi',
+                vibe: 'sad',
+                cover: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=500',
+                lyricsQuote: 'ומה נשאר מכל האהבה הזאת, הכל פתאום נראה רחוק...',
+                ytQuery: 'פאר טסי אהבה חולה',
+                spotifyUrl: 'https://open.spotify.com/search/%D7%A4%D7%90%D7%A8%20%D7%90%D7%94%D7%91%D7%94%20%D7%97%D7%95%D7%9C%D7%94',
+                bpm: 95,
+                freq: 240
+            },
+
+            // Israeli Pop/Hip-Hop
+            {
+                id: 's13',
+                title: 'סהרורי',
+                artistId: 'tuna',
+                artistName: 'טונה',
+                genre: 'hiphop',
+                vibe: 'focus',
+                cover: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=500',
+                lyricsQuote: 'הלילה שוב אני ער, מסתובב בין המילים...',
+                ytQuery: 'טונה סהרורי',
+                spotifyUrl: 'https://open.spotify.com/search/%D7%90%D7%95%D7%A0%D7%94%20%D7%A1%D7%94%D7%A8%D7%95%D7%A8%D7%99',
+                bpm: 90,
+                freq: 210
+            },
+            {
+                id: 's14',
+                title: 'נתק אותי',
+                artistId: 'ravid_plotnik',
+                artistName: 'רביד פלוטניק',
+                genre: 'hiphop',
+                vibe: 'workout',
+                cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500',
+                lyricsQuote: 'תן לי את הקצב, שחרר את הלחץ...',
+                ytQuery: 'רביד פלוטניק נתק אותי',
+                spotifyUrl: 'https://open.spotify.com/search/%D7%A8%D7%91%D7%99%D7%93%20%D7%A4%D7%9C%D7%95%D7%90%D7%A0%D7%99%D7%A7',
+                bpm: 115,
+                freq: 330
+            },
+            {
+                id: 's15',
+                title: 'Unicorn',
+                artistId: 'noa_kirel',
+                artistName: 'נועה קירל',
+                genre: 'pop',
+                vibe: 'upbeat',
+                cover: 'https://images.unsplash.com/photo-1526478806334-5fd488fcaabc?w=500',
+                lyricsQuote: 'I\'m gonna stand here like a unicorn...',
+                ytQuery: 'Noa Kirel Unicorn Eurovision',
+                spotifyUrl: 'https://open.spotify.com/search/Noa%20Kirel%20Unicorn',
+                bpm: 130,
+                freq: 410
+            },
+            {
+                id: 's16',
+                title: 'אלוף העולם',
+                artistId: 'hanan_ben_ari',
+                artistName: 'חנן בן ארי',
+                genre: 'pop',
+                vibe: 'workout',
+                cover: 'https://images.unsplash.com/photo-1442504028989-ab58b5f29a4a?w=500',
+                lyricsQuote: 'אני אלוף העולם בניפוח בלונים...',
+                ytQuery: 'חנן בן ארי אלוף העולם',
+                spotifyUrl: 'https://open.spotify.com/search/%D7%97%D7%A0%D7%9F%20%D7%91%D7%9F%20%D7%90%D7%A8%D7%99%20%D7%90%D7%9C%D7%95%D7%A3%20%D7%94%D7%A2%D7%95%D7%9C%D7%9D',
+                bpm: 122,
+                freq: 360
+            },
+            {
+                id: 's17',
+                title: 'ממעמקים',
+                artistId: 'idan_raichel',
+                artistName: 'הפרויקט של עידן רייכל',
+                genre: 'pop',
+                vibe: 'chill',
+                cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500',
+                lyricsQuote: 'ממעמקים קראתי אלייך בואי אלי...',
+                ytQuery: 'עידן רייכל ממעמקים',
+                spotifyUrl: 'https://open.spotify.com/search/%D7%A2%D7%99%D7%93%D7%9F%20%D7%A8%D7%99%D7%99%D7%9B%D7%9C%20%D7%9E%D7%9E%D7%A2%D7%9E%D7%A7%D7%99%D7%9D',
+                bpm: 80,
+                freq: 190
+            },
+
+            // Global Pop/HipHop/Rock
+            {
+                id: 's18',
+                title: 'God\'s Plan',
+                artistId: 'drake',
+                artistName: 'Drake',
+                genre: 'hiphop',
+                vibe: 'upbeat',
+                cover: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=500',
+                lyricsQuote: 'She said, "Do you love me?" I tell her, "Only partly..."',
+                ytQuery: 'Drake Gods Plan official video',
+                spotifyUrl: 'https://open.spotify.com/search/Drake%20Gods%20Plan',
+                bpm: 77,
+                freq: 230
+            },
+            {
+                id: 's19',
+                title: 'Anti-Hero',
+                artistId: 'taylor_swift',
+                artistName: 'Taylor Swift',
+                genre: 'pop',
+                vibe: 'chill',
+                cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=500',
+                lyricsQuote: 'It\'s me, hi, I\'m the problem, it\'s me...',
+                ytQuery: 'Taylor Swift Anti Hero',
+                spotifyUrl: 'https://open.spotify.com/search/Taylor%20Swift%20Anti-Hero',
+                bpm: 97,
+                freq: 250
+            },
+            {
+                id: 's20',
+                title: 'HUMBLE.',
+                artistId: 'kendrick_lamar',
+                artistName: 'Kendrick Lamar',
+                genre: 'hiphop',
+                vibe: 'workout',
+                cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500',
+                lyricsQuote: 'Sit down, be humble...',
+                ytQuery: 'Kendrick Lamar Humble',
+                spotifyUrl: 'https://open.spotify.com/search/Kendrick%20Lamar%20Humble',
+                bpm: 150,
+                freq: 420
+            },
+            {
+                id: 's21',
+                title: 'A Sky Full of Stars',
+                artistId: 'coldplay',
+                artistName: 'Coldplay',
+                genre: 'rock',
+                vibe: 'upbeat',
+                cover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500',
+                lyricsQuote: '\'Cause in a sky, \'cause in a sky full of stars, I think I saw you...',
+                ytQuery: 'Coldplay A Sky Full of Stars',
+                spotifyUrl: 'https://open.spotify.com/search/Coldplay%20A%20Sky%20Full%20of%20Stars',
+                bpm: 125,
+                freq: 390
+            },
+            {
+                id: 's22',
+                title: 'Levitating',
+                artistId: 'dua_lipa',
+                artistName: 'Dua Lipa',
+                genre: 'pop',
+                vibe: 'upbeat',
+                cover: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=500',
+                lyricsQuote: 'If you wanna run away with me, I know a galaxy...',
+                ytQuery: 'Dua Lipa Levitating',
+                spotifyUrl: 'https://open.spotify.com/search/Dua%20Lipa%20Levitating',
+                bpm: 103,
+                freq: 340
+            }
+        ];
+
+        // ==========================================
+        // APP STATE MANAGEMENT
+        // ==========================================
+        let state = {
+            selectedGenre: 'all',
+            selectedVibe: 'all',
+            selectedArtist: 'all',
+            searchQuery: '',
+            favorites: JSON.parse(localStorage.getItem('beatmatch_favorites') || '[]'),
+            currentPlayingSong: null,
+            audioSynthContext: null,
+            audioOscillator: null,
+            isPlayingAudio: false,
+            audioTimerInterval: null,
+            audioSeconds: 0
+        };
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        window.onload = function() {
+            renderGenreFilters();
+            renderVibeFilters();
+            renderArtistFilters();
+            generateRecommendations();
+            updateFavoritesCounter();
+        };
+
+        // ==========================================
+        // FILTER RENDERERS
+        // ==========================================
+
+        function renderGenreFilters() {
+            const container = document.getElementById('genreContainer');
+            container.innerHTML = GENRES.map(g => `
+                <button onclick="selectGenre('${g.id}')" 
+                    class="glass-pill px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 ${state.selectedGenre === g.id ? 'active' : 'text-gray-300'}">
+                    <i class="fa-solid ${g.icon}"></i>
+                    ${g.name}
+                </button>
+            `).join('');
+        }
+
+        function renderVibeFilters() {
+            const container = document.getElementById('vibeContainer');
+            container.innerHTML = VIBES.map(v => `
+                <button onclick="selectVibe('${v.id}')" 
+                    class="glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all text-center border ${state.selectedVibe === v.id ? 'border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/20' : 'hover:border-white/20'}">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${v.color} flex items-center justify-center text-white text-xs">
+                        <i class="fa-solid ${v.icon}"></i>
+                    </div>
+                    <span class="text-xs font-medium text-white">${v.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderArtistFilters(filterQuery = '') {
+            const container = document.getElementById('artistContainer');
+            
+            // Filter artists by current genre if applicable
+            let filtered = ARTISTS.filter(a => {
+                const matchGenre = state.selectedGenre === 'all' || a.genre === state.selectedGenre;
+                const matchSearch = filterQuery === '' || a.name.toLowerCase().includes(filterQuery.toLowerCase());
+                return matchGenre && matchSearch;
+            });
+
+            let html = `
+                <button onclick="selectArtist('all')" class="glass-pill px-3 py-1.5 rounded-xl text-xs font-medium ${state.selectedArtist === 'all' ? 'active' : 'text-gray-300'}">
+                    כל האמנים
+                </button>
+            `;
+
+            html += filtered.map(a => `
+                <button onclick="selectArtist('${a.id}')" class="glass-pill px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 ${state.selectedArtist === a.id ? 'active' : 'text-gray-300'}">
+                    <img src="${a.img}" class="w-4 h-4 rounded-full object-cover" alt="${a.name}">
+                    ${a.name}
+                </button>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        function filterArtistsInList(query) {
+            renderArtistFilters(query);
+        }
+
+        // ==========================================
+        // SELECTION HANDLERS
+        // ==========================================
+
+        function selectGenre(genreId) {
+            state.selectedGenre = genreId;
+            // Reset artist if changing genre
+            state.selectedArtist = 'all';
+            renderGenreFilters();
+            renderArtistFilters();
+            document.getElementById('selectedGenreCount').innerText = genreId === 'all' ? 'הכל מוצג' : 'מסונן לפי ג\'אנר';
+            generateRecommendations();
+        }
+
+        function selectVibe(vibeId) {
+            state.selectedVibe = state.selectedVibe === vibeId ? 'all' : vibeId;
+            renderVibeFilters();
+            const vibeObj = VIBES.find(v => v.id === state.selectedVibe);
+            document.getElementById('selectedVibeLabel').innerText = vibeObj ? vibeObj.name : 'כל האווירות';
+            generateRecommendations();
+        }
+
+        function selectArtist(artistId) {
+            state.selectedArtist = artistId;
+            renderArtistFilters();
+            generateRecommendations();
+        }
+
+        function resetFilters() {
+            state.selectedGenre = 'all';
+            state.selectedVibe = 'all';
+            state.selectedArtist = 'all';
+            state.searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderGenreFilters();
+            renderVibeFilters();
+            renderArtistFilters();
+            generateRecommendations();
+        }
+
+        function triggerSurpriseMe() {
+            const randomGenre = GENRES[Math.floor(Math.random() * GENRES.length)].id;
+            const randomVibe = VIBES[Math.floor(Math.random() * VIBES.length)].id;
+            selectGenre(randomGenre);
+            selectVibe(randomVibe);
+        }
+
+        // ==========================================
+        // RECOMMENDATION ALGORITHM ENGINE
+        // ==========================================
+
+        function generateRecommendations() {
+            const grid = document.getElementById('recommendationsGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            let scoredSongs = SONGS_DATABASE.map(song => {
+                let score = 50; // Base match score
+
+                // Genre Match
+                if (state.selectedGenre !== 'all') {
+                    if (song.genre === state.selectedGenre) score += 30;
+                    else score -= 20;
+                }
+
+                // Vibe Match
+                if (state.selectedVibe !== 'all') {
+                    if (song.vibe === state.selectedVibe) score += 25;
+                    else score -= 10;
+                }
+
+                // Artist Match
+                if (state.selectedArtist !== 'all') {
+                    if (song.artistId === state.selectedArtist) score += 40;
+                    else score -= 15;
+                }
+
+                // Global Search Match
+                if (state.searchQuery.trim() !== '') {
+                    const q = state.searchQuery.toLowerCase();
+                    if (song.title.toLowerCase().includes(q) || song.artistName.toLowerCase().includes(q) || song.genre.toLowerCase().includes(q)) {
+                        score += 50;
+                    } else {
+                        score = 0; // Filter out completely if searching and no match
+                    }
+                }
+
+                // Cap score between 65 and 99
+                score = Math.min(99, Math.max(60, score));
+
+                return { ...song, matchScore: score };
+            });
+
+            // Filter songs with score > 0
+            scoredSongs = scoredSongs.filter(s => s.matchScore >= 60);
+
+            // Sort by match score descending
+            scoredSongs.sort((a, b) => b.matchScore - a.matchScore);
+
+            document.getElementById('resultsCountLabel').innerText = `מציג ${scoredSongs.length} שירים מומלצים`;
+
+            if (scoredSongs.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            grid.innerHTML = scoredSongs.map(song => {
+                const isFav = state.favorites.some(f => f.id === song.id);
+                const vibeObj = VIBES.find(v => v.id === song.vibe) || { name: song.vibe, icon: 'fa-music' };
+
+                return `
+                    <div class="glass-card rounded-3xl overflow-hidden hover:border-pink-500/40 transition-all duration-300 flex flex-col justify-between group">
+                        
+                        <!-- Top Cover Image Header -->
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${song.cover}" alt="${song.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                            
+                            <!-- Match Badge -->
+                            <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-pink-500/30 flex items-center gap-1.5 text-xs text-pink-300 font-bold">
+                                <i class="fa-solid fa-sparkles"></i>
+                                ${song.matchScore}% התאמה
+                            </div>
+
+                            <!-- Favorite Button -->
+                            <button onclick="toggleFavorite('${song.id}')" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center text-white hover:text-pink-400 transition-colors">
+                                <i class="${isFav ? 'fa-solid text-pink-500' : 'fa-regular'} fa-heart"></i>
+                            </button>
+
+                            <!-- Title & Artist Overlay -->
+                            <div class="absolute bottom-3 right-3 left-3">
+                                <span class="inline-block text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-500/30 mb-1">
+                                    ${song.genre.toUpperCase()}
+                                </span>
+                                <h4 class="text-xl font-black text-white leading-snug truncate">${song.title}</h4>
+                                <p class="text-xs text-gray-300 font-medium truncate">${song.artistName}</p>
+                            </div>
+                        </div>
+
+                        <!-- Card Body Content -->
+                        <div class="p-5 space-y-4 flex-grow flex flex-col justify-between">
+                            
+                            <!-- Vibe Badge & Lyric Snippet -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-xs text-gray-400">
+                                    <span class="flex items-center gap-1 text-purple-300">
+                                        <i class="fa-solid ${vibeObj.icon}"></i>
+                                        ${vibeObj.name}
+                                    </span>
+                                    <button onclick="openLyricsModal('${song.id}')" class="text-indigo-400 hover:underline flex items-center gap-1 text-[11px]">
+                                        <i class="fa-solid fa-quote-right"></i>
+                                        מילים וסיבת המלצה
+                                    </button>
+                                </div>
+
+                                <p class="text-xs text-gray-300 italic bg-white/5 p-2.5 rounded-xl border border-white/5 truncate">
+                                    "${song.lyricsQuote}"
+                                </p>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="pt-2 border-t border-white/5 flex items-center justify-between gap-2">
+                                
+                                <!-- Synthetic Audio Preview Button -->
+                                <button onclick="playAudioPreview('${song.id}')" class="flex-1 glass-button py-2 px-3 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-play text-pink-400"></i>
+                                    השמע הדגמה
+                                </button>
+
+                                <!-- Youtube Link -->
+                                <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(song.ytQuery)}" target="_blank" 
+                                   class="w-9 h-9 rounded-xl bg-red-600/20 border border-red-500/30 text-red-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all">
+                                    <i class="fa-brands fa-youtube"></i>
+                                </a>
+
+                                <!-- Spotify Link -->
+                                <a href="${song.spotifyUrl}" target="_blank" 
+                                   class="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-all">
+                                    <i class="fa-brands fa-spotify"></i>
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // GLOBAL SEARCH HANDLER
+        // ==========================================
+
+        function handleGlobalSearch(query) {
+            state.searchQuery = query;
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            generateRecommendations();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            state.searchQuery = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            generateRecommendations();
+        }
+
+        // ==========================================
+        // AUDIO PREVIEW SYSTEM (Web Audio API Synth)
+        // ==========================================
+
+        function playAudioPreview(songId) {
+            const song = SONGS_DATABASE.find(s => s.id === songId);
+            if (!song) return;
+
+            stopAudioPreview(); // Stop any currently playing audio
+
+            state.currentPlayingSong = song;
+            state.isPlayingAudio = true;
+            state.audioSeconds = 0;
+
+            // Update Sticky Player UI
+            const player = document.getElementById('stickyAudioPlayer');
+            document.getElementById('playerCover').src = song.cover;
+            document.getElementById('playerTitle').innerText = song.title;
+            document.getElementById('playerArtist').innerText = song.artistName;
+            document.getElementById('playerYoutubeBtn').onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(song.ytQuery)}`, '_blank');
+            document.getElementById('playerSpotifyBtn').onclick = () => window.open(song.spotifyUrl, '_blank');
+            
+            player.classList.remove('translate-y-full');
+
+            // Web Audio API Synthesizer melody loop preview
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                state.audioSynthContext = new AudioCtx();
+                
+                let osc = state.audioSynthContext.createOscillator();
+                let gain = state.audioSynthContext.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(song.freq || 300, state.audioSynthContext.currentTime);
+                
+                // Pulsing melodic pitch modulation
+                setInterval(() => {
+                    if (osc && state.isPlayingAudio && state.audioSynthContext) {
+                        const shift = Math.sin(Date.now() / 200) * 40;
+                        osc.frequency.setValueAtTime((song.freq || 300) + shift, state.audioSynthContext.currentTime);
+                    }
+                }, 100);
+
+                gain.gain.setValueAtTime(0.08, state.audioSynthContext.currentTime);
+                osc.connect(gain);
+                gain.connect(state.audioSynthContext.destination);
+
+                osc.start();
+                state.audioOscillator = osc;
+            } catch (e) {
+                console.log('Audio Context error:', e);
+            }
+
+            // Audio Timer
+            state.audioTimerInterval = setInterval(() => {
+                state.audioSeconds++;
+                const mins = Math.floor(state.audioSeconds / 60);
+                const secs = state.audioSeconds % 60;
+                document.getElementById('playerTimer').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }, 1000);
+        }
+
+        function togglePlayPauseAudio() {
+            if (!state.isPlayingAudio) {
+                if (state.currentPlayingSong) playAudioPreview(state.currentPlayingSong.id);
+            } else {
+                stopAudioPreview();
+            }
+        }
+
+        function stopAudioPreview() {
+            if (state.audioOscillator) {
+                try {
+                    state.audioOscillator.stop();
+                    state.audioOscillator.disconnect();
+                } catch(e) {}
+                state.audioOscillator = null;
+            }
+            if (state.audioSynthContext) {
+                try { state.audioSynthContext.close(); } catch(e) {}
+                state.audioSynthContext = null;
+            }
+
+            clearInterval(state.audioTimerInterval);
+            state.isPlayingAudio = false;
+            
+            const player = document.getElementById('stickyAudioPlayer');
+            player.classList.add('translate-y-full');
+        }
+
+        // ==========================================
+        // FAVORITES / PLAYLIST MANAGEMENT
+        // ==========================================
+
+        function toggleFavorite(songId) {
+            const song = SONGS_DATABASE.find(s => s.id === songId);
+            if (!song) return;
+
+            const index = state.favorites.findIndex(f => f.id === songId);
+            if (index > -1) {
+                state.favorites.splice(index, 1);
+            } else {
+                state.favorites.push(song);
+            }
+
+            localStorage.setItem('beatmatch_favorites', JSON.stringify(state.favorites));
+            updateFavoritesCounter();
+            generateRecommendations();
+            renderFavoritesList();
+        }
+
+        function updateFavoritesCounter() {
+            document.getElementById('favCount').innerText = state.favorites.length;
+            document.getElementById('favCountMobile').innerText = state.favorites.length;
+        }
+
+        function renderFavoritesList() {
+            const container = document.getElementById('favoritesList');
+            if (state.favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fa-regular fa-heart text-3xl mb-2 text-pink-500/40"></i>
+                        <p class="text-sm">אין עדיין שירים שמורים בפלייליסט שלך.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = state.favorites.map(song => `
+                <div class="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+                    <div class="flex items-center gap-3">
+                        <img src="${song.cover}" class="w-10 h-10 rounded-xl object-cover" alt="Song">
+                        <div>
+                            <h5 class="font-bold text-white text-sm">${song.title}</h5>
+                            <p class="text-xs text-gray-400">${song.artistName}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="playAudioPreview('${song.id}')" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-bold">
+                            נגן
+                        </button>
+                        <button onclick="toggleFavorite('${song.id}')" class="text-red-400 hover:text-red-300 p-1.5">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleFavoritesModal() {
+            const modal = document.getElementById('favoritesModal');
+            if (modal.classList.contains('hidden')) {
+                renderFavoritesList();
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            } else {
+                modal.classList.add('opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        function clearAllFavorites() {
+            state.favorites = [];
+            localStorage.removeItem('beatmatch_favorites');
+            updateFavoritesCounter();
+            renderFavoritesList();
+            generateRecommendations();
+        }
+
+        // ==========================================
+        // LYRICS & DETAILS MODAL
+        // ==========================================
+
+        function openLyricsModal(songId) {
+            const song = SONGS_DATABASE.find(s => s.id === songId);
+            if (!song) return;
+
+            document.getElementById('lyricsModalCover').src = song.cover;
+            document.getElementById('lyricsModalTitle').innerText = song.title;
+            document.getElementById('lyricsModalArtist').innerText = song.artistName;
+            document.getElementById('lyricsModalText').innerText = `"${song.lyricsQuote}"`;
+            
+            // Build reason
+            let reason = `השיר הזה הומלץ מכיוון שהוא משתייך לג'אנר ה-${song.genre.toUpperCase()} ומתאים לאווירה שחיפשת.`;
+            if (state.selectedArtist !== 'all') {
+                reason += ` כמו כן, השיר הוא של האמן הנבחר: ${song.artistName}.`;
+            }
+            document.getElementById('lyricsModalReason').innerText = reason;
+
+            const modal = document.getElementById('lyricsModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeLyricsModal() {
+            const modal = document.getElementById('lyricsModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+    </script>
+</body>
+</html>

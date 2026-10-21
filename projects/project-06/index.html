@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אתר כושר הטניס של מוכתר - אימוני טניס, כוח מתפרץ, ספרינטים, סולמות & שיווי משקל</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Rubik -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Rubik', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            dark: '#0f172a',
+                            card: '#1e293b'
+                        },
+                        tennis: {
+                            500: '#ccff00',
+                            600: '#a3cc00',
+                            dark: '#82a300'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #0b0f19;
+            color: #f8fafc;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4ade80 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-tennis {
+            background: linear-gradient(135deg, #ccff00 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-card {
+            background: rgba(26, 36, 52, 0.75);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card:hover {
+            border-color: rgba(204, 255, 0, 0.4);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-lime-400 selection:text-slate-950">
+
+    <header class="sticky top-0 z-40 glass-card border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="showSection('home')">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-lime-400 to-green-500 flex items-center justify-center shadow-lg shadow-lime-500/20">
+                        <i class="fa-solid fa-bolt-lightning text-2xl text-slate-950"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl sm:text-2xl font-black tracking-wider gradient-text">אתר כושר הטניס של מוכתר</span>
+                        <span class="text-xs block text-slate-400 -mt-1 font-semibold">ספרינטים, סולמות, שיווי משקל & כוח מתפרץ</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden lg:flex items-center gap-1 font-medium">
+                    <button onclick="showSection('home')" class="nav-btn px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-house"></i> בית
+                    </button>
+                    <button onclick="showSection('workouts')" class="nav-btn px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-fire"></i> ספריית אימונים
+                    </button>
+                    <button onclick="filterWorkouts('ספרינטים וריצות')" class="nav-btn px-3 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 hover:bg-orange-500 hover:text-slate-950 transition-all text-xs flex items-center gap-1.5 font-bold">
+                        <i class="fa-solid fa-person-running"></i> ספרינטים
+                    </button>
+                    <button onclick="filterWorkouts('סולמות אג\'יליטי')" class="nav-btn px-3 py-1.5 rounded-xl bg-teal-400/10 border border-teal-400/30 text-teal-300 hover:bg-teal-400 hover:text-slate-950 transition-all text-xs flex items-center gap-1.5 font-bold">
+                        <i class="fa-solid fa-bars-staggered"></i> סולמות
+                    </button>
+                    <button onclick="filterWorkouts('שיווי משקל')" class="nav-btn px-3 py-1.5 rounded-xl bg-cyan-400/10 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-400 hover:text-slate-950 transition-all text-xs flex items-center gap-1.5 font-bold">
+                        <i class="fa-solid fa-scale-balanced"></i> שיווי משקל
+                    </button>
+                    <button onclick="showSection('schedule')" class="nav-btn px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-calendar-days"></i> תכנית 7 ימים
+                    </button>
+                    <button onclick="showSection('generator')" class="nav-btn px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> מחולל
+                    </button>
+                    <button onclick="showSection('timer')" class="nav-btn px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-stopwatch"></i> טיימר
+                    </button>
+                    <button onclick="showSection('stats')" class="nav-btn px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-line"></i> היסטוריה
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <div class="lg:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-800 bg-slate-900/95 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="showSection('home'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-house w-5"></i> בית
+            </button>
+            <button onclick="showSection('workouts'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-fire w-5"></i> ספריית אימונים
+            </button>
+            <button onclick="filterWorkouts('ספרינטים וריצות'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-orange-400 bg-orange-500/10 font-bold flex items-center gap-3">
+                <i class="fa-solid fa-person-running w-5"></i> ספרינטים וריצות
+            </button>
+            <button onclick="filterWorkouts('סולמות אג\'יליטי'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-teal-300 bg-teal-500/10 font-bold flex items-center gap-3">
+                <i class="fa-solid fa-bars-staggered w-5"></i> תרגילי סולמות
+            </button>
+            <button onclick="filterWorkouts('שיווי משקל'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-cyan-300 bg-cyan-500/10 font-bold flex items-center gap-3">
+                <i class="fa-solid fa-scale-balanced w-5"></i> שיווי משקל ויציבות
+            </button>
+            <button onclick="filterWorkouts('כוח מתפרץ'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-lime-400 bg-lime-400/10 font-bold flex items-center gap-3">
+                <i class="fa-solid fa-bolt w-5"></i> כוח מתפרץ
+            </button>
+            <button onclick="showSection('schedule'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-calendar-days w-5"></i> תוכנית 7 ימים
+            </button>
+            <button onclick="showSection('generator'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-wand-magic-sparkles w-5"></i> מחולל אימונים
+            </button>
+            <button onclick="showSection('timer'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-stopwatch w-5"></i> טיימר אינטרוולים
+            </button>
+            <button onclick="showSection('stats'); toggleMobileMenu()" class="w-full text-right px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-chart-line w-5"></i> היסטוריה וסטטיסטיקה
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- SECTION 1: HOME / HERO -->
+        <section id="sec-home" class="space-y-12 transition-all duration-300">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl overflow-hidden glass-card p-8 md:p-14 border border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-lime-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="space-y-6 max-w-2xl relative z-10 text-center md:text-right">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-lime-400/20 to-orange-400/20 text-lime-300 border border-lime-400/30">
+                        <i class="fa-solid fa-bolt-lightning"></i> תוכנית עלית (3X) - כוח מתפרץ, ספרינטים, סולמות ושיווי משקל
+                    </span>
+                    <h1 class="text-3xl md:text-5xl font-black leading-tight tracking-tight">
+                        ספרינטים, כוח מתפרץ, <br>
+                        <span class="gradient-tennis">סולמות אג'יליטי ושיווי משקל מקצועי</span>
+                    </h1>
+                    <p class="text-slate-400 text-sm md:text-base leading-relaxed">
+                        בברוכים הבאים ל-<strong>אתר כושר הטניס של מוכתר</strong>! תוכנית אימונים מקצועית לכל ימות השבוע הכוללת ריצות ספרינט מתפרצות, עבודת רגליים בסולמות (Agility Ladder), תרגילי יציבות ושיווי משקל, ואימוני חדר כושר עצמתיים.
+                    </p>
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
+                        <button onclick="filterWorkouts('ספרינטים וריצות')" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 font-bold text-slate-950 shadow-lg shadow-orange-500/25 hover:scale-105 transition-all text-xs sm:text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-person-running"></i> ספרינטים וריצות
+                        </button>
+                        <button onclick="filterWorkouts('סולמות אג\'יליטי')" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-teal-400 to-emerald-500 font-bold text-slate-950 shadow-lg shadow-teal-400/25 hover:scale-105 transition-all text-xs sm:text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-bars-staggered"></i> סולמות אג'יליטי
+                        </button>
+                        <button onclick="filterWorkouts('שיווי משקל')" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 font-bold text-slate-950 shadow-lg shadow-cyan-400/25 hover:scale-105 transition-all text-xs sm:text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-scale-balanced"></i> שיווי משקל
+                        </button>
+                        <button onclick="filterWorkouts('כוח מתפרץ')" class="px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 font-bold text-lime-400 border border-slate-700 transition-all text-xs sm:text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> כוח מתפרץ
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative z-10 w-full md:w-auto flex justify-center">
+                    <div class="relative w-60 h-60 md:w-72 md:h-72 rounded-full bg-gradient-to-tr from-orange-500/20 via-lime-400/20 to-teal-400/20 flex items-center justify-center p-4 border border-slate-700/50 shadow-2xl">
+                        <i class="fa-solid fa-person-running text-7xl md:text-8xl text-orange-400 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Categories Grid -->
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold">סוגי האימונים באתר של מוכתר</h2>
+                    <button onclick="showSection('workouts')" class="text-lime-400 hover:text-lime-300 text-sm font-semibold">לכל הקטגוריות <i class="fa-solid fa-chevron-left text-xs"></i></button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Sprints & Running -->
+                    <div onclick="filterWorkouts('ספרינטים וריצות')" class="glass-card p-6 rounded-2xl cursor-pointer transition-all hover:-translate-y-1 group border-orange-500/30 bg-orange-500/5">
+                        <div class="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/30 text-orange-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-person-running"></i>
+                        </div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-300 mb-2">תאוצה קצה</span>
+                        <h3 class="text-lg font-bold mb-2">ספרינטים & ריצות</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">תאוצה משיא עמידה, ספרינטים בעלייה, ריצות שאטל ושינויי מקצב מטורפים.</p>
+                    </div>
+
+                    <!-- Agility Ladders -->
+                    <div onclick="filterWorkouts('סולמות אג\'יליטי')" class="glass-card p-6 rounded-2xl cursor-pointer transition-all hover:-translate-y-1 group border-teal-400/30 bg-teal-400/5">
+                        <div class="w-12 h-12 rounded-2xl bg-teal-400/20 border border-teal-400/30 text-teal-300 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-bars-staggered"></i>
+                        </div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-teal-400/20 text-teal-300 mb-2">עבודת רגליים</span>
+                        <h3 class="text-lg font-bold mb-2">סולמות אג'יליטי</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">Icky Shuffle, צעדים כפולים, מעברים צדיים, וקואורדינציה אולימפית במהירות שיא.</p>
+                    </div>
+
+                    <!-- Balance & Stability -->
+                    <div onclick="filterWorkouts('שיווי משקל')" class="glass-card p-6 rounded-2xl cursor-pointer transition-all hover:-translate-y-1 group border-cyan-400/30 bg-cyan-400/5">
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-400/20 border border-cyan-400/30 text-cyan-300 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-400/20 text-cyan-300 mb-2">יציבות ופרופריוצפציה</span>
+                        <h3 class="text-lg font-bold mb-2">שיווי משקל & יציבות</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">נחיתות חד-רגליות, עבודה על בוסו/משטח לא יציב, פלג גוף מרכזי ושליטה מוחלטת.</p>
+                    </div>
+
+                    <!-- Explosive Power -->
+                    <div onclick="filterWorkouts('כוח מתפרץ')" class="glass-card p-6 rounded-2xl cursor-pointer transition-all hover:-translate-y-1 group border-lime-400/30 bg-lime-400/5">
+                        <div class="w-12 h-12 rounded-2xl bg-lime-400/20 border border-lime-400/30 text-lime-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-lime-400/20 text-lime-300 mb-2">פליאומטריקה</span>
+                        <h3 class="text-lg font-bold mb-2">כוח מתפרץ & זינוקים</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">קפיצות עומק, זריקות כדור כוח מסיביות, זינוקים אופקיים ושיגור מהמקום.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: SCHEDULE FOR 7 DAYS -->
+        <section id="sec-schedule" class="hidden space-y-8">
+            <div class="border-b border-slate-800 pb-6">
+                <span class="px-3 py-1 bg-lime-400/10 border border-lime-400/30 text-lime-400 text-xs font-bold rounded-full">מערך אימונים שבועי מורחב למקצוענים (Microcycle 3X)</span>
+                <h2 class="text-3xl font-black mt-2">תוכנית 7 ימים מקיפה - ספרינטים, סולמות & שיווי משקל</h2>
+                <p class="text-slate-400 text-sm mt-1">שילוב יומי מדויק המשלב תאוצה, קואורדינציית רגליים בסולמות, ייצוב חד-רגלי וכוח מסיבי</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Day 1 -->
+                <div class="glass-card p-6 rounded-3xl border border-orange-500/40 relative">
+                    <span class="absolute top-4 left-4 bg-orange-500 text-slate-950 text-xs font-black px-3 py-1 rounded-full">יום 1</span>
+                    <h3 class="text-lg font-bold text-white mb-1">ספרינטים, תאוצה & זינוקים</h3>
+                    <span class="text-xs text-orange-400 font-semibold block mb-3">עצימות: מקסימלית (100%)</span>
+                    <p class="text-xs text-slate-400 mb-4">ספרינטים מ-0 ל-100, זינוקי תאוצה מעמידות שונות, ושיגור כוח מתפרץ.</p>
+                    <button onclick="openWorkoutModal('sprint-accel-1')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all">הצג אימון יום 1</button>
+                </div>
+
+                <!-- Day 2 -->
+                <div class="glass-card p-6 rounded-3xl border border-teal-400/40 relative">
+                    <span class="absolute top-4 left-4 bg-teal-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full">יום 2</span>
+                    <h3 class="text-lg font-bold text-white mb-1">סולמות אג'יליטי & קואורדינציה</h3>
+                    <span class="text-xs text-teal-300 font-semibold block mb-3">עצימות: גבוהה מאוד (טכניקה ומהירות)</span>
+                    <p class="text-xs text-slate-400 mb-4">עבודת רגליים אולימפית בסולם: Icky Shuffle, צעדים כפולים ושינויי מקצב מטורפים.</p>
+                    <button onclick="openWorkoutModal('ladder-pro-1')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all">הצג אימון יום 2</button>
+                </div>
+
+                <!-- Day 3 -->
+                <div class="glass-card p-6 rounded-3xl border border-cyan-400/40 relative">
+                    <span class="absolute top-4 left-4 bg-cyan-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full">יום 3</span>
+                    <h3 class="text-lg font-bold text-white mb-1">שיווי משקל דינמי & יציבות</h3>
+                    <span class="text-xs text-cyan-300 font-semibold block mb-3">עצימות: ממוקדת יציבות ושרירי ליבה</span>
+                    <p class="text-xs text-slate-400 mb-4">נחיתות חד-רגליות, עבודה על משטח לא יציב, חיזוק קרסוליים ומפרקי ירך.</p>
+                    <button onclick="openWorkoutModal('balance-core-1')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all">הצג אימון יום 3</button>
+                </div>
+
+                <!-- Day 4 -->
+                <div class="glass-card p-6 rounded-3xl border border-blue-500/40 relative">
+                    <span class="absolute top-4 left-4 bg-blue-500 text-white text-xs font-black px-3 py-1 rounded-full">יום 4</span>
+                    <h3 class="text-lg font-bold text-white mb-1">חדר כושר: כוח מרבי</h3>
+                    <span class="text-xs text-blue-400 font-semibold block mb-3">עצימות: עומס משקלים כבד</span>
+                    <p class="text-xs text-slate-400 mb-4">סקוואט כבד, דדליפט מורכב, מכרעים דינמיים ודחיפת אגן לכוח מתפרץ בקרקע.</p>
+                    <button onclick="openWorkoutModal('gym-legs-power')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all">הצג אימון יום 4</button>
+                </div>
+
+                <!-- Day 5 -->
+                <div class="glass-card p-6 rounded-3xl border border-amber-400/40 relative">
+                    <span class="absolute top-4 left-4 bg-amber-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full">יום 5</span>
+                    <h3 class="text-lg font-bold text-white mb-1">שינוי מקום ומצב במהירות (COD)</h3>
+                    <span class="text-xs text-amber-300 font-semibold block mb-3">עצימות: גבוהה מאוד (90%)</span>
+                    <p class="text-xs text-slate-400 mb-4">בלימות חירום בצעד אחד, שינויי כיוון 5-10-5, ויציאות פתאומיות משכיבה.</p>
+                    <button onclick="openWorkoutModal('cod-agility-pro')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all">הצג אימון יום 5</button>
+                </div>
+
+                <!-- Day 6 -->
+                <div class="glass-card p-6 rounded-3xl border border-lime-400/40 relative">
+                    <span class="absolute top-4 left-4 bg-lime-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full">יום 6</span>
+                    <h3 class="text-lg font-bold text-white mb-1">כוח מתפרץ & כדורי כוח</h3>
+                    <span class="text-xs text-lime-400 font-semibold block mb-3">עצימות: גבוהה מאוד (95%)</span>
+                    <p class="text-xs text-slate-400 mb-4">Depth Jumps מספסל, זריקות כדור כוח מסיביות, וקפיצות קופסה חד-רגליות.</p>
+                    <button onclick="openWorkoutModal('tennis-pro-1')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all">הצג אימון יום 6</button>
+                </div>
+
+                <!-- Day 7 -->
+                <div class="glass-card p-6 rounded-3xl border border-purple-500/40 relative col-span-1 md:col-span-2 lg:col-span-3 bg-purple-500/5">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div>
+                            <span class="bg-purple-500 text-white text-xs font-black px-3 py-1 rounded-full">יום 7</span>
+                            <h3 class="text-xl font-bold text-white mt-2">מתיחות מורחבות & גמישות עמוקה</h3>
+                            <p class="text-xs text-slate-300 mt-1">סשן מתיחות עמוק מקיף לשחרור כל שרירי הגוף, המסטרינג, מקרבי ירך, גב, כתפיים, ושחרור מפרק הירך.</p>
+                        </div>
+                        <button onclick="openWorkoutModal('stretches-deep-pro')" class="px-6 py-3 rounded-xl bg-purple-500 text-white text-xs font-bold hover:bg-purple-400 transition-all shrink-0">הצג סשן מתיחות יום 7</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: WORKOUT LIBRARY -->
+        <section id="sec-workouts" class="hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-3xl font-black">ספריית אימונים מורחבת (3X Database)</h2>
+                    <p class="text-slate-400 text-sm mt-1">בחר קטגוריה לצפייה באימונים ותרגילים מפורטים</p>
+                </div>
+                
+                <!-- Category Filter Buttons -->
+                <div class="flex flex-wrap gap-2" id="filter-buttons">
+                    <button onclick="filterWorkouts('הכל')" class="filter-btn active px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-green-500 text-slate-950">הכל</button>
+                    <button onclick="filterWorkouts('ספרינטים וריצות')" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-orange-400 border border-orange-500/30 hover:bg-slate-700"><i class="fa-solid fa-person-running ml-1"></i> ספרינטים וריצות</button>
+                    <button onclick="filterWorkouts('סולמות אג\'יליטי')" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-teal-300 border border-teal-400/30 hover:bg-slate-700"><i class="fa-solid fa-bars-staggered ml-1"></i> סולמות אג'יליטי</button>
+                    <button onclick="filterWorkouts('שיווי משקל')" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-cyan-300 border border-cyan-400/30 hover:bg-slate-700"><i class="fa-solid fa-scale-balanced ml-1"></i> שיווי משקל</button>
+                    <button onclick="filterWorkouts('כוח מתפרץ')" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-lime-400 border border-lime-400/30 hover:bg-slate-700"><i class="fa-solid fa-bolt ml-1"></i> כוח מתפרץ</button>
+                    <button onclick="filterWorkouts('טניס מקצועי')" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-yellow-400 border border-yellow-400/30 hover:bg-slate-700"><i class="fa-solid fa-trophy ml-1"></i> טניס Pro</button>
+                    <button onclick="filterWorkouts('חדר כושר')" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-blue-400 border border-blue-500/30 hover:bg-slate-700"><i class="fa-solid fa-dumbbell ml-1"></i> חדר כושר</button>
+                    <button onclick="filterWorkouts('שינויי כיוון')" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-amber-300 border border-amber-400/30 hover:bg-slate-700"><i class="fa-solid fa-arrows-split-up-and-left ml-1"></i> שינויי כיוון</button>
+                    <button onclick="filterWorkouts('מתיחות')" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-purple-300 border border-purple-500/30 hover:bg-slate-700"><i class="fa-solid fa-child-reaching ml-1"></i> מתיחות</button>
+                </div>
+            </div>
+
+            <!-- Workout Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="workouts-grid">
+                <!-- Dynamically Populated via JavaScript -->
+            </div>
+        </section>
+
+        <!-- SECTION 4: WORKOUT GENERATOR -->
+        <section id="sec-generator" class="hidden space-y-8">
+            <div class="max-w-2xl mx-auto glass-card p-8 rounded-3xl border border-slate-700/50">
+                <div class="text-center space-y-3 mb-8">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-yellow-400 to-amber-500 flex items-center justify-center text-slate-950 text-3xl mx-auto shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h2 class="text-3xl font-black">מחולל האימונים המורחב של מוכתר</h2>
+                    <p class="text-slate-400 text-sm">צור אימון מותאם אישית הכולל ספרינטים, סולמות, שיווי משקל, או כוח מתפרץ</p>
+                </div>
+
+                <form id="generator-form" onsubmit="generateCustomWorkout(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 text-slate-300">סוג האימון המבוקש</label>
+                        <select id="gen-type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500">
+                            <option value="ספרינטים ואינטרוולים">ספרינטים ותאוצה מתפרצת (Sprint & Acceleration) 🏃</option>
+                            <option value="סולמות אג'יליטי">סולמות אג'יליטי ועבודת רגליים (Agility Ladder) 🪜</option>
+                            <option value="שיווי משקל ויציבות">שיווי משקל דינמי ושרירי ייצוב (Balance & Core) ⚖️</option>
+                            <option value="כוח מתפרץ ופליאומטריקה">כוח מתפרץ, קופסאות וכדורי כוח (Explosive Power) ⚡</option>
+                            <option value="טניס מקצועי">טניס מקצועי (עבודת רגליים ופליאומטריקה) 🏆</option>
+                            <option value="חדר כושר כבד">חדר כושר: כוח מרבי והרמת משקולות 🏋️</option>
+                            <option value="שינויי כיוון ומצב">שינוי מקום ומצב במהירות (COD & Agility) ⚡</option>
+                            <option value="מתיחות וגמישות מורחבות">מתיחות מורחבות ושחרור מפרקים 🧘</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-slate-300">רמת עצימות</label>
+                            <select id="gen-level" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500">
+                                <option value="ספורטאי עלית (Elite Pro)" selected>ספורטאי עלית (Elite Pro)</option>
+                                <option value="מקצועי תחרותי">מקצועי תחרותי (Advanced)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-slate-300">משך אימון (בדקות)</label>
+                            <select id="gen-duration" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500">
+                                <option value="30">30 דקות (אינטנסיבי ממוקד)</option>
+                                <option value="45" selected>45 דקות (סטנדרט מקצועי)</option>
+                                <option value="60">60 דקות (אימון עומק מלא)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-slate-950 font-bold rounded-xl shadow-lg shadow-green-500/20 transition-all text-base flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> מחולל אימון מותאם אישית
+                    </button>
+                </form>
+
+                <div id="generated-result" class="hidden mt-8 pt-8 border-t border-slate-800">
+                    <!-- Generated workout display -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: TIMER -->
+        <section id="sec-timer" class="hidden space-y-8">
+            <div class="max-w-xl mx-auto glass-card p-8 rounded-3xl border border-slate-700/50 text-center space-y-6">
+                <div>
+                    <span class="text-xs font-bold px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20">טיימר מקצועי / Tabata & Sprint Interval</span>
+                    <h2 class="text-3xl font-black mt-2">טיימר אינטרוולים לספרינטים ותחרות</h2>
+                </div>
+
+                <!-- Timer Display -->
+                <div class="relative w-64 h-64 mx-auto flex flex-col items-center justify-center rounded-full border-8 border-slate-800 bg-slate-950/50 shadow-inner" id="timer-display-bg">
+                    <span id="timer-phase" class="text-xs font-bold tracking-widest uppercase text-green-400 mb-1">מוכן להתחלה</span>
+                    <span id="timer-time" class="text-6xl font-black tracking-tight font-mono">00:45</span>
+                    <span id="timer-round" class="text-xs text-slate-400 mt-2">סבב 1 מתוך 10</span>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center justify-center gap-4 pt-2">
+                    <button id="btn-timer-start" onclick="toggleTimer()" class="w-16 h-16 rounded-2xl bg-green-500 hover:bg-green-400 text-slate-950 flex items-center justify-center text-2xl shadow-lg shadow-green-500/30 transition-all">
+                        <i class="fa-solid fa-play" id="timer-icon"></i>
+                    </button>
+                    <button onclick="resetTimer()" class="w-16 h-16 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-2xl border border-slate-700 transition-all">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+                <!-- Config -->
+                <div class="grid grid-cols-3 gap-3 text-right bg-slate-900/60 p-4 rounded-2xl border border-slate-800 text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1">זמן עבודה (שניות)</label>
+                        <input type="number" id="cfg-work" value="45" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-center font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">זמן מנוחה (שניות)</label>
+                        <input type="number" id="cfg-rest" value="15" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-center font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">מספר סבבים</label>
+                        <input type="number" id="cfg-rounds" value="10" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-center font-bold">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: STATS & HISTORY -->
+        <section id="sec-stats" class="hidden space-y-8">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-3xl font-black">היסטוריית אימונים & עומסים</h2>
+                    <p class="text-slate-400 text-sm mt-1">מעקב ביצועים לשחקן הפעיל 7 ימים בשבוע</p>
+                </div>
+                <button onclick="clearHistory()" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-bold transition-all">
+                    ניקוי היסטוריה
+                </button>
+            </div>
+
+            <div id="stats-summary" class="grid grid-cols-1 sm:grid-cols-4 gap-6">
+                <div class="glass-card p-6 rounded-2xl border border-slate-800">
+                    <span class="text-slate-400 text-xs font-semibold">אימונים שהושלמו</span>
+                    <p id="stat-total" class="text-4xl font-black text-green-400 mt-2">0</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border border-slate-800">
+                    <span class="text-slate-400 text-xs font-semibold">זמן אימון מצטבר</span>
+                    <p id="stat-time" class="text-4xl font-black text-blue-400 mt-2">0 דקות</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border border-slate-800">
+                    <span class="text-slate-400 text-xs font-semibold">אימוני ספרינטים & סולמות</span>
+                    <p id="stat-sprints" class="text-4xl font-black text-orange-400 mt-2">0</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border border-slate-800">
+                    <span class="text-slate-400 text-xs font-semibold">אימוני כוח & חדר כושר</span>
+                    <p id="stat-gym" class="text-4xl font-black text-indigo-400 mt-2">0</p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                <div class="p-4 bg-slate-900/50 border-b border-slate-800 font-bold text-sm">יומן אימונים אחרונים</div>
+                <div id="history-list" class="divide-y divide-slate-800">
+                    <!-- History items populated via JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal for Detailed Workout View -->
+    <div id="workout-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-3xl p-6 md:p-8 border border-slate-700 space-y-6 relative">
+            <button onclick="closeModal()" class="absolute top-6 left-6 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div id="modal-content">
+                <!-- Dynamically rendered -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+            <p class="text-slate-400 text-sm">אתר כושר הטניס של מוכתר © 2026 - מערכת אימונים מורחבת (3X) לספורטאי עלית</p>
+            <p class="text-slate-600 text-xs">הקפד על חימום מקיף לפני כל אימון עצימות גבוהה, שתיית מים מרובה ומתיחות התאוששות למניעת פציעות עומס!</p>
+        </div>
+    </footer>
+
+    <script>
+        // DATABASE FOR WORKOUTS
+        const workoutsData = [
+            // --- SPRINTS & RUNNING ---
+            {
+                id: 'sprint-accel-1',
+                title: 'תאוצת קצה & ספרינטים מ-0 ל-100 (15 תרגילים)',
+                category: 'ספרינטים וריצות',
+                duration: '60 דק\'',
+                level: 'Elite Pro 7-Days',
+                icon: 'fa-person-running',
+                color: 'text-orange-400',
+                bgColor: 'bg-orange-500/10',
+                borderColor: 'border-orange-500/30',
+                desc: 'אימון ספרינטים ותאוצה מורחב הכולל 15 תרגילים: חימום דינמי, זינוקים, ספרינטים בשינויי קצב, מתיחות ושחרור בסיום.',
+                exercises: [
+                    // Warmup (1-3)
+                    { name: '1. Arm Circles & Dynamic Hugs (חימום דינמי לפלג גוף עליון)', duration: '2 דקות', desc: 'סיבובי זרועות ומתיחות דינמיות של החזה להכשרת הריאה והכתפיים.' },
+                    { name: '2. High Knees & Butt Kicks (ריצת ברכיים לחזה ועקבים לישבן)', duration: '3 דקות', desc: 'הגברת דופק והפעלת הראשי וההמסטרינגס לקראת מאמץ עצים.' },
+                    { name: '3. Hip Openers & Leg Swings (פתיחת מפרקי ירך)', duration: '3 דקות', desc: 'הנפות רגליים קדימה, אחורה ולצדדים להגדלת טווח התנועה.' },
+                    // Core Sprints & Power (4-11)
+                    { name: '4. Push-up Position Sprint Starts (זינוק מכיפוף מרפקים)', duration: '5 סטים של 15 מטר', desc: 'זינוק מפוצץ משכיבת סמיכה על הרצפה לספרינט מלא ב-100% מאמץ.' },
+                    { name: '5. Resisted Band Sprints (ספרינט כנגד גומייה)', duration: '5 סטים של 10 מטר', desc: 'ספרינט חזק במקום כנגד גומיית התנגדות מתוחה.' },
+                    { name: '6. Flying 20m Sprints (ספרינט בתנופה מלאה)', duration: '5 סטים', desc: 'ריצה קלה של 10 מטרים וכניסה לספרינט בשיא המהירות ל-20 מטרים נוספים.' },
+                    { name: '7. Hill Sprints (ספרינט בעלייה תלולה)', duration: '6 סטים של 20 מטר', desc: 'ריצה בעלייה תלולה לפיתוח כוח דחיפה עוצמתי ברגליים.' },
+                    { name: '8. Curved Sprint Runs (ספרינט במסלול קשתי)', duration: '4 סטים לכל כיוון', desc: 'ספרינט מהיר תוך סיבוב ופנייה בריצה מדויקת.' },
+                    { name: '9. Shuttle Run 5m-10m-15m (ריצת שאטל צוברת)', duration: '4 סטים מלאים', desc: 'ספרינט לקו ראשון, נגיעה בקרקע, חזרה, וזינוק לקו הבא.' },
+                    { name: '10. Backpedal to Forward Sprint (אחורנית וזינוק קדימה)', duration: '5 סטים', desc: 'ריצה אחורנית של 5 מטרים, בלימה וזינוק בספרינט 10 מטר קדימה.' },
+                    { name: '11. Lateral Shuffle to Sprint (צעד רדיפה ויציאה לספרינט)', duration: '5 סטים', desc: 'תנועה צדית של 4 מטרים ויציאה אגרסיבית לספרינט ישר.' },
+                    // Stretches & Recovery (12-15)
+                    { name: '12. Standing Hamstring Stretch (מתיחת המסטרינגס בעמידה)', duration: '2 דקות', desc: 'מתיחה סטטית עמוקה לחלק האחורי של הירך.' },
+                    { name: '13. Couch Stretch / Quads (מתיחת ארבע-ראשי ומתני-כסל)', duration: '2 דקות לכל רגל', desc: 'מתיחה עמוקה לקדמת הירך לשחרור עומסים.' },
+                    { name: '14. Calf & Achilles Stretch (מתיחת תאומים ואכילס)', duration: '2 דקות לכל צד', desc: 'שחרור השריר התאום והגידים לאחר ספרינטים עצימים.' },
+                    { name: '15. Deep Child\'s Pose (תנוחת הילד לשחרור גב)', duration: '3 דקות', desc: 'מתיחה רגועה לשחרור הגב התחתון, הזרועות והנשימה.' }
+                ]
+            },
+
+            // --- AGILITY & HURDLES / LADDERS COMBINED ---
+            {
+                id: 'ladder-pro-1',
+                title: 'אימון סולם, קפיצות מעל רף & שינויי קצב (15 תרגילים)',
+                category: 'סולמות אג\'יליטי',
+                duration: '60 דק\'',
+                level: 'Elite Pro 7-Days',
+                icon: 'fa-bars-staggered',
+                color: 'text-teal-300',
+                bgColor: 'bg-teal-400/10',
+                borderColor: 'border-teal-400/30',
+                desc: 'אימון אולטרה-מקצועי המשלב תרגילי סולם אג\'יליטי, קפיצות מעל רף/משוכות, שינויי קצב מתפרצים, ומתיחות שחרור בסיום.',
+                exercises: [
+                    // Warmup (1-3)
+                    { name: '1. Light Jog with Arm Swings (ריצה קלה בשילוב תנועות זרוע)', duration: '3 דקות', desc: 'העלאת טמפרטורת הגוף והכנת השרירים למאמץ קואורדינטיבי.' },
+                    { name: '2. Dynamic Leg Swings (הנפות רגליים קדימה וצדדים)', duration: '2 דקות לכל רגל', desc: 'שיפור גמישות מפרק הירך לקראת קפיצות וצעדים מהירים.' },
+                    { name: '3. Ankle & Wrist Mobility (ניוד קרסוליים ושורש כף יד)', duration: '2 דקות', desc: 'חיזוק וניוד המפרקים הבולמים את הנחיתות.' },
+                    // Core Ladder & Hurdles / Rhythm Changes (4-11)
+                    { name: '4. Icky Shuffle בסולם אג\'יליטי', duration: '4 סטים', desc: 'כניסה עם שתי רגליים לתוך שלב ויציאה צדית במהירות מקסימלית.' },
+                    { name: '5. Over-the-Bar Hurdle Jumps (קפיצות רצופות מעל רף/משוכה)', duration: '5 סטים של 8 קפיצות', desc: 'קפיצות מפוצצות בשתי רגליים מעל רף בגובה 30-40 ס"מ ללא שהייה בקרקע.' },
+                    { name: '6. Fast Pace to Slow Tempo Ladder (שינוי קצב מבוקר בסולם)', duration: '4 סטים', desc: 'עבודת רגליים אולטרה מהירה בשלבים 1-4, המאטה לשלבים 5-6 וספרינט מתפרץ בסוף.' },
+                    { name: '7. Single-Leg Hurdle Hop (קפיצה מעל רף ברגל אחת)', duration: '4 סטים של 5 קפיצות לכל רגל', desc: 'פיתוח יציבות, כוח מתפרץ ובלימה חד-רגלית מעל רף גבוה.' },
+                    { name: '8. In-and-Out Lateral Feet בסולם', duration: '4 סטים', desc: 'תנועה צדית לאורך הסולם עם כניסה ויציאה של שתי הרגליים מכל משבצת.' },
+                    { name: '9. Lateral Hurdle Crossovers (קפיצה צדית מצליבה מעל רף)', duration: '4 סטים', desc: 'זינוק צדי מעל רף והנחת רגל מייצבת בשינוי כיוון מיידי.' },
+                    { name: '10. Carioca Fast Feet (צעד מצליב קריוקה בסולם)', duration: '4 סטים לכל צד', desc: 'הצלבת רגליים מהירה מלפנים ומאחור תוך שמירה על יציבות אופקית.' },
+                    { name: '11. High Knees Ladder + Burst Sprint (ברכיים בסולם + שיגור)', duration: '5 סטים', desc: 'הקפצת ברכיים מהירה בסולם ויציאה מידית בספרינט 10 מטר בסוף.' },
+                    // Stretches & Recovery (12-15)
+                    { name: '12. Seated Butterfly Stretch (מתיחת פרפר למקרבי ירך)', duration: '3 דקות', desc: 'שחרור עמוק למקרבי הירך והמפשעה לאחר שינויי כיוון.' },
+                    { name: '13. Pigeon Pose (תנוחת היונה לאגן והגלוטאוס)', duration: '2 דקות לכל צד', desc: 'פתיחת האגן ושחרור השרירים העמוקים בישבן.' },
+                    { name: '14. Wall Calf Stretch (מתיחת תאומים מול קיר)', duration: '2 דקות לכל רגל', desc: 'מתיחה ממוקדת לשרירי השוקיים והאכילס.' },
+                    { name: '15. Standing Forward Fold (כפילה לפנים בעמידה לשחרור גב)', duration: '2 דקות', desc: 'הרפיה מוחלטת של השרשרת האחורית ועמוד השדרה.' }
+                ]
+            },
+
+            // --- BALANCE & STABILITY ---
+            {
+                id: 'balance-core-1',
+                title: 'שיווי משקל דינמי, יציבות & ליבה (15 תרגילים)',
+                category: 'שיווי משקל',
+                duration: '50 דק\'',
+                level: 'Elite Pro 7-Days',
+                icon: 'fa-scale-balanced',
+                color: 'text-cyan-300',
+                bgColor: 'bg-cyan-400/10',
+                borderColor: 'border-cyan-400/30',
+                desc: 'אימון יציבות ושיווי משקל מקיף ב-15 שלבים: חימום, נחיתות, חיזוק חד-רגלי, מתיחות ושחרור עמוק.',
+                exercises: [
+                    // Warmup (1-3)
+                    { name: '1. Dynamic Torso Twists (פיתולי גו בעמידה)', duration: '2 דקות', desc: 'הכנת השרשרת הצידית והליבה לתנועה.' },
+                    { name: '2. Ankle Circles & Toe Raises (סיבובי קרסול ועליות על קצות האצבעות)', duration: '3 דקות', desc: 'הפעלת מייצבי הקרסול והכנת המפרקים למשטח חוסר יציבות.' },
+                    { name: '3. Bodyweight Side Lunges (מכרעים צדיים משקל גוף)', duration: '3 דקות', desc: 'פתיחת האגן והכנת הברכיים לבלימות צדיות.' },
+                    // Core Drills (4-11)
+                    { name: '4. Single-Leg Dumbbell Reach (הגעה חד-רגלית לפנים)', duration: '4 סטים של 10 חזרות', desc: 'עמידה על רגל אחת, כיפוף קל בברך והגעה קדימה עם משקולת.' },
+                    { name: '5. Bosu / Pad Single Leg Balance Hold (עמידה על משטח לא יציב)', duration: '4 סטים של 45 שניות', desc: 'עמידה חד-רגלית על בוסו בעיניים עצומות לשמירה על יציבות.' },
+                    { name: '6. Single-Leg Hop and Stick (זינוק חד-רגלי ועצירה קפואה)', duration: '4 סטים של 8 קפיצות', desc: 'קפיצה צדית ונחיתה על רגל אחת תוך קיפאון של 3 שניות.' },
+                    { name: '7. Star Excursion Drill (כוכב שיווי משקל)', duration: '3 סטים לכל רגל', desc: 'שליחת הרגל השנייה ל-8 כיוונים שונים מבלי לגעת ברצפה.' },
+                    { name: '8. Paloff Press on Single Leg (פאלוף פרס על רגל אחת)', duration: '3 סטים של 12 חזרות', desc: 'חיזוק הליבה נגד פיתול בעמידה חד-רגלית כנגד גומייה.' },
+                    { name: '9. Lateral Bound with Single-Leg Freeze (זינוק אופקי לקיפאון)', duration: '4 סטים', desc: 'זינוק למרחק צדי ובלימה מוחלטת בנחיתה.' },
+                    { name: '10. Single-Leg Deadlift (דדליפט רומני על רגל אחת)', duration: '3 סטים של 10 חזרות', desc: 'חיזוק המסטרינגס ויציבות האגן במצב יחיד.' },
+                    { name: '11. Plank with Leg Lift (פלאנק עם הנפת רגל)', duration: '3 סטים של 45 שניות', desc: 'ייצוב ליבה מתקדם ומניעת פיתול אגן.' },
+                    // Stretches & Recovery (12-15)
+                    { name: '12. Figure 4 Glute Stretch (מתיחת ישבן בצורת 4)', duration: '2 דקות לכל צד', desc: 'שחרור מפרק הירך והגלוטאוס המייצב.' },
+                    { name: '13. Cobra Pose (תנוחת הקוברה לפתיחת בטן וגב)', duration: '2 דקות', desc: 'מתיחה ומענה לעומסי פלאנק וליבה.' },
+                    { name: '14. Standing IT-Band Stretch (מתיחת ה-IT-Band בצידי הירך)', duration: '2 דקות לכל צד', desc: 'שחרור הרצועה הצידית בירך למניעת כאבי ברכיים.' },
+                    { name: '15. Deep Breathing & Corpse Pose (הקשבה לנשימה והרפיה)', duration: '3 דקות', desc: 'שחרור כל שרירי הגוף, הורדת הדופק והתאוששות.' }
+                ]
+            },
+
+            // --- EXPLOSIVE POWER ---
+            {
+                id: 'explosive-power-1',
+                title: 'כוח מתפרץ עילאי & פליאומטריקה (15 תרגילים)',
+                category: 'כוח מתפרץ',
+                duration: '60 דק\'',
+                level: 'Elite Pro 7-Days',
+                icon: 'fa-bolt-lightning',
+                color: 'text-lime-400',
+                bgColor: 'bg-lime-400/10',
+                borderColor: 'border-lime-400/30',
+                desc: 'אימון כוח מתפרץ מלא הכולל 15 תרגילים: חימום פליאומטרי, זינוקים, זריקות כדור כוח, ומתיחות שחרור.',
+                exercises: [
+                    // Warmup (1-3)
+                    { name: '1. Jumping Jacks & Seal Jacks (קפיצות פישוק-סגור)', duration: '3 דקות', desc: 'הכנת הגידים והשרירים לעומסי נחיתה.' },
+                    { name: '2. Dynamic Squat to Toe Raise (סקוואט דינמי לעלייה על אצבעות)', duration: '2 דקות', desc: 'הפעלת הקרסול והראשי למאמץ מפוצץ.' },
+                    { name: '3. Arm Swings & Rotational Warmup (סיבובי גו וזרועות)', duration: '2 דקות', desc: 'פתיחת בית החזה והכנה לזריקות כדורים.' },
+                    // Core Power (4-11)
+                    { name: '4. Broad Jump to Vertical Jump (קפיצה למרחק + לגובה)', duration: '5 סטים של 5 חזרות', desc: 'זינוק לפנים ומיד עם הנחיתה זינוק לגובה מקסימלי.' },
+                    { name: '5. Medicine Ball Overhead Backward Throw (זריקת כדור כוח לאחור)', duration: '5 סטים של 6 זריקות', desc: 'זריקה מפוצצת מעל הראש לאחור תוך פתיחת אגן.' },
+                    { name: '6. Hurling Bound Jumps (קפיצות משוכות רציפות)', duration: '4 סטים של 5 משוכות', desc: 'קפיצות רציפות מעל משוכות ללא שהייה בקרקע.' },
+                    { name: '7. Single-Leg Bounding (זינוקים רציפים על רגל אחת)', duration: '4 סטים של 15 מטר', desc: 'זינוקים עוצמתיים לפנים על רגל אחת למרחק מרבי.' },
+                    { name: '8. Depth Jumps (קפיצת עומק מספסל וזינוק מעלה)', duration: '4 סטים של 6 חזרות', desc: 'נחיתה מספסל וזינוק מיידי למעלה.' },
+                    { name: '9. Med-Ball Rotational Slam (זריקת כדור כוח צידית מפוצצת)', duration: '4 סטים של 8 לכל צד', desc: 'פיתול גוף מלא וזריקת כדור כוח כנגד קיר.' },
+                    { name: '10. Tuck Jumps (קפיצות מפוצצות עם ברכיים לחזה)', duration: '4 סטים של 8 חזרות', desc: 'זינוק לגובה והרמת הברכיים במהירות לחזה.' },
+                    { name: '11. Explosive Push-ups (שכיבות סמיכה מתפרצות עם מחיאת כף)', duration: '4 סטים של 8 חזרות', desc: 'דחיפה מפוצצת של פלג גוף עליון מהרצפה.' },
+                    // Stretches & Recovery (12-15)
+                    { name: '12. Kneeling Quad & Hip Flexor Stretch (מתיחת ירך ומתני-כסל)', duration: '2 דקות לכל צד', desc: 'שחרור קדמת האגן והירך מהמאמץ הזינוקי.' },
+                    { name: '13. Standing Hamstring & Calf Stretch (מתיחת המסטרינגס ושוק)', duration: '2 דקות לכל רגל', desc: 'שחרור השרשרת האחורית מהנחיתות.' },
+                    { name: '14. Shoulder & Chest Doorway Stretch (מתיחת חזה וכתפיים)', duration: '2 דקות', desc: 'פתיחת החזה ממאמץ הזריקות.' },
+                    { name: '15. Child\'s Pose with Side Reach (תנוחת הילד עם המצדדה)', duration: '3 דקות', desc: 'שחרור הגב התחתון והלטים (רחב גבי).' }
+                ]
+            },
+
+            // --- TENNIS PRO ---
+            {
+                id: 'tennis-pro-1',
+                title: 'אימון כוח מתפרץ & עבודת מגרש Pro (15 תרגילים)',
+                category: 'טניס מקצועי',
+                duration: '60 דק\'',
+                level: 'Elite Pro 7-Days',
+                icon: 'fa-trophy',
+                color: 'text-yellow-400',
+                bgColor: 'bg-yellow-400/10',
+                borderColor: 'border-yellow-400/30',
+                desc: 'אימון טניס מקצועי ב-15 שלבים: חימום מגרש, Split-Steps, חבטות כדור כוח, זינוקים, ומתיחות התאוששות למניעת פציעות.',
+                exercises: [
+                    // Warmup (1-3)
+                    { name: '1. Side Shuffles & Crossover Steps (צעדי רדיפה והצלבות)', duration: '3 דקות', desc: 'חימום תנועתי ייעודי למגרש הטניס.' },
+                    { name: '2. Shadow Swings Warmup (חבטות צל פורהנד/בקהנד)', duration: '3 דקות', desc: 'הכנת הכתפיים והאגן לרוטציות עצימות.' },
+                    { name: '3. Ankle and Wrist Dynamic Mobility (חימום שורש כף יד וקרסול)', duration: '2 דקות', desc: 'מניעת נקעים ומרפק טניס (Tennis Elbow).' },
+                    // Core Drills (4-11)
+                    { name: '4. Split Step אלכסוני מפוצץ + זינוק צדי', duration: '5 סטים של 12 חזרות', desc: 'Split Step מהיר וזינוק אגרסיבי ל-3 מטרים.' },
+                    { name: '5. Depth Jumps מספסל לגובה מקסימלי', duration: '5 סטים של 8 חזרות', desc: 'נחיתה מספסל וזינוק אגרסיבי למעלה לסרב מנצח.' },
+                    { name: '6. Medicine Ball Rotational Slam (חבטת כדור כוח)', duration: '4 סטים של 10 לכל צד', desc: 'פיתול גוף מלא וזריקה מפוצצת של כדור כוח כנגד קיר.' },
+                    { name: '7. Single-Leg Box Jump (קפיצה על קופסה ברגל אחת)', duration: '4 סטים של 8 לכל רגל', desc: 'חיזוק יציאות מהירות ויציבות חד-רגלית.' },
+                    { name: '8. Backpedal to Forehand Burst Sprint (ריצה אחורנית וזינוק)', duration: '4 סטים', desc: 'חזרה אחורה וכניסה מפוצצת לחבטה קדמית.' },
+                    { name: '9. Side-to-Side Cone Touch (נגיעות קונוס מגרש מהירות)', duration: '4 סטים של 30 שניות', desc: 'צעדי רדיפה מהירים ובלימות נמוכות.' },
+                    { name: '10. Overhead Serve Slam with Med-Ball (זריקת כדור מעל הראש)', duration: '4 סטים של 10 חזרות', desc: 'חיזוק תנועת הסרב העוצמתית.' },
+                    { name: '11. Low Defender Lunges (מכרעים נמוכים למכדורי דרופ-שוט)', duration: '4 סטים של 10 חזרות', desc: 'חיזוק הירכיים להגעה לכדורים נמוכים.' },
+                    // Stretches & Recovery (12-15)
+                    { name: '12. Tennis Elbow & Wrist Extensor Stretch (מתיחת שורש כף היד)', duration: '2 דקות לכל זרוע', desc: 'מתיחה קריטית למניעת מרפק טניס.' },
+                    { name: '13. Cross-Body Shoulder Stretch (מתיחת כתף אחורית)', duration: '2 דקות לכל זרוע', desc: 'שחרור מפרק הכתף לאחר חבטות רבות.' },
+                    { name: '14. Groin & Adductor Stretch (מתיחת מפשעה ומקרבי ירך)', duration: '3 דקות', desc: 'מתיחת השרירים הפנימיים לשמירה על גלישות בטוחות.' },
+                    { name: '15. Reclined Spinal Twist (פיתול שדרה בשכיבה)', duration: '2 דקות לכל צד', desc: 'שחרור הגב התחתון מתנועות הפיתול של האימון.' }
+                ]
+            },
+
+            // --- GYM / WEIGHTS ---
+            {
+                id: 'gym-legs-power',
+                title: 'חדר כושר: כוח מרבי ופלג גוף תחתון (15 תרגילים)',
+                category: 'חדר כושר',
+                duration: '60 דק\'',
+                level: 'Elite Pro 7-Days',
+                icon: 'fa-dumbbell',
+                color: 'text-blue-400',
+                bgColor: 'bg-blue-500/10',
+                borderColor: 'border-blue-500/30',
+                desc: 'אימון חדר כושר מלא ב-15 שלבים: חימום משקלים, סקוואטים, דדליפטים, תרגילי עזר, ומתיחות שחרור עמוק.',
+                exercises: [
+                    // Warmup (1-3)
+                    { name: '1. Stationary Bike / Treadmill Warmup (אופניים/הליכון)', duration: '5 דקות', desc: 'חימום סיבולת לב ריאה והגברת זרימת הדם.' },
+                    { name: '2. Unloaded Goblet Squats (סקוואט חימום קל)', duration: '2 סטים של 10 חזרות', desc: 'פתיחת טווח תנועה במפרקי הירך והברכיים.' },
+                    { name: '3. World\'s Greatest Stretch (מתיחת עולם דינמית)', duration: '3 דקות', desc: 'פתיחת כל השרשרת התנועתית לקראת הרמות כבדות.' },
+                    // Core Weights (4-11)
+                    { name: '4. Barbell Back Squats (סקוואט עם מוט)', duration: '5 סטים של 5 חזרות', desc: 'סקוואט מלא ועמוק לפיתוח כוח טהור בברכיים ובישבן.' },
+                    { name: '5. Barbell Romanian Deadlift (דדליפט רומני)', duration: '4 סטים של 8 חזרות', desc: 'חיזוק ה-Hamstrings והשרשרת האחורית.' },
+                    { name: '6. Walking Dumbbell Lunges (מכרעים דינמיים עם משקולות)', duration: '4 סטים של 12 צעדים', desc: 'פיתוח כוח חד-רגלי שווה בכל רגל.' },
+                    { name: '7. Barbell Hip Thrust (דחיפת אגן מעלה)', duration: '4 סטים של 10 חזרות', desc: 'פיתוח כוח מפוצץ ביציאה ממהירות אפס.' },
+                    { name: '8. Standing Calf Raises (עליות תאומים עם משקל)', duration: '4 סטים של 15 חזרות', desc: 'חיזוק השוקיים לקפיצות ויציאות מהירות.' },
+                    { name: '9. Cable Woodchoppers (פיתול כבל אלכסוני)', duration: '3 סטים של 12 לכל צד', desc: 'חיזוק הליבה הסיבובית עבור חבטות עוצמתיות.' },
+                    { name: '10. Hanging Leg Raises (הרמת רגליים בתלייה)', duration: '3 סטים של 12 חזרות', desc: 'חיזוק שרירי הבטן התחתונה ומתני-כסל.' },
+                    { name: '11. Dumbbell Farmer Walk (הליכת איכר עם משקולות)', duration: '3 סטים של 40 מטר', desc: 'חיזוק אחיזת היד, הכתפיים והיציבות הכללית.' },
+                    // Stretches & Recovery (12-15)
+                    { name: '12. Lying Hamstring Stretch with Band (מתיחת המסטרינגס בלהק)', duration: '2 דקות לכל רגל', desc: 'שחרור השריר האחורי מעומס הדדליפט.' },
+                    { name: '13. Foam Roller / Quad Stretch (מתיחה ועיסוי קוואדס)', duration: '3 דקות', desc: 'שחרור נוקשות מהארבע-ראשי.' },
+                    { name: '14. Standing Glute Stretch (מתיחת ישבן בעמידה)', duration: '2 דקות לכל צד', desc: 'שחרור השרירים העמוקים שפעלו בסקוואט.' },
+                    { name: '15. Child\'s Pose with Lower Back Stretch (תנוחת הילד לגב)', duration: '3 דקות', desc: 'הרפיה מלאה של עמוד השדרה והגב התחתון.' }
+                ]
+            },
+
+            // --- CHANGE OF DIRECTION ---
+            {
+                id: 'cod-agility-pro',
+                title: 'שינוי מקום ומצב במהירות (15 תרגילים)',
+                category: 'שינויי כיוון',
+                duration: '55 דק\'',
+                level: 'Elite Pro 7-Days',
+                icon: 'fa-arrows-split-up-and-left',
+                color: 'text-amber-300',
+                bgColor: 'bg-amber-400/10',
+                borderColor: 'border-amber-400/30',
+                desc: 'אימון שינויי כיוון, יציאות משכיבה, בלימות חירום ומתיחות שחרור מקיפות (15 תרגילים).',
+                exercises: [
+                    // Warmup (1-3)
+                    { name: '1. Light Jog to Carioca (ריצה קלה והצלבות)', duration: '3 דקות', desc: 'חימום רב-כיווני דינמי.' },
+                    { name: '2. Dynamic Ankle & Hip Mobilization (חימום קרסול ואגן)', duration: '3 דקות', desc: 'הכנת המפרקים לזיוויות בלימה חדות.' },
+                    { name: '3. Lateral High Knees (ברכיים למעלה בתנועה צדית)', duration: '2 דקות', desc: 'הגברת דופק והורדת זמן מגע בקרקע.' },
+                    // Core Drills (4-11)
+                    { name: '4. Prone Start Sprints (זינוק משכיבה על הבטן)', duration: '6 חזרות של 10 מטר', desc: 'שכיבה מלאה, קימה כבזק וספרינט מלא.' },
+                    { name: '5. 5-10-5 Pro Agility Shuttle (שאטל 5-10-5)', duration: '5 סטים מלאים', desc: 'ריצה צדית של 5m, נגיעה בקו, ספרינט מנוגד של 10m וחזרה.' },
+                    { name: '6. Hard Deceleration & Plant Step (בלימת חירום וכיוון)', duration: '5 סטים לכל צד', desc: 'ספרינט מלא ועצירה מוחלטת בצעד אחד נמוך לשינוי כיוון.' },
+                    { name: '7. T-Drill Sprint & Backpedal (אימון T מלא)', duration: '4 סטים', desc: 'ספרינט קדימה, צעדי רדיפה ימינה/שמאלה, וריצה אחורנית.' },
+                    { name: '8. Supine Start Sprint (זינוק משכיבה על הגב)', duration: '5 חזרות', desc: 'שכיבה על הגב, התהפכות מהירה ושיגור בספרינט.' },
+                    { name: '9. Figure 8 Cone Sprint (ספרינט בצורת שמונה בין קונוסים)', duration: '4 סטים', desc: 'שמירה על מרכז כובד נמוך בפניות חדות.' },
+                    { name: '10. Z-Drill Agility Runs (ריצת זיגזג Z צפופה)', duration: '4 סטים', desc: 'שינויי כיוון באלכסונים חדים מול קונוסים.' },
+                    { name: '11. Reactive Partner Command Starts (זינוק לפי אות קולי)', duration: '5 חזרות', desc: 'תגובה מיידית לשריקה/פקודה ויציאה לכיוון המצוין.' },
+                    // Stretches & Recovery (12-15)
+                    { name: '12. Adductor Butterfly Stretch (מתיחת מקרבים בפרפר)', duration: '3 דקות', desc: 'שחרור המפשעה לאחר שינויי כיוון חדים.' },
+                    { name: '13. Standing Calf & Achilles Stretch (מתיחת תאומים ואכילס)', duration: '2 דקות לכל רגל', desc: 'שחרור השוקיים שבלמו את התנועה.' },
+                    { name: '14. Seated Torso Twist Stretch (מתיחת פיתול גו בישיבה)', duration: '2 דקות לכל צד', desc: 'שחרור הגב התחתון מהשינויים המהירים.' },
+                    { name: '15. Lie-Down Legs Up Wall (הנחת רגליים על קיר לשחרור)', duration: '3 דקות', desc: 'הזרמת דם חזרה ללב והתאוששות מלאה.' }
+                ]
+            },
+
+            // --- STRETCHES & RECOVERY ---
+            {
+                id: 'stretches-deep-pro',
+                title: 'סשן מתיחות עמוקות, גמישות & ניוד (15 תרגילים)',
+                category: 'מתיחות',
+                duration: '45 דק\'',
+                level: 'Pro Recovery',
+                icon: 'fa-child-reaching',
+                color: 'text-purple-300',
+                bgColor: 'bg-purple-500/10',
+                borderColor: 'border-purple-500/30',
+                desc: 'תוכנית מתיחות אולטימטיבית ב-15 שלבים לשחרור מוחלט, גמישות והתאוששות מלאה לשחקני עלית.',
+                exercises: [
+                    { name: '1. Standing Dynamic Neck & Shoulder Rolls', duration: '2 דקות', desc: 'שחרור מתחים מהצוואר והכתפיים.' },
+                    { name: '2. Standing Side Bends (כפילה צדית בעמידה)', duration: '2 דקות', desc: 'מתיחת השרירים הבין-צלעיים והמותניים.' },
+                    { name: '3. Dynamic Cat-Cow Stretch (חתול-פרה לשדרה)', duration: '3 דקות', desc: 'ניוד עמוד השדרה והגב התחתון.' },
+                    { name: '4. Standing Hamstring Stretch (מתיחת המסטרינגס)', duration: '2 דקות לכל רגל', desc: 'שחרור השרשרת האחורית.' },
+                    { name: '5. Deep Butterfly Stretch (מתיחת פרפר עמוקה)', duration: '3 דקות', desc: 'פתיחת מקרבי הירך והמפשעה.' },
+                    { name: '6. Couch Stretch / Quads (מתיחת ארבע-ראשי עמוקה)', duration: '2 דקות לכל צד', desc: 'מתיחה ממוקדת לקדמת הירך.' },
+                    { name: '7. Pigeon Pose (תנוחת היונה לאגן)', duration: '2.5 דקות לכל צד', desc: 'פתיחת האגן ושחרור הגלוטאוס.' },
+                    { name: '8. Cobra Pose (תנוחת הקוברה לפתיחת בטן)', duration: '2 דקות', desc: 'מתיחת שרירי הבטן ובית החזה.' },
+                    { name: '9. Child\'s Pose with Side Stretch (תנוחת הילד)', duration: '3 דקות', desc: 'שחרור הגב התחתון והלטים.' },
+                    { name: '10. Seated Spinal Twist (פיתול גו בישיבה)', duration: '2 דקות לכל צד', desc: 'שחרור חוליות הגב והישבן.' },
+                    { name: '11. Wall Calf & Soleus Stretch (מתיחת תאומים מול קיר)', duration: '2 דקות לכל רגל', desc: 'שחרור מקיף לשוקיים.' },
+                    { name: '12. Tennis Elbow Forearm Stretch (מתיחת אמות היד)', duration: '2 דקות לכל זרוע', desc: 'מתיחה ממוקדת למניעת מרפק טניס.' },
+                    { name: '13. Cross-Body Shoulder Stretch (מתיחת כתף אחורית)', duration: '2 דקות לכל זרוע', desc: 'שחרור הכתפיים מחבטות.' },
+                    { name: '14. Happy Baby Pose (תנוחת תינוק מאושר)', duration: '2 דקות', desc: 'שחרור מפרקי הירך והגב התחתון.' },
+                    { name: '15. Savasana Corpse Pose (הרפיה מלאה ונשימה)', duration: '4 דקות', desc: 'הרגעה מוחלטת של מערכת העצבים.' }
+                ]
+            }
+        ];
+
+        // State Management
+        let currentSection = 'home';
+        let currentFilter = 'הכל';
+        let workoutHistory = [];
+
+        try {
+            workoutHistory = JSON.parse(localStorage.getItem('mukhtar_fit_history') || '[]');
+        } catch(e) {
+            workoutHistory = [];
+        }
+
+        let timerInterval = null;
+        let timerState = {
+            isRunning: false,
+            phase: 'work',
+            timeRemaining: 45,
+            currentRound: 1,
+            totalRounds: 10,
+            workTime: 45,
+            restTime: 15
+        };
+
+        // App Initialization
+        window.onload = function() {
+            renderWorkouts();
+            updateHistoryUI();
+        };
+
+        // Navigation Management
+        function showSection(sectionId) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById(`sec-${sectionId}`);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+            currentSection = sectionId;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function filterWorkouts(category) {
+            currentFilter = category;
+            showSection('workouts');
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.innerText.includes(category) || (category === 'הכל' && btn.innerText === 'הכל')) {
+                    btn.className = 'filter-btn active px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-green-500 text-slate-950';
+                } else {
+                    btn.className = 'filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-slate-300 hover:bg-slate-700';
+                }
+            });
+
+            renderWorkouts();
+        }
+
+        // Render Workouts Grid
+        function renderWorkouts() {
+            const grid = document.getElementById('workouts-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const filtered = currentFilter === 'הכל' 
+                ? workoutsData 
+                : workoutsData.filter(w => w.category === currentFilter);
+
+            filtered.forEach(w => {
+                const card = document.createElement('div');
+                card.className = `glass-card p-6 rounded-3xl flex flex-col justify-between border ${w.borderColor} transition-all hover:-translate-y-1`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-bold px-3 py-1 rounded-full ${w.bgColor} ${w.color} border ${w.borderColor}">
+                                ${w.category}
+                            </span>
+                            <span class="text-xs text-slate-400 font-medium">
+                                <i class="fa-regular fa-clock ml-1"></i> ${w.duration}
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 flex items-center gap-2">
+                            <i class="fa-solid ${w.icon} ${w.color}"></i> ${w.title}
+                        </h3>
+                        <p class="text-slate-400 text-xs mb-6 leading-relaxed">${w.desc}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-4 pt-4 border-t border-slate-800">
+                            <span>דרגה: <strong class="text-lime-400 font-extrabold">${w.level}</strong></span>
+                            <span>תרגילים: <strong class="text-slate-200">${w.exercises.length}</strong></span>
+                        </div>
+                        <button onclick="openWorkoutModal('${w.id}')" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play text-green-400"></i> הצג אימון מלא
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Modal Logic
+        function openWorkoutModal(workoutId) {
+            const workout = workoutsData.find(w => w.id === workoutId);
+            if (!workout) return;
+
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl ${workout.bgColor} ${workout.color} flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid ${workout.icon}"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-lime-400 font-bold uppercase tracking-wider">${workout.category}</span>
+                            <h2 class="text-2xl font-black">${workout.title}</h2>
+                        </div>
+                    </div>
+                    <p class="text-slate-300 text-xs md:text-sm leading-relaxed">${workout.desc}</p>
+                    
+                    <div class="flex gap-4 text-xs bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <div>משך: <strong class="text-white">${workout.duration}</strong></div>
+                        <div>רמה: <strong class="text-lime-400">${workout.level}</strong></div>
+                    </div>
+
+                    <h3 class="font-bold text-base pt-2 border-t border-slate-800">תרגילי האימון למקצוענים:</h3>
+                    <div class="space-y-3">
+                        ${workout.exercises.map((ex, idx) => `
+                            <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/80 flex items-start gap-3">
+                                <span class="w-7 h-7 rounded-xl bg-slate-800 text-lime-400 flex items-center justify-center font-bold text-xs shrink-0">${idx + 1}</span>
+                                <div class="space-y-1 w-full">
+                                    <div class="flex items-center justify-between flex-wrap gap-1">
+                                        <h4 class="font-bold text-white text-xs sm:text-sm">${ex.name}</h4>
+                                        <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded bg-slate-800 text-lime-300">${ex.duration}</span>
+                                    </div>
+                                    <p class="text-slate-400 text-xs">${ex.desc}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="pt-4 flex gap-3">
+                        <button onclick="logWorkoutCompleted('${workout.title}', '${workout.category}')" class="flex-1 py-3 bg-green-500 hover:bg-green-400 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-xs sm:text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-check"></i> סמן כאימון שהושלם בהצלחה
+                        </button>
+                        <button onclick="closeModal()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs sm:text-sm">
+                            סגור
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('workout-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('workout-modal').classList.add('hidden');
+        }
+
+        // Custom Workout Generator
+        function generateCustomWorkout(e) {
+            e.preventDefault();
+            const type = document.getElementById('gen-type').value;
+            const level = document.getElementById('gen-level').value;
+            const duration = document.getElementById('gen-duration').value;
+
+            const resDiv = document.getElementById('generated-result');
+            resDiv.classList.remove('hidden');
+
+            let customExercises = [];
+            if (type.includes('ספרינטים')) {
+                customExercises = [
+                    'זינוק משכיבת סמיכה לספרינט 15 מטר ב-100% מאמץ',
+                    'ספרינט עם התנגדות גומייה רציפה (5 סטים)',
+                    'Flying 20m Sprints עם כניסה בתנופה',
+                    'ריצת זיגזג מהירה בין 6 קונוסים'
+                ];
+            } else if (type.includes('סולמות')) {
+                customExercises = [
+                    'Icky Shuffle אולטרה מהיר לאורך כל הסולם',
+                    'כניסה ויציאה צדית (In-and-Out Lateral Feet)',
+                    'Ali Shuffle מהיר + יציאה לספרינט בסוף',
+                    'קפיצות פישוק-סגור ברגל אחת ובשתי רגליים'
+                ];
+            } else if (type.includes('שיווי משקל')) {
+                customExercises = [
+                    'עמידה חד-רגלית על Bosu Ball בעיניים עצומות',
+                    'קפיצה צדית ונחיתה חד-רגלית קפואה (Single-Leg Stick)',
+                    'הגעה חד-רגלית עם משקולת (Dumbbell Single-Leg Reach)',
+                    'הליכת גומייה ליציבות קרסול ומפרק הירך'
+                ];
+            } else if (type.includes('מתפרץ')) {
+                customExercises = [
+                    'Broad Jump לפנים + זינוק לגובה מקסימלי',
+                    'זריקת כדור כוח כבד לאחור מעל הראש',
+                    'קפיצות משוכות רציפות ללא השהיה בקרקע',
+                    'Single-Leg Bounding - זינוקים רציפים לפנים'
+                ];
+            } else if (type.includes('טניס')) {
+                customExercises = [
+                    'Split-step אולטרה מהיר + זינוק 3 מטרים',
+                    'Depth Jumps מספסל לגובה מקסימלי',
+                    'זריקת כדור כוח כבדה בצידי הגוף (Rotational Slam)',
+                    'Suicides קצרים עם עצירה מוחלטת בצעד אחד'
+                ];
+            } else if (type.includes('חדר כושר')) {
+                customExercises = [
+                    'סקוואט כבד עם מוט (5 סטים של 5 חזרות)',
+                    'דדליפט רומני מורכב לשרשרת אחורית',
+                    'לחיצת חזה בשיפוע עם משקולות כבדות',
+                    'פיתול כבלים אלכסוני לכוח סיבובי'
+                ];
+            } else if (type.includes('שינויי כיוון')) {
+                customExercises = [
+                    'זינוק מסיבי משכיבה מלאה על הבטן לספרינט',
+                    'ריצת שינוי כיוון Pro Agility 5-10-5',
+                    'בלימת חירום וכיוון מנוגד (Deceleration Plant)',
+                    'T-Drill ספרינט וצעדי רדיפה צדיים'
+                ];
+            } else {
+                customExercises = [
+                    'מתיחת Hamstrings סטטית ארוכה',
+                    'מתיחת פרפר עמוקה למקרבי ירך',
+                    'Couch Stretch עמוק לארבע-ראשי',
+                    'Cobra Pose לשיחרור גב תחתון וכתפיים'
+                ];
+            }
+
+            resDiv.innerHTML = `
+                <div class="space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-lime-500/30">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <span class="text-xs font-bold text-lime-400 bg-lime-500/10 px-3 py-1 rounded-full border border-lime-500/20">אימון עלית מותאם אישית</span>
+                        <span class="text-xs text-slate-400">${duration} דקות | ${level}</span>
+                    </div>
+                    <h3 class="text-xl font-bold">תוכנית האימון שנוצרה עבורך (${type})</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm text-slate-300">
+                        ${customExercises.map(ex => `<li class="flex items-center gap-2"><i class="fa-solid fa-bolt text-lime-400"></i> ${ex}</li>`).join('')}
+                    </ul>
+                    <button onclick="logWorkoutCompleted('אימון מותאם: ${type}', '${type}')" class="w-full mt-2 py-3 bg-gradient-to-r from-lime-400 to-green-500 text-slate-950 font-bold rounded-xl text-xs hover:scale-105 transition-all">
+                        סמן כאימון שהושלם בהצלחה
+                    </button>
+                </div>
+            `;
+        }
+
+        // Interval Timer Logic
+        function toggleTimer() {
+            if (timerState.isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            timerState.workTime = parseInt(document.getElementById('cfg-work').value) || 45;
+            timerState.restTime = parseInt(document.getElementById('cfg-rest').value) || 15;
+            timerState.totalRounds = parseInt(document.getElementById('cfg-rounds').value) || 10;
+
+            if (!timerState.isRunning && timerState.timeRemaining === 45) {
+                timerState.timeRemaining = timerState.workTime;
+            }
+
+            timerState.isRunning = true;
+            document.getElementById('timer-icon').className = 'fa-solid fa-pause';
+
+            timerInterval = setInterval(() => {
+                timerState.timeRemaining--;
+
+                if (timerState.timeRemaining < 0) {
+                    if (timerState.phase === 'work') {
+                        timerState.phase = 'rest';
+                        timerState.timeRemaining = timerState.restTime;
+                    } else {
+                        timerState.phase = 'work';
+                        timerState.currentRound++;
+                        if (timerState.currentRound > timerState.totalRounds) {
+                            resetTimer();
+                            return;
+                        }
+                        timerState.timeRemaining = timerState.workTime;
+                    }
+                }
+                updateTimerUI();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            timerState.isRunning = false;
+            clearInterval(timerInterval);
+            document.getElementById('timer-icon').className = 'fa-solid fa-play';
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerState.phase = 'work';
+            timerState.currentRound = 1;
+            timerState.timeRemaining = parseInt(document.getElementById('cfg-work').value) || 45;
+            updateTimerUI();
+        }
+
+        function updateTimerUI() {
+            const mins = Math.floor(timerState.timeRemaining / 60).toString().padStart(2, '0');
+            const secs = (timerState.timeRemaining % 60).toString().padStart(2, '0');
+            
+            document.getElementById('timer-time').innerText = `${mins}:${secs}`;
+            document.getElementById('timer-round').innerText = `סבב ${timerState.currentRound} מתוך ${timerState.totalRounds}`;
+            
+            const phaseLabel = document.getElementById('timer-phase');
+            const bg = document.getElementById('timer-display-bg');
+
+            if (timerState.phase === 'work') {
+                phaseLabel.innerText = 'עבודת קצה - 100% מאמץ!';
+                phaseLabel.className = 'text-xs font-bold tracking-widest uppercase text-lime-400 mb-1';
+                bg.className = 'relative w-64 h-64 mx-auto flex flex-col items-center justify-center rounded-full border-8 border-lime-400/50 bg-slate-950/50 shadow-inner';
+            } else {
+                phaseLabel.innerText = 'מנוחה ונשימה';
+                phaseLabel.className = 'text-xs font-bold tracking-widest uppercase text-blue-400 mb-1';
+                bg.className = 'relative w-64 h-64 mx-auto flex flex-col items-center justify-center rounded-full border-8 border-blue-500/40 bg-slate-950/50 shadow-inner';
+            }
+        }
+
+        // History Tracker
+        function logWorkoutCompleted(title, category) {
+            const entry = {
+                title,
+                category,
+                date: new Date().toLocaleDateString('he-IL', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            workoutHistory.unshift(entry);
+            try {
+                localStorage.setItem('mukhtar_fit_history', JSON.stringify(workoutHistory));
+            } catch(e){}
+            
+            updateHistoryUI();
+            closeModal();
+            showSection('stats');
+        }
+
+        function updateHistoryUI() {
+            document.getElementById('stat-total').innerText = workoutHistory.length;
+            document.getElementById('stat-time').innerText = `${workoutHistory.length * 45} דקות`;
+            
+            const sprintCount = workoutHistory.filter(h => h.category.includes('ספרינט') || h.category.includes('סולמ')).length;
+            document.getElementById('stat-sprints').innerText = sprintCount;
+
+            const gymCount = workoutHistory.filter(h => h.category.includes('כושר') || h.category.includes('כוח')).length;
+            document.getElementById('stat-gym').innerText = gymCount;
+
+            const list = document.getElementById('history-list');
+            if (!list) return;
+
+            if (workoutHistory.length === 0) {
+                list.innerHTML = `<div class="p-6 text-center text-slate-500 text-sm">טרם ביצעת אימונים. בחר אימון והתחל לעבוד!</div>`;
+                return;
+            }
+
+            list.innerHTML = workoutHistory.map(item => `
+                <div class="p-4 flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-200">${item.title}</h4>
+                        <span class="text-xs text-slate-500">${item.date}</span>
+                    </div>
+                    <span class="text-xs px-2.5 py-1 rounded-full ${item.category.includes('ספרינט') ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 'bg-slate-800 text-slate-300'} font-bold">
+                        ${item.category}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            workoutHistory = [];
+            try {
+                localStorage.removeItem('mukhtar_fit_history');
+            } catch(e){}
+            updateHistoryUI();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitHome Israel - תוכנית אימונים ביתית מלאה</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tone.js Sound FX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                        heading: ['Rubik', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        },
+                        cyanAccent: '#0ea5e9',
+                        darkCard: '#1e293b',
+                        darkBg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .gradient-brand {
+            background: linear-gradient(135deg, #22c55e 0%, #0ea5e9 100%);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        @keyframes pulseBorder {
+            0%, 100% { border-color: rgba(34, 197, 94, 0.3); }
+            50% { border-color: rgba(34, 197, 94, 0.9); }
+        }
+        .animate-pulse-border {
+            animation: pulseBorder 2.5s infinite ease-in-out;
+        }
+        .timer-ring {
+            transition: stroke-dashoffset 0.3s linear;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-black">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="sticky top-0 z-40 glass-card border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="scrollToTop()">
+                <div class="w-10 h-10 rounded-xl gradient-brand flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-green-500/20">
+                    <i class="fa-solid fa-dumbbell"></i>
+                </div>
+                <div>
+                    <span class="text-xl sm:text-2xl font-black font-heading tracking-tight text-white">Fit<span class="text-brand-500">Home</span></span>
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400 block -mt-1">אימונים אינטנסיביים לבית</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-300">
+                <a href="#program-section" class="hover:text-brand-500 transition-colors">התוכנית השבועית שלי</a>
+                <a href="#stats-section" class="hover:text-brand-500 transition-colors">יומן מעקב</a>
+                <a href="#library-section" class="hover:text-brand-500 transition-colors">מאגר תרגילים</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <button onclick="resetQuestionnaire()" class="glass-card hover:bg-slate-800 text-slate-200 text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-700 flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-rotate-right text-brand-500"></i>
+                    <span>שאלון מחדש</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow space-y-10">
+
+        <!-- 1. INITIAL QUESTIONNAIRE / WIZARD -->
+        <section id="wizard-section" class="max-w-3xl mx-auto my-4">
+            <div class="glass-card rounded-3xl p-6 sm:p-10 border border-slate-700 shadow-2xl relative overflow-hidden animate-pulse-border">
+                
+                <!-- Wizard Header -->
+                <div class="text-center mb-8">
+                    <span class="text-xs font-black uppercase text-brand-500 tracking-wider bg-brand-500/10 px-3.5 py-1 rounded-full border border-brand-500/20">שאלון אבחון כושר אישי</span>
+                    <h1 class="text-2xl sm:text-4xl font-black font-heading text-white mt-3">בניית תוכנית אימונים באורך ריאלי</h1>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-2">נעבור מספר שאלות כדי להתאים אימון שמכיל חימום, סבבי עבודה מלאים, מנוחות ומתיחות!</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-800 h-2 rounded-full mt-6 overflow-hidden">
+                        <div id="wizard-progress" class="gradient-brand h-full transition-all duration-300" style="width: 14%;"></div>
+                    </div>
+                    <span class="text-[11px] font-bold text-slate-400 block mt-2">שלב <span id="current-step-lbl" class="text-brand-500">1</span> מתוך 7</span>
+                </div>
+
+                <!-- STEP 1: GENDER -->
+                <div id="q-step-1" class="q-step space-y-4">
+                    <h3 class="text-lg font-bold text-slate-200 text-center"><i class="fa-solid fa-user-group text-brand-500 ml-2"></i>1. עבור מי מיועדת התוכנית?</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <button type="button" onclick="setWizardData('gender', 'women', this)" class="q-opt p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-venus text-3xl text-pink-400 mb-2 block"></i>
+                            <span class="font-bold text-sm text-white block">נשים</span>
+                            <span class="text-[11px] text-slate-400">דגש חיטוב, ישבן, ליבה וסיבולת</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('gender', 'men', this)" class="q-opt p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-mars text-3xl text-cyan-400 mb-2 block"></i>
+                            <span class="font-bold text-sm text-white block">גברים</span>
+                            <span class="text-[11px] text-slate-400">דגש היפרטרופיה, חזה, כתפיים וליבה</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('gender', 'all', this)" class="q-opt p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-genderless text-3xl text-emerald-400 mb-2 block"></i>
+                            <span class="font-bold text-sm text-white block">אחר / לכולם</span>
+                            <span class="text-[11px] text-slate-400">אימון מאוזן ומקיף לכל שרירי הגוף</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: FITNESS LEVEL -->
+                <div id="q-step-2" class="q-step hidden space-y-4">
+                    <h3 class="text-lg font-bold text-slate-200 text-center"><i class="fa-solid fa-gauge-high text-brand-500 ml-2"></i>2. מהי רמת הכושר הנוכחית שלך?</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button type="button" onclick="setWizardData('level', 'beginner', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all">
+                            <span class="font-bold text-sm text-emerald-400 block mb-1">מתחיל / מתחילה</span>
+                            <span class="text-[11px] text-slate-400">ללא ניסיון או לאחר הפסקה ממושכת. מנוחות ארוכות יותר וקצב מבוקר.</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('level', 'intermediate', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all">
+                            <span class="font-bold text-sm text-cyan-400 block mb-1">בינוני / בינונית</span>
+                            <span class="text-[11px] text-slate-400">מתאמן/ת באופן סדיר, שולט/ת בטכניקות הבסיס ומחפש/ת אתגר סדיר.</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('level', 'advanced', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all">
+                            <span class="font-bold text-sm text-purple-400 block mb-1">מתקדם / מתקדמת</span>
+                            <span class="text-[11px] text-slate-400">כושר גבוה, נפח עבודה אינטנסיבי, מנוחות קצרות וסבבים מרובים.</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: MAIN GOAL -->
+                <div id="q-step-3" class="q-step hidden space-y-4">
+                    <h3 class="text-lg font-bold text-slate-200 text-center"><i class="fa-solid fa-bullseye text-brand-500 ml-2"></i>3. מה מטרת האימון המרכזית?</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button type="button" onclick="setWizardData('goal', 'fat_burn', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all flex items-center gap-3">
+                            <i class="fa-solid fa-fire text-2xl text-amber-500 shrink-0"></i>
+                            <div>
+                                <span class="font-bold text-sm text-white block">חיטוב וירידה במשקל</span>
+                                <span class="text-[11px] text-slate-400">אימון דינמי להעלאת דופק ושריפת קלוריות מוגברת</span>
+                            </div>
+                        </button>
+                        <button type="button" onclick="setWizardData('goal', 'muscle_build', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all flex items-center gap-3">
+                            <i class="fa-solid fa-dumbbell text-2xl text-emerald-400 shrink-0"></i>
+                            <div>
+                                <span class="font-bold text-sm text-white block">בניית שריר וחיזוק</span>
+                                <span class="text-[11px] text-slate-400">תרגילי כוח מורכבים ועבודה תחת עומס</span>
+                            </div>
+                        </button>
+                        <button type="button" onclick="setWizardData('goal', 'health', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all flex items-center gap-3">
+                            <i class="fa-solid fa-heart-pulse text-2xl text-rose-400 shrink-0"></i>
+                            <div>
+                                <span class="font-bold text-sm text-white block">כושר כללי ובריאות</span>
+                                <span class="text-[11px] text-slate-400">שיפור הסיבולת, האנרגיה היומית ומערכת הלב-ריאה</span>
+                            </div>
+                        </button>
+                        <button type="button" onclick="setWizardData('goal', 'flexibility', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all flex items-center gap-3">
+                            <i class="fa-solid fa-spa text-2xl text-purple-400 shrink-0"></i>
+                            <div>
+                                <span class="font-bold text-sm text-white block">גמישות, יציבה ומניעת כאבים</span>
+                                <span class="text-[11px] text-slate-400">חיזוק מפרקים, יציבה נכונה ושחרור עומסים</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: DAYS PER WEEK -->
+                <div id="q-step-4" class="q-step hidden space-y-4">
+                    <h3 class="text-lg font-bold text-slate-200 text-center"><i class="fa-solid fa-calendar-days text-brand-500 ml-2"></i>4. כמה ימים בשבוע ברצונך להתאמן?</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        <button type="button" onclick="setWizardData('daysPerWeek', 2, this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <span class="font-black text-xl text-brand-400 block">2</span>
+                            <span class="text-xs text-slate-300">ימים בשבוע</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('daysPerWeek', 3, this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <span class="font-black text-xl text-brand-400 block">3</span>
+                            <span class="text-xs text-slate-300">ימים בשבוע</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('daysPerWeek', 4, this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <span class="font-black text-xl text-brand-400 block">4</span>
+                            <span class="text-xs text-slate-300">ימים בשבוע</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('daysPerWeek', 5, this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <span class="font-black text-xl text-brand-400 block">5</span>
+                            <span class="text-xs text-slate-300">ימים בשבוע</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('daysPerWeek', 6, this)" class="q-opt col-span-2 sm:col-span-1 p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <span class="font-black text-xl text-brand-400 block">6</span>
+                            <span class="text-xs text-slate-300">ימים בשבוע</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 5: REALISTIC SESSION DURATION -->
+                <div id="q-step-5" class="q-step hidden space-y-4">
+                    <h3 class="text-lg font-bold text-slate-200 text-center"><i class="fa-solid fa-stopwatch text-brand-500 ml-2"></i>5. מהו אורך האימון המבוקש בכל סשן?</h3>
+                    <p class="text-xs text-slate-400 text-center -mt-2">הזמן כולל חימום דינמי, סבבים מרובים של תרגילים ומתיחות סיום מלאות.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button type="button" onclick="setWizardData('duration', 20, this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-emerald-400">15 - 20 דקות</span>
+                                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">אינטנסיבי קצר</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 block mt-1">חימום (3 דק') + סבב מרכזי 2 סיבובים + מתיחות (3 דק')</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('duration', 30, this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-cyan-400">25 - 30 דקות</span>
+                                <span class="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full font-bold">מומלץ בינוני</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 block mt-1">חימום (4 דק') + סבב מרכזי 3 סיבובים + מתיחות (4 דק')</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('duration', 40, this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-purple-400">35 - 45 דקות</span>
+                                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-full">מקיף ומלא</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 block mt-1">חימום מורחב + 3-4 סיבובים + מנוחות מובנות + מתיחות</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('duration', 55, this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-right transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-amber-400">50+ דקות</span>
+                                <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full">אימון מקצועי</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 block mt-1">עבודה בעצימות גבוהה, נפח תרגילים מקסימלי לכל שריר</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 6: EQUIPMENT AVAILABLE -->
+                <div id="q-step-6" class="q-step hidden space-y-4">
+                    <h3 class="text-lg font-bold text-slate-200 text-center"><i class="fa-solid fa-toolbox text-brand-500 ml-2"></i>6. איזה ציוד זמין עבורך?</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <button type="button" onclick="setWizardData('equipment', 'none', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-person text-2xl text-brand-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">משקל גוף בלבד</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('equipment', 'bands', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-ribbon text-2xl text-cyan-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">גומיות התנגדות</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('equipment', 'dumbbells', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-dumbbell text-2xl text-purple-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">משקולות / בקבוקים</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('equipment', 'mat_chair', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-chair text-2xl text-amber-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">מזרן / כיסא</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 7: FOCUS AREAS -->
+                <div id="q-step-7" class="q-step hidden space-y-4">
+                    <h3 class="text-lg font-bold text-slate-200 text-center"><i class="fa-solid fa-sliders text-brand-500 ml-2"></i>7. מחיזוק איזה אזור היית רוצה להתחיל?</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <button type="button" onclick="setWizardData('focus', 'core', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-circle-dot text-2xl text-emerald-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">בטן וליבה</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('focus', 'legs', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-person-running text-2xl text-cyan-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">רגליים וישבן</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('focus', 'upper', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-child-reaching text-2xl text-purple-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">פלג גוף עליון</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('focus', 'cardio', this)" class="q-opt p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-fire text-2xl text-amber-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">אירובי וחיטוב</span>
+                        </button>
+                        <button type="button" onclick="setWizardData('focus', 'full', this)" class="q-opt col-span-2 sm:col-span-2 p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500 text-center transition-all">
+                            <i class="fa-solid fa-child text-2xl text-pink-400 mb-2 block"></i>
+                            <span class="font-bold text-xs text-white block">גוף מלא (Full Body)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between mt-8 pt-4 border-t border-slate-800">
+                    <button id="btn-wiz-back" onclick="wizardStepBack()" class="text-slate-400 hover:text-white font-bold text-xs px-4 py-2 invisible">
+                        <i class="fa-solid fa-arrow-right ml-1"></i> חזור
+                    </button>
+                    <button id="btn-wiz-next" onclick="wizardStepNext()" disabled class="gradient-brand text-slate-950 font-black text-xs px-6 py-3 rounded-xl shadow-lg shadow-green-500/20 disabled:opacity-40 disabled:cursor-not-allowed">
+                        להמשך <i class="fa-solid fa-arrow-left mr-1"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- 2. PROGRAM DASHBOARD & SCHEDULE -->
+        <section id="program-section" class="hidden space-y-8">
+            
+            <!-- Summary Banner -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-brand-500/40 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/20 text-brand-400 text-xs font-black mb-3 border border-brand-500/30">
+                            <i class="fa-solid fa-circle-check"></i> תוכנית האימונים המלאה שודרגה בהצלחה!
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-black font-heading text-white">הלו"ז השבועי שלך - אימונים מלאים בזמן אמת</h2>
+                        <p id="user-summary-text" class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed max-w-3xl"></p>
+                    </div>
+
+                    <button onclick="resetQuestionnaire()" class="glass-card hover:bg-slate-800 text-slate-300 font-bold text-xs px-4 py-3 rounded-xl border border-slate-700 flex items-center gap-2 shrink-0 self-start md:self-center">
+                        <i class="fa-solid fa-sliders text-brand-500"></i>
+                        <span>שינוי העדפות בשאלון</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- WEEKLY DAYS SCHEDULE (7 DAYS GRID) -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-black font-heading text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-week text-brand-500"></i>
+                        תוכנית 7 ימים שבועית (<span id="schedule-days-count" class="text-brand-500">3</span> ימי אימון פעילים)
+                    </h3>
+                </div>
+
+                <div id="weekly-schedule-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards dynamically rendered by JavaScript -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 3. PROGRESS TRACKER STATS -->
+        <section id="stats-section" class="hidden">
+            <h3 class="text-xl font-black font-heading text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-chart-line text-brand-500"></i>
+                יומן מעקב והתקדמות אישית
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="glass-card p-5 rounded-2xl text-center border border-slate-800">
+                    <i class="fa-solid fa-trophy text-3xl text-amber-400 mb-2"></i>
+                    <span id="stat-completed-val" class="block text-3xl font-black text-white">0</span>
+                    <span class="text-xs text-slate-400">אימונים מלאים שהושלמו</span>
+                </div>
+                <div class="glass-card p-5 rounded-2xl text-center border border-slate-800">
+                    <i class="fa-solid fa-clock text-3xl text-cyan-400 mb-2"></i>
+                    <span id="stat-minutes-val" class="block text-3xl font-black text-white">0</span>
+                    <span class="text-xs text-slate-400">דקות אימון מצטברות</span>
+                </div>
+                <div class="glass-card p-5 rounded-2xl text-center border border-slate-800">
+                    <i class="fa-solid fa-bolt text-3xl text-brand-400 mb-2"></i>
+                    <span id="stat-streak-val" class="block text-3xl font-black text-white">1</span>
+                    <span class="text-xs text-slate-400">רצף ימי התמדה</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. EXERCISE LIBRARY REFERENCE -->
+        <section id="library-section" class="hidden">
+            <h3 class="text-xl font-black font-heading text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-book-bookmark text-brand-500"></i>
+                ספריית התרגילים המלאה
+            </h3>
+            <div id="exercise-library-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- 5. PRE-WORKOUT DETAILS MODAL -->
+    <div id="pre-workout-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+        <div class="bg-slate-900 rounded-3xl max-w-2xl w-full border border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <div class="p-5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <span id="pre-day-lbl" class="text-[10px] font-black uppercase text-brand-400 bg-brand-500/10 px-2.5 py-0.5 rounded-full border border-brand-500/20">יום 1</span>
+                    <h3 id="pre-title-lbl" class="text-lg font-black text-white mt-1">שם האימון</h3>
+                </div>
+                <button onclick="closePreWorkoutModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-grow text-xs sm:text-sm">
+                
+                <!-- Calculation breakdown -->
+                <div class="bg-slate-950 rounded-2xl p-4 border border-brand-500/30 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <span class="text-slate-400 block text-[11px]">זמן אימון כולל מחושב</span>
+                        <span id="pre-calc-total-time" class="text-2xl font-black text-brand-400">28 דקות</span>
+                    </div>
+                    <div class="flex gap-4 text-center border-r border-slate-800 pr-4">
+                        <div>
+                            <span class="text-slate-400 text-[10px] block">סבבים מרכזיים</span>
+                            <span id="pre-calc-rounds" class="font-black text-white">3 סיבובים</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 text-[10px] block">סה"כ תרגילים</span>
+                            <span id="pre-calc-ex-count" class="font-black text-white">12 תרגילים</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Structure Breakdown -->
+                <div class="space-y-4">
+                    <h4 class="font-bold text-white text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-brand-500"></i> מבנה האימון המפורט:
+                    </h4>
+
+                    <!-- Warmup Section -->
+                    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                        <div class="flex items-center justify-between font-bold text-amber-400 text-xs mb-2">
+                            <span><i class="fa-solid fa-fire-flame-curved ml-1"></i> שלב 1: חימום דינמי</span>
+                            <span id="pre-warmup-dur">4 דקות</span>
+                        </div>
+                        <ul id="pre-warmup-list" class="space-y-1.5 text-slate-300 text-xs list-disc list-inside"></ul>
+                    </div>
+
+                    <!-- Main Work Section -->
+                    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                        <div class="flex items-center justify-between font-bold text-emerald-400 text-xs mb-2">
+                            <span><i class="fa-solid fa-dumbbell ml-1"></i> שלב 2: סבב עבודה מרכזי (מבוצע ברוטציה)</span>
+                            <span id="pre-main-dur">20 דקות</span>
+                        </div>
+                        <ul id="pre-main-list" class="space-y-1.5 text-slate-300 text-xs list-disc list-inside"></ul>
+                    </div>
+
+                    <!-- Cooldown Section -->
+                    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                        <div class="flex items-center justify-between font-bold text-purple-400 text-xs mb-2">
+                            <span><i class="fa-solid fa-spa ml-1"></i> שלב 3: שחרור ומתיחות</span>
+                            <span id="pre-cool-dur">4 דקות</span>
+                        </div>
+                        <ul id="pre-cool-list" class="space-y-1.5 text-slate-300 text-xs list-disc list-inside"></ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-end">
+                <button onclick="startWorkoutPlayerNow()" class="w-full sm:w-auto gradient-brand text-slate-950 font-black px-8 py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-green-500/20">
+                    <i class="fa-solid fa-play"></i> התחל אימון בלייב עכשיו
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- 6. LIVE INTERACTIVE WORKOUT PLAYER MODAL -->
+    <div id="player-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+        <div class="bg-slate-900 rounded-3xl max-w-2xl w-full border border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
+            
+            <!-- Player Top Bar -->
+            <div class="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <span id="player-section-tag" class="text-[10px] font-black uppercase text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">חימום</span>
+                    <h3 id="player-workout-name" class="text-base font-black text-white mt-1">שם האימון</h3>
+                </div>
+                <button onclick="closeWorkoutPlayer()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Player Content Body -->
+            <div class="p-5 overflow-y-auto space-y-5 flex-grow">
+
+                <!-- Visual Exercise Illustration / Diagram Box -->
+                <div id="player-exercise-card" class="bg-slate-950 rounded-2xl p-6 border border-slate-800 flex flex-col items-center justify-center text-center relative overflow-hidden transition-all">
+                    
+                    <!-- SVG Visual Pose Indicator -->
+                    <div id="player-pose-box" class="w-28 h-28 rounded-full bg-brand-500/10 border-2 border-brand-500/40 flex items-center justify-center text-brand-400 text-5xl mb-3 animate-pulse">
+                        <i id="player-exercise-icon" class="fa-solid fa-person-running"></i>
+                    </div>
+
+                    <h4 id="player-exercise-title" class="text-xl font-black text-white">שם התרגיל</h4>
+                    <p id="player-round-indicator" class="text-xs font-bold text-slate-400 mt-1">סיבוב 1 מתוך 3</p>
+                </div>
+
+                <!-- Clock & Circular Timer -->
+                <div class="bg-slate-950 rounded-2xl p-4 text-center border border-slate-800 flex flex-col items-center justify-center">
+                    <div id="player-phase-label" class="text-xs font-black uppercase tracking-widest text-emerald-400 mb-1">עבודה רציפה</div>
+                    
+                    <div class="text-5xl font-black font-mono tracking-widest text-white my-1" id="player-timer-clock">00:45</div>
+
+                    <!-- Controls -->
+                    <div class="flex items-center justify-center gap-3 mt-4">
+                        <button onclick="prevExercise()" class="p-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs" title="תרגיל קודם">
+                            <i class="fa-solid fa-backward-step"></i>
+                        </button>
+                        <button id="btn-player-toggle" onclick="togglePlayerTimer()" class="gradient-brand text-slate-950 font-black px-8 py-3 rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-green-500/20">
+                            <i id="player-play-icn" class="fa-solid fa-play"></i>
+                            <span id="player-play-txt">התחל</span>
+                        </button>
+                        <button onclick="nextExercise()" class="p-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs" title="תרגיל הבא">
+                            <i class="fa-solid fa-forward-step"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Exercise Form Guidance -->
+                <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+                    <h5 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-lightbulb"></i> דגשי טכניקה וביצוע נכון
+                    </h5>
+                    <p id="player-exercise-tip" class="text-xs text-slate-300 leading-relaxed">הוראות ביצוע מפורטות יופיעו כאן.</p>
+                </div>
+
+            </div>
+
+            <!-- Player Footer -->
+            <div class="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs">
+                <span id="player-progress-txt" class="text-slate-400 font-medium">תרגיל 1 מתוך 12</span>
+                <button onclick="finishWorkout()" class="bg-brand-500/20 text-brand-400 hover:bg-brand-500 hover:text-slate-950 font-bold px-4 py-2 rounded-xl transition-all border border-brand-500/30">
+                    <i class="fa-solid fa-check ml-1"></i> סיום אימון
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-6 text-center text-slate-500 text-xs">
+        <p class="font-bold text-slate-400">FitHome Israel • מאמן כושר ביתי חכם בעברית מלאה</p>
+        <p class="text-[11px] text-slate-600 mt-1">יש להתאמן בהתאם ליכולת האישית ובסביבה בטוחה. © 2026</p>
+    </footer>
+
+
+    <!-- JAVASCRIPT APP ENGINE -->
+    <script>
+        // --- MASTER EXERCISE DATABASE WITH CATEGORIES ---
+        const exercisesDB = {
+            warmup: [
+                { id: 'w1', name: 'סיבובי זרועות וכתפיים', duration: 40, icon: 'fa-child-reaching', tip: 'עמדו בפישוק קל, סובבו זרועות לפנים ולאחור באופן חופשי לחימום מפרק הכתף.' },
+                { id: 'w2', name: 'הנפות רגליים דינמיות', duration: 40, icon: 'fa-person-running', tip: 'הניפו רגל לפנים ולאחור לסירוגין לפתיחת מפרק הירך והאמסטרינג.' },
+                { id: 'w3', name: 'ריצה קלה במקום / צעדים מהירים', duration: 45, icon: 'fa-person-walking', tip: 'קצב קל להעלאת חום הגוף, דופק ומחזור הדם.' },
+                { id: 'w4', name: 'סיבובי אגן וטורסו', duration: 40, icon: 'fa-person-walking-arrow-loop-left', tip: 'סובבו את האגן והגב העליון מצד לצד בצורה מבוקרת לשחרור הליבה.' }
+            ],
+            main: [
+                { id: 'm1', name: 'סקוואט קלאסי (Squats)', duration: 45, icon: 'fa-person-walking-arrow-loop-left', tip: 'גב ישר, רדו כמו ישיבה על כיסא לאחור, משקל על העקבים, ברכיים פונות לכיוון אצבעות הרגליים.' },
+                { id: 'm2', name: 'שקיעות סמיכה (Push-Ups)', duration: 45, icon: 'fa-mat', tip: 'גוף ישר בקו אחד, בטן מכווצת. רדו עד שהחזה כמעט נוגע ברצפה (ניתן לבצע על ברכיים).' },
+                { id: 'm3', name: 'לאנג\'ים לאחור לסירוגין', duration: 45, icon: 'fa-person-running', tip: 'צעד רחב לאחור, כיפוף 90 מעלות בברכיים. שמרו על גו זקוף.' },
+                { id: 'm4', name: 'פלאנק סטטי על אמות (Plank)', duration: 45, icon: 'fa-grip-lines', tip: 'הישענו על האמות, בטן וישבן מכווצים חזק, ללא שקיעה של הגב התחתון.' },
+                { id: 'm5', name: 'גשר ישבן (Glute Bridge)', duration: 50, icon: 'fa-child-reaching', tip: 'שכבו על הגב, דחפו דרך העקבים והרימו את האגן תוך כווץ מקסימלי של הישבן.' },
+                { id: 'm6', name: 'טיפוס הרים מבוקר (Mountain Climbers)', duration: 40, icon: 'fa-person-walking', tip: 'מעמידת שקיעת סמיכה, קרוב ברכיים לכיוון החזה בקצב מהיר אך נשלט.' },
+                { id: 'm7', name: 'חתירה כנגד משקל גוף / גומייה', duration: 45, icon: 'fa-dumbbell', tip: 'כווצו שכמות לאחור, שמרו על כתפיים נמוכות וגב ישר.' },
+                { id: 'm8', name: 'פלאנק צידי (Side Plank)', duration: 40, icon: 'fa-slash', tip: 'הישענו על אמה אחת, הרימו אגן באוויר ושמרו על קו ישר מאוזן.' },
+                { id: 'm9', name: 'סקוואט קפיצה / סקוואט דינמי', duration: 40, icon: 'fa-bolt', tip: 'ירידה לסקוואט ועלייה מתפרצת למעלה. מתאים לעבודה אירובית וחיזוק רגליים.' },
+                { id: 'm10', name: 'פלאנק אלכסונים (Knee to Elbow)', duration: 45, icon: 'fa-circle-dot', tip: 'מפלאנק, קירוב ברך ימין למרפק שמאל ולהיפך לעבודה על אלכסוני הבטן.' }
+            ],
+            cooldown: [
+                { id: 'c1', name: 'מתיחת האמסטרינגס וגב תחתון', duration: 40, icon: 'fa-child', tip: 'עמידה ישרה, הטיות גו לפנים לכיוון כפות הרגליים בנשימות עמוקות.' },
+                { id: 'c2', name: 'מתיחת ארבע ראשי (ירך קדמית)', duration: 40, icon: 'fa-person-walking', tip: 'אחיזת קרסול לאחור, קירוב ברכיים זו לזו ושמירה על יציבות.' },
+                { id: 'c3', name: 'מתיחת חזה וכתפיים', duration: 40, icon: 'fa-hand-holding-heart', tip: 'פתיחת זרועות לצדדים, שילוב ידיים לאחור ומתיחה עדינה לבית החזה.' },
+                { id: 'c4', name: 'מתיחת חתול-פרה להרפיית הגב', duration: 45, icon: 'fa-dog', tip: 'על ארבע, קימור וקיעור של הגב בקצב הנשימה לשחרור עמוד השדרה.' }
+            ]
+        };
+
+        // --- APP STATE ---
+        let userPreferences = JSON.parse(localStorage.getItem('fithome_user_prefs')) || {
+            gender: null,
+            level: null,
+            goal: null,
+            daysPerWeek: 3,
+            duration: 30,
+            equipment: null,
+            focus: null,
+            isCompleted: false
+        };
+
+        let currentWizardStep = 1;
+
+        let userStats = JSON.parse(localStorage.getItem('fithome_stats')) || {
+            completed: 0,
+            minutes: 0,
+            streak: 1
+        };
+
+        // Live Player State
+        let currentFullWorkout = [];
+        let currentWorkoutMeta = {};
+        let currentExerciseIdx = 0;
+        let playerTimer = null;
+        let playerTimeLeft = 0;
+        let isPlayerActive = false;
+
+        // Sound FX using Tone.js
+        function playSoundBeep(type = 'step') {
+            try {
+                const synth = new Tone.Synth().toDestination();
+                if(type === 'step') {
+                    synth.triggerAttackRelease("E5", "8n");
+                } else if(type === 'rest') {
+                    synth.triggerAttackRelease("C5", "8n");
+                } else if(type === 'done') {
+                    synth.triggerAttackRelease("G5", "4n");
+                }
+            } catch(e) {}
+        }
+
+        // --- INIT APP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (userPreferences.isCompleted) {
+                showProgramDashboard();
+            } else {
+                showWizard();
+            }
+            renderStats();
+            renderExerciseLibrary();
+        });
+
+        // --- WIZARD HANDLERS ---
+        function setWizardData(key, val, btnEl) {
+            userPreferences[key] = val;
+
+            const parent = btnEl.parentElement;
+            parent.querySelectorAll('.q-opt').forEach(b => b.classList.remove('border-brand-500', 'bg-brand-500/10'));
+            btnEl.classList.add('border-brand-500', 'bg-brand-500/10');
+
+            document.getElementById('btn-wiz-next').disabled = false;
+        }
+
+        function wizardStepNext() {
+            if (currentWizardStep < 7) {
+                document.getElementById(`q-step-${currentWizardStep}`).classList.add('hidden');
+                currentWizardStep++;
+                document.getElementById(`q-step-${currentWizardStep}`).classList.remove('hidden');
+
+                document.getElementById('current-step-lbl').innerText = currentWizardStep;
+                document.getElementById('wizard-progress').style.width = `${(currentWizardStep / 7) * 100}%`;
+                document.getElementById('btn-wiz-back').classList.remove('invisible');
+
+                validateStepState();
+
+                if (currentWizardStep === 7) {
+                    document.getElementById('btn-wiz-next').innerHTML = `צור תוכנית <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>`;
+                }
+            } else {
+                userPreferences.isCompleted = true;
+                localStorage.setItem('fithome_user_prefs', JSON.stringify(userPreferences));
+                showProgramDashboard();
+            }
+        }
+
+        function wizardStepBack() {
+            if (currentWizardStep > 1) {
+                document.getElementById(`q-step-${currentWizardStep}`).classList.add('hidden');
+                currentWizardStep--;
+                document.getElementById(`q-step-${currentWizardStep}`).classList.remove('hidden');
+
+                document.getElementById('current-step-lbl').innerText = currentWizardStep;
+                document.getElementById('wizard-progress').style.width = `${(currentWizardStep / 7) * 100}%`;
+                document.getElementById('btn-wiz-next').innerHTML = `להמשך <i class="fa-solid fa-arrow-left mr-1"></i>`;
+                document.getElementById('btn-wiz-next').disabled = false;
+
+                if (currentWizardStep === 1) {
+                    document.getElementById('btn-wiz-back').classList.add('invisible');
+                }
+            }
+        }
+
+        function validateStepState() {
+            let isValid = false;
+            if (currentWizardStep === 1 && userPreferences.gender) isValid = true;
+            if (currentWizardStep === 2 && userPreferences.level) isValid = true;
+            if (currentWizardStep === 3 && userPreferences.goal) isValid = true;
+            if (currentWizardStep === 4 && userPreferences.daysPerWeek) isValid = true;
+            if (currentWizardStep === 5 && userPreferences.duration) isValid = true;
+            if (currentWizardStep === 6 && userPreferences.equipment) isValid = true;
+            if (currentWizardStep === 7 && userPreferences.focus) isValid = true;
+
+            document.getElementById('btn-wiz-next').disabled = !isValid;
+        }
+
+        function showWizard() {
+            document.getElementById('wizard-section').classList.remove('hidden');
+            document.getElementById('program-section').classList.add('hidden');
+            document.getElementById('stats-section').classList.add('hidden');
+            document.getElementById('library-section').classList.add('hidden');
+        }
+
+        function resetQuestionnaire() {
+            userPreferences.isCompleted = false;
+            currentWizardStep = 1;
+            document.querySelectorAll('.q-step').forEach(s => s.classList.add('hidden'));
+            document.getElementById('q-step-1').classList.remove('hidden');
+            document.getElementById('current-step-lbl').innerText = '1';
+            document.getElementById('wizard-progress').style.width = '14%';
+            document.getElementById('btn-wiz-back').classList.add('invisible');
+            document.getElementById('btn-wiz-next').innerHTML = `להמשך <i class="fa-solid fa-arrow-left mr-1"></i>`;
+            showWizard();
+            scrollToTop();
+        }
+
+        // --- DASHBOARD & SCHEDULE BUILDER ---
+        function showProgramDashboard() {
+            document.getElementById('wizard-section').classList.add('hidden');
+            document.getElementById('program-section').classList.remove('hidden');
+            document.getElementById('stats-section').classList.remove('hidden');
+            document.getElementById('library-section').classList.remove('hidden');
+
+            renderUserSummary();
+            generateWeeklySchedule();
+            scrollToTop();
+        }
+
+        function renderUserSummary() {
+            const genderTxt = userPreferences.gender === 'women' ? 'נשים' : (userPreferences.gender === 'men' ? 'גברים' : 'אימון מותאם לכולם');
+            const levelTxt = getLevelLabel(userPreferences.level);
+            const goalTxt = getGoalLabel(userPreferences.goal);
+
+            document.getElementById('user-summary-text').innerHTML = `
+                הגדרות פעילות: <strong>${genderTxt}</strong> ברמת כושר <strong>${levelTxt}</strong>.
+                מטרת על: <strong>${goalTxt}</strong> • <strong>${userPreferences.daysPerWeek} ימי אימון בשבוע</strong> • משך סשן מתוכנן: <strong>${userPreferences.duration} דקות אמת</strong> בכל אימון.
+            `;
+        }
+
+        function getGoalLabel(g) {
+            switch(g) {
+                case 'fat_burn': return 'חיטוב וירידה במשקל';
+                case 'muscle_build': return 'בניית שריר וחיזוק';
+                case 'health': return 'כושר כללי ובריאות';
+                case 'flexibility': return 'גמישות ויציבה';
+                default: return 'כושר ביתי';
+            }
+        }
+
+        function getLevelLabel(l) {
+            switch(l) {
+                case 'beginner': return 'מתחיל/ה';
+                case 'intermediate': return 'בינוני/ת';
+                case 'advanced': return 'מתקדם/ת';
+                default: return 'כללי';
+            }
+        }
+
+        function generateWeeklySchedule() {
+            const grid = document.getElementById('weekly-schedule-grid');
+            grid.innerHTML = '';
+
+            const selectedDaysCount = parseInt(userPreferences.daysPerWeek) || 3;
+            document.getElementById('schedule-days-count').innerText = selectedDaysCount;
+
+            const weekDays = [
+                { name: 'יום ראשון', active: true },
+                { name: 'יום שני', active: selectedDaysCount >= 5 },
+                { name: 'יום שלישי', active: selectedDaysCount >= 2 },
+                { name: 'יום רביעי', active: selectedDaysCount >= 6 },
+                { name: 'יום חמישי', active: selectedDaysCount >= 3 },
+                { name: 'יום שישי', active: selectedDaysCount >= 4 },
+                { name: 'יום שבת (מנוחה)', active: false }
+            ];
+
+            let workoutCounter = 0;
+
+            weekDays.forEach((day, idx) => {
+                const card = document.createElement('div');
+                
+                if (day.active) {
+                    workoutCounter++;
+                    const title = getWorkoutTitleForDay(workoutCounter);
+                    const calcInfo = calculateWorkoutDuration(userPreferences.duration);
+
+                    card.className = "glass-card rounded-2xl p-5 border border-slate-800 flex flex-col justify-between hover:border-brand-500/50 transition-all";
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[11px] font-black uppercase text-brand-400 bg-brand-500/10 px-2.5 py-1 rounded-lg border border-brand-500/30">
+                                    ${day.name}
+                                </span>
+                                <span class="text-xs text-slate-300 font-bold"><i class="fa-regular fa-clock ml-1 text-brand-400"></i>${calcInfo.totalMinutes} דקות</span>
+                            </div>
+                            <h4 class="font-black text-lg text-white mb-2">${title}</h4>
+                            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                                חימום דינמי (${calcInfo.warmupTime} דק') + סבב מרכזי ${calcInfo.rounds} סיבובים + שחרור ומתיחות.
+                            </p>
+                        </div>
+
+                        <button onclick="openPreWorkoutModal('${day.name}', '${title}', ${calcInfo.rounds})" class="w-full gradient-brand text-slate-950 font-extrabold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-green-500/10 hover:opacity-90 transition-all">
+                            <i class="fa-solid fa-list-check"></i> תצוגת אימון מלאה
+                        </button>
+                    `;
+                } else {
+                    card.className = "glass-card rounded-2xl p-5 border border-slate-800/50 opacity-60 flex flex-col justify-between";
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[11px] font-bold text-slate-400 bg-slate-800 px-2.5 py-1 rounded-lg">
+                                    ${day.name}
+                                </span>
+                                <span class="text-xs text-slate-500">יום התאוששות</span>
+                            </div>
+                            <h4 class="font-bold text-base text-slate-400 mb-1">יום מנוחה והתאוששות</h4>
+                            <p class="text-xs text-slate-500">יום למילוי מצברים, הליכה קלה ושיווי משקל נכון לגוף.</p>
+                        </div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        function getWorkoutTitleForDay(idx) {
+            const map = {
+                1: 'אימון גוף מלא (Full Body) וסיבולת',
+                2: 'אימון פלג גוף תחתון, ירכיים וישבן',
+                3: 'אימון פלג גוף עליון, חזה וזרועות',
+                4: 'אימון אינטנסיבי לשריפת שומן וחיזוק הליבה',
+                5: 'אימון כוח ממוקד בטן, גב ויציבה',
+                6: 'אימון כושר דינמי ומתיחות מקיפות'
+            };
+            return map[idx] || 'אימון כושר מותאם אישית';
+        }
+
+        // --- DURATION CALCULATOR ENGINE ---
+        function calculateWorkoutDuration(targetMinutes) {
+            let rounds = 2;
+            let workSec = 45;
+            let restSec = 15;
+            let roundRestSec = 60;
+            let warmupTimeMin = 3;
+            let coolTimeMin = 3;
+
+            if (targetMinutes >= 40) {
+                rounds = 4;
+                warmupTimeMin = 5;
+                coolTimeMin = 5;
+            } else if (targetMinutes >= 30) {
+                rounds = 3;
+                warmupTimeMin = 4;
+                coolTimeMin = 4;
+            } else {
+                rounds = 2;
+                warmupTimeMin = 3;
+                coolTimeMin = 3;
+            }
+
+            const mainExCount = 6;
+            const singleRoundSec = mainExCount * (workSec + restSec);
+            const totalMainSec = (singleRoundSec * rounds) + ((rounds - 1) * roundRestSec);
+            const calculatedTotalMin = Math.round((totalMainSec / 60) + warmupTimeMin + coolTimeMin);
+
+            return {
+                totalMinutes: calculatedTotalMin,
+                rounds: rounds,
+                warmupTime: warmupTimeMin,
+                coolTime: coolTimeMin,
+                mainSec: totalMainSec
+            };
+        }
+
+        // --- PRE-WORKOUT MODAL ---
+        function openPreWorkoutModal(dayName, title, rounds) {
+            const calc = calculateWorkoutDuration(userPreferences.duration);
+            currentWorkoutMeta = { dayName, title, rounds, calc };
+
+            document.getElementById('pre-day-lbl').innerText = dayName;
+            document.getElementById('pre-title-lbl').innerText = title;
+            document.getElementById('pre-calc-total-time').innerText = `${calc.totalMinutes} דקות`;
+            document.getElementById('pre-calc-rounds').innerText = `${rounds} סיבובים`;
+            
+            const totalExercises = exercisesDB.warmup.length + (exercisesDB.main.slice(0, 6).length * rounds) + exercisesDB.cooldown.length;
+            document.getElementById('pre-calc-ex-count').innerText = `${totalExercises} תרגילים בסה"כ`;
+
+            // Render details
+            document.getElementById('pre-warmup-dur').innerText = `${calc.warmupTime} דקות`;
+            document.getElementById('pre-warmup-list').innerHTML = exercisesDB.warmup.map(e => `<li>${e.name} (${e.duration} שניות)</li>`).join('');
+
+            document.getElementById('pre-main-dur').innerText = `${Math.round(calc.mainSec / 60)} דקות (${rounds} סבבים חוזרים)`;
+            document.getElementById('pre-main-list').innerHTML = exercisesDB.main.slice(0, 6).map(e => `<li>${e.name} (45 שנ' עבודה / 15 שנ' מנוחה)</li>`).join('');
+
+            document.getElementById('pre-cool-dur').innerText = `${calc.coolTime} דקות`;
+            document.getElementById('pre-cool-list').innerHTML = exercisesDB.cooldown.map(e => `<li>${e.name} (${e.duration} שניות)</li>`).join('');
+
+            document.getElementById('pre-workout-modal').classList.remove('hidden');
+        }
+
+        function closePreWorkoutModal() {
+            document.getElementById('pre-workout-modal').classList.add('hidden');
+        }
+
+        // --- WORKOUT PLAYER ENGINE ---
+        function startWorkoutPlayerNow() {
+            closePreWorkoutModal();
+
+            // Construct full sequence of workout steps
+            currentFullWorkout = [];
+
+            // 1. Warmup
+            exercisesDB.warmup.forEach(ex => {
+                currentFullWorkout.push({ ...ex, section: 'חימום', type: 'work' });
+            });
+
+            // 2. Main Sets with Rounds
+            const mainExList = exercisesDB.main.slice(0, 6);
+            for (let r = 1; r <= currentWorkoutMeta.rounds; r++) {
+                mainExList.forEach((ex, idx) => {
+                    currentFullWorkout.push({ 
+                        ...ex, 
+                        section: `סבב מרכזי - סיבוב ${r} מתוך ${currentWorkoutMeta.rounds}`, 
+                        type: 'work',
+                        roundInfo: `סיבוב ${r} מתוך ${currentWorkoutMeta.rounds}`
+                    });
+                    
+                    // Rest between exercises
+                    currentFullWorkout.push({
+                        id: `rest_${r}_${idx}`,
+                        name: 'מנוחה והסדרת נשימה',
+                        duration: 15,
+                        icon: 'fa-mug-hot',
+                        section: 'מנוחה',
+                        type: 'rest',
+                        tip: 'קחו שואל של אוויר, שתו מים והתכוננו לתרגיל הבא.'
+                    });
+                });
+
+                // Extra round rest if not last round
+                if (r < currentWorkoutMeta.rounds) {
+                    currentFullWorkout.push({
+                        id: `round_rest_${r}`,
+                        name: 'מנוחת סבב מורחבת',
+                        duration: 45,
+                        icon: 'fa-bed',
+                        section: 'מנוחה בין סבבים',
+                        type: 'rest',
+                        tip: 'סיימת סבב בהצלחה! קח מנוחה ארוכה יותר והתאושש.'
+                    });
+                }
+            }
+
+            // 3. Cooldown Stretches
+            exercisesDB.cooldown.forEach(ex => {
+                currentFullWorkout.push({ ...ex, section: 'שחרור ומתיחות', type: 'work' });
+            });
+
+            currentExerciseIdx = 0;
+            document.getElementById('player-workout-name').innerText = currentWorkoutMeta.title;
+
+            loadExerciseToPlayer(0);
+            document.getElementById('player-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function loadExerciseToPlayer(idx) {
+            pausePlayerTimer();
+
+            const ex = currentFullWorkout[idx];
+            document.getElementById('player-section-tag').innerText = ex.section;
+            document.getElementById('player-exercise-title').innerText = ex.name;
+            document.getElementById('player-exercise-tip').innerText = ex.tip;
+            document.getElementById('player-exercise-icon').className = `fa-solid ${ex.icon}`;
+            document.getElementById('player-round-indicator').innerText = ex.roundInfo || ex.section;
+
+            if (ex.type === 'rest') {
+                document.getElementById('player-phase-label').innerText = 'מנוחה';
+                document.getElementById('player-phase-label').className = 'text-xs font-black uppercase tracking-widest text-cyan-400 mb-1';
+                document.getElementById('player-exercise-card').classList.add('border-cyan-500/50');
+            } else {
+                document.getElementById('player-phase-label').innerText = 'זמן עבודה';
+                document.getElementById('player-phase-label').className = 'text-xs font-black uppercase tracking-widest text-emerald-400 mb-1';
+                document.getElementById('player-exercise-card').classList.remove('border-cyan-500/50');
+            }
+
+            playerTimeLeft = ex.duration;
+            updateClockDisplay();
+
+            document.getElementById('player-progress-txt').innerText = `שלב ${idx + 1} מתוך ${currentFullWorkout.length}`;
+        }
+
+        function togglePlayerTimer() {
+            if (isPlayerActive) {
+                pausePlayerTimer();
+            } else {
+                startPlayerTimer();
+            }
+        }
+
+        function startPlayerTimer() {
+            if (isPlayerActive) return;
+            isPlayerActive = true;
+            document.getElementById('player-play-icn').className = 'fa-solid fa-pause';
+            document.getElementById('player-play-txt').innerText = 'השהה';
+
+            playerTimer = setInterval(() => {
+                playerTimeLeft--;
+                updateClockDisplay();
+
+                if (playerTimeLeft <= 0) {
+                    clearInterval(playerTimer);
+                    isPlayerActive = false;
+
+                    if (currentExerciseIdx < currentFullWorkout.length - 1) {
+                        currentExerciseIdx++;
+                        playSoundBeep(currentFullWorkout[currentExerciseIdx].type === 'rest' ? 'rest' : 'step');
+                        loadExerciseToPlayer(currentExerciseIdx);
+                        startPlayerTimer();
+                    } else {
+                        finishWorkout();
+                    }
+                }
+            }, 1000);
+        }
+
+        function pausePlayerTimer() {
+            isPlayerActive = false;
+            clearInterval(playerTimer);
+            document.getElementById('player-play-icn').className = 'fa-solid fa-play';
+            document.getElementById('player-play-txt').innerText = 'המשך';
+        }
+
+        function updateClockDisplay() {
+            const m = Math.floor(playerTimeLeft / 60);
+            const s = playerTimeLeft % 60;
+            document.getElementById('player-timer-clock').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function nextExercise() {
+            if (currentExerciseIdx < currentFullWorkout.length - 1) {
+                currentExerciseIdx++;
+                loadExerciseToPlayer(currentExerciseIdx);
+            }
+        }
+
+        function prevExercise() {
+            if (currentExerciseIdx > 0) {
+                currentExerciseIdx--;
+                loadExerciseToPlayer(currentExerciseIdx);
+            }
+        }
+
+        function finishWorkout() {
+            pausePlayerTimer();
+            playSoundBeep('done');
+
+            userStats.completed += 1;
+            userStats.minutes += currentWorkoutMeta.calc ? currentWorkoutMeta.calc.totalMinutes : 30;
+            localStorage.setItem('fithome_stats', JSON.stringify(userStats));
+
+            renderStats();
+
+            alert('כל הכבוד! סיימת אימון מלא, אפקטיבי ואינטנסיבי בהצלחה! 💪');
+            closeWorkoutPlayer();
+        }
+
+        function closeWorkoutPlayer() {
+            pausePlayerTimer();
+            document.getElementById('player-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // --- STATS & EXERCISE LIBRARY ---
+        function renderStats() {
+            document.getElementById('stat-completed-val').innerText = userStats.completed;
+            document.getElementById('stat-minutes-val').innerText = userStats.minutes;
+            document.getElementById('stat-streak-val').innerText = userStats.streak;
+        }
+
+        function renderExerciseLibrary() {
+            const grid = document.getElementById('exercise-library-grid');
+            const allEx = [...exercisesDB.warmup, ...exercisesDB.main, ...exercisesDB.cooldown];
+
+            grid.innerHTML = allEx.map(ex => `
+                <div class="glass-card p-4 rounded-xl border border-slate-800 text-right">
+                    <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-400 flex items-center justify-center text-lg mb-2">
+                        <i class="fa-solid ${ex.icon}"></i>
+                    </div>
+                    <h5 class="font-bold text-sm text-white mb-1">${ex.name}</h5>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">${ex.tip}</p>
+                </div>
+            `).join('');
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

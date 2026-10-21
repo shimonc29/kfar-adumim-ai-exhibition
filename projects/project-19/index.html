@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodVibe - המלצות תוכן לפי מצב רוח</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Heebo & Rubik) -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b',
+                        accentViolet: '#8b5cf6',
+                        accentRose: '#f43f5e',
+                        accentAmber: '#f59e0b',
+                        accentEmerald: '#10b981',
+                        accentSky: '#06b6d4'
+                    },
+                    fontFamily: {
+                        sans: ['Heebo', 'Rubik', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f1f5f9;
+            font-family: 'Heebo', sans-serif;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-relaxed { box-shadow: 0 0 25px rgba(16, 185, 129, 0.25); }
+        .glow-energetic { box-shadow: 0 0 25px rgba(245, 158, 11, 0.25); }
+        .glow-melancholic { box-shadow: 0 0 25px rgba(6, 182, 212, 0.25); }
+        .glow-focused { box-shadow: 0 0 25px rgba(139, 92, 246, 0.25); }
+        .glow-dramatic { box-shadow: 0 0 25px rgba(244, 63, 94, 0.25); }
+        
+        .transition-all-custom {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .star-rating i {
+            cursor: pointer;
+            transition: color 0.15s ease-in-out, transform 0.15s ease-in-out;
+        }
+        .star-rating i:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+
+    <header class="fixed top-0 left-0 right-0 z-50 glass-card border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+                        <i class="fa-solid fa-masks-theater text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-extrabold bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">MoodVibe</span>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex items-center gap-1 font-medium">
+                    <button onclick="navigateTo('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> המלצה משולבת
+                    </button>
+                    <button onclick="navigateTo('books')" id="nav-books" class="nav-btn px-4 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-2">
+                        <i class="fa-solid fa-book text-emerald-400"></i> ספרים
+                    </button>
+                    <button onclick="navigateTo('movies')" id="nav-movies" class="nav-btn px-4 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-2">
+                        <i class="fa-solid fa-film text-rose-400"></i> סרטים וסדרות
+                    </button>
+                    <button onclick="navigateTo('music')" id="nav-music" class="nav-btn px-4 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-2">
+                        <i class="fa-solid fa-music text-cyan-400"></i> מוזיקה
+                    </button>
+                    <button onclick="navigateTo('favorites')" id="nav-favorites" class="nav-btn px-4 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-2 relative">
+                        <i class="fa-solid fa-heart text-pink-500"></i> המועדפים שלי
+                        <span id="fav-badge" class="hidden absolute -top-1 -right-1 bg-pink-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-slate-300 p-2 rounded-lg hover:bg-slate-800 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900/95 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="navigateTo('home'); toggleMobileMenu()" class="w-full text-right px-4 py-2.5 rounded-lg text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-wand-magic-sparkles text-purple-400 w-5"></i> המלצה משולבת
+            </button>
+            <button onclick="navigateTo('books'); toggleMobileMenu()" class="w-full text-right px-4 py-2.5 rounded-lg text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-book text-emerald-400 w-5"></i> ספרים
+            </button>
+            <button onclick="navigateTo('movies'); toggleMobileMenu()" class="w-full text-right px-4 py-2.5 rounded-lg text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-film text-rose-400 w-5"></i> סרטים וסדרות
+            </button>
+            <button onclick="navigateTo('music'); toggleMobileMenu()" class="w-full text-right px-4 py-2.5 rounded-lg text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-music text-cyan-400 w-5"></i> מוזיקה
+            </button>
+            <button onclick="navigateTo('favorites'); toggleMobileMenu()" class="w-full text-right px-4 py-2.5 rounded-lg text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-heart text-pink-500 w-5"></i> המועדפים שלי
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full flex-grow">
+
+        <!-- Page Home: Combined Recommendation -->
+        <section id="page-home" class="page-section space-y-10">
+            <!-- Hero Mood Selector Header -->
+            <div class="text-center space-y-4 max-w-3xl mx-auto pt-4">
+                <span class="px-4 py-1.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/20 inline-block mb-2">
+                    ✨ פלטפורמת התאמת תוכן אישית
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                    איך מרגיש היום שלך?
+                </h1>
+                <p class="text-slate-400 text-base sm:text-lg">
+                    בחר את מצב הרוח שלך וקבל מארז חווייתי המשלב ספר, סרט או סדרה, ומוזיקה שמתאימים בדיוק לאווירה.
+                </p>
+
+                <!-- Mood Selector Buttons -->
+                <div class="pt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+                    <button onclick="selectMood('relaxed')" id="mood-btn-relaxed" class="mood-btn group flex flex-col items-center justify-center p-4 rounded-2xl glass-card border-2 border-emerald-500/30 hover:border-emerald-500 hover:bg-emerald-500/10 transition-all-custom">
+                        <span class="text-3xl mb-2 group-hover:scale-125 transition-transform">🍃</span>
+                        <span class="font-semibold text-emerald-300">רגוע</span>
+                    </button>
+                    <button onclick="selectMood('energetic')" id="mood-btn-energetic" class="mood-btn group flex flex-col items-center justify-center p-4 rounded-2xl glass-card border-2 border-amber-500/30 hover:border-amber-500 hover:bg-amber-500/10 transition-all-custom">
+                        <span class="text-3xl mb-2 group-hover:scale-125 transition-transform">⚡</span>
+                        <span class="font-semibold text-amber-300">אנרגטי</span>
+                    </button>
+                    <button onclick="selectMood('melancholic')" id="mood-btn-melancholic" class="mood-btn group flex flex-col items-center justify-center p-4 rounded-2xl glass-card border-2 border-cyan-500/30 hover:border-cyan-500 hover:bg-cyan-500/10 transition-all-custom">
+                        <span class="text-3xl mb-2 group-hover:scale-125 transition-transform">🌧️</span>
+                        <span class="font-semibold text-cyan-300">מלנכולי</span>
+                    </button>
+                    <button onclick="selectMood('focused')" id="mood-btn-focused" class="mood-btn group flex flex-col items-center justify-center p-4 rounded-2xl glass-card border-2 border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 transition-all-custom">
+                        <span class="text-3xl mb-2 group-hover:scale-125 transition-transform">🎧</span>
+                        <span class="font-semibold text-purple-300">מרוכז</span>
+                    </button>
+                    <button onclick="selectMood('dramatic')" id="mood-btn-dramatic" class="mood-btn group flex flex-col items-center justify-center p-4 rounded-2xl glass-card border-2 border-rose-500/30 hover:border-rose-500 hover:bg-rose-500/10 transition-all-custom col-span-2 sm:col-span-1">
+                        <span class="text-3xl mb-2 group-hover:scale-125 transition-transform">🔥</span>
+                        <span class="font-semibold text-rose-300">דרמטי</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Recommendation Display Area -->
+            <div id="combined-recommendation-container" class="mt-8 transition-all duration-500">
+                <!-- Content inserted via JS -->
+            </div>
+        </section>
+
+        <!-- Page Books -->
+        <section id="page-books" class="page-section hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-book text-emerald-400"></i> ספרים מומלצים
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">גלה ספרים מעוררי השראה ומותאמים לכל רוח ונפש</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="relative min-w-[200px]">
+                        <input type="text" id="books-search" oninput="renderBooks()" placeholder="חיפוש ספר או מחבר..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 pr-9">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-slate-500 text-xs"></i>
+                    </div>
+                    <select id="books-mood-filter" onchange="renderBooks()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+                        <option value="all">כל מצבי הרוח</option>
+                        <option value="relaxed">🍃 רגוע</option>
+                        <option value="energetic">⚡ אנרגטי</option>
+                        <option value="melancholic">🌧️ מלנכולי</option>
+                        <option value="focused">🎧 מרוכז</option>
+                        <option value="dramatic">🔥 דרמטי</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JS populated -->
+            </div>
+        </section>
+
+        <!-- Page Movies & TV -->
+        <section id="page-movies" class="page-section hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-film text-rose-400"></i> סרטים וסדרות
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">חוויית צפייה קולנועית מותאמת אישית עם מידע על פלטפורמות זמינות</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="relative min-w-[180px]">
+                        <input type="text" id="movies-search" oninput="renderMovies()" placeholder="חיפוש סרט או סדרה..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-rose-500 pr-9">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-slate-500 text-xs"></i>
+                    </div>
+                    <div class="bg-slate-900 p-1 rounded-xl border border-slate-800 flex items-center">
+                        <button onclick="setMovieTypeFilter('all')" id="btn-type-all" class="movie-type-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-purple-600 text-white transition">הכל</button>
+                        <button onclick="setMovieTypeFilter('movie')" id="btn-type-movie" class="movie-type-btn px-3 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">סרטים</button>
+                        <button onclick="setMovieTypeFilter('tv')" id="btn-type-tv" class="movie-type-btn px-3 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">סדרות</button>
+                    </div>
+
+                    <select id="movies-mood-filter" onchange="renderMovies()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-rose-500">
+                        <option value="all">כל מצבי הרוח</option>
+                        <option value="relaxed">🍃 רגוע</option>
+                        <option value="energetic">⚡ אנרגטי</option>
+                        <option value="melancholic">🌧️ מלנכולי</option>
+                        <option value="focused">🎧 מרוכז</option>
+                        <option value="dramatic">🔥 דרמטי</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="movies-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JS populated -->
+            </div>
+        </section>
+
+        <!-- Page Music -->
+        <section id="page-music" class="page-section hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-music text-cyan-400"></i> מוזיקה ואלבומים
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">צלילים, אלבומים ושירים שמנחיתים את האווירה הנכונה</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <select id="music-mood-filter" onchange="renderMusic()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        <option value="all">כל מצבי הרוח</option>
+                        <option value="relaxed">🍃 רגוע</option>
+                        <option value="energetic">⚡ אנרגטי</option>
+                        <option value="melancholic">🌧️ מלנכולי</option>
+                        <option value="focused">🎧 מרוכז</option>
+                        <option value="dramatic">🔥 דרמטי</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="music-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JS populated -->
+            </div>
+        </section>
+
+        <!-- Page Favorites -->
+        <section id="page-favorites" class="page-section hidden space-y-6">
+            <div class="border-b border-slate-800 pb-5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-heart text-pink-500"></i> המועדפים שלי
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">כל הפריטים ששמרת במקום אחד</p>
+                </div>
+                <button onclick="clearAllFavorites()" id="clear-fav-btn" class="text-xs text-slate-400 hover:text-rose-400 border border-slate-700 hover:border-rose-500/50 px-3 py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-trash-can ml-1"></i> ניקוי הכל
+                </button>
+            </div>
+
+            <div id="favorites-content" class="space-y-10">
+                <!-- JS Populated -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 text-white px-5 py-3 rounded-xl border border-slate-700 shadow-2xl flex items-center gap-3">
+        <span id="toast-icon" class="text-pink-500"><i class="fa-solid fa-check-circle"></i></span>
+        <span id="toast-msg" class="text-sm font-medium">הודעה</span>
+    </div>
+
+    <!-- Share & Modal Overlay -->
+    <div id="comments-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl relative">
+            <button onclick="closeCommentsModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="modal-item-title" class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-comments text-purple-400"></i> תגובות עבור
+            </h3>
+            
+            <div id="modal-comments-list" class="max-h-60 overflow-y-auto space-y-3 pr-1 text-sm">
+                <!-- Comments populated dynamically -->
+            </div>
+
+            <form onsubmit="handleAddComment(event)" class="space-y-3 border-t border-slate-800 pt-3">
+                <input type="hidden" id="modal-item-id">
+                <input type="text" id="comment-author" required placeholder="השם שלך..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500">
+                <textarea id="comment-text" required rows="2" placeholder="כתוב תגובה..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500 resize-none"></textarea>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-medium py-2 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> שלח תגובה
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-8 text-center text-slate-500 text-sm">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-300">MoodVibe</span> - פלטפורמת המלצות תוכן לפי מצב רוח
+            </div>
+            <p>© 2026 כל הזכויות שמורות. נוצר עבור חוויית משתמש מותאמת אישית.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Data Definitions - Tailored specifically for Teens & Young Adults
+        const MOOD_META = {
+            relaxed: { name: 'רגוע', icon: '🍃', color: 'emerald', bg: 'from-emerald-900/40 via-slate-900 to-slate-950', border: 'border-emerald-500/40' },
+            energetic: { name: 'אנרגטי', icon: '⚡', color: 'amber', bg: 'from-amber-900/40 via-slate-900 to-slate-950', border: 'border-amber-500/40' },
+            melancholic: { name: 'מלנכולי', icon: '🌧️', color: 'cyan', bg: 'from-cyan-900/40 via-slate-900 to-slate-950', border: 'border-cyan-500/40' },
+            focused: { name: 'מרוכז', icon: '🎧', color: 'purple', bg: 'from-purple-900/40 via-slate-900 to-slate-950', border: 'border-purple-500/40' },
+            dramatic: { name: 'דרמטי', icon: '🔥', color: 'rose', bg: 'from-rose-900/40 via-slate-900 to-slate-950', border: 'border-rose-500/40' }
+        };
+
+        const BOOKS_DATA = [
+            // Focused Mood
+            {
+                id: 'b1',
+                title: 'הארי פוטר ואבן החכמים',
+                author: 'ג׳יי. קיי. רולינג',
+                genre: 'פנטזיה / הרפתקאות',
+                mood: 'focused',
+                cover: 'https://images.unsplash.com/photo-1618663938038-2309759477a3?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'יתום צעיר מגלה ביום הולדתו ה-11 שהוא קוסם ומגיע לבית הספר הוגוורטס לכישוף ולקוסמות.'
+            },
+            {
+                id: 'b7',
+                title: 'פרסי ג׳קסון וגנב הברק',
+                author: 'ריק ריירדן',
+                genre: 'מיתולוגיה / הרפתקאות',
+                mood: 'focused',
+                cover: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'פרסי מגלה שהוא חצאי-אל מודרני ונשלח למסע מסוכן להחזרת הברק המקורי של זאוס ולהצלת העולם.'
+            },
+            {
+                id: 'b8',
+                title: 'אמנות הקיפול הפנימי',
+                author: 'תומס יונג',
+                genre: 'פיתוח אישי לנוער',
+                mood: 'focused',
+                cover: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'מדריך מעצים ומלא טיפים להתמודדות עם לחצים, לימודים, חברויות ופיתוח ביטחון עצמי.'
+            },
+            {
+                id: 'b15',
+                title: 'ששת העורבים (Six of Crows)',
+                author: 'לי בארדוגו',
+                genre: 'פנטזיה אורבנית / תכנון שוד',
+                mood: 'focused',
+                cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'שישה פושעים צעירים מבריקים יוצאים למבצע שוד כמעט בלתי אפשרי בלב מצודה שמורה.'
+            },
+
+            // Relaxed Mood
+            {
+                id: 'b2',
+                title: 'שומרת הערכים (Keeper of the Lost Cities)',
+                author: 'שאנון מסנג׳ר',
+                genre: 'פנטזיה קסומה',
+                mood: 'relaxed',
+                cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'סופי היא ילדה מיוחדת שמגלה שהיא בעצם אלפית ושייכת לעולם נסתר ומלא קסם ושלווה.'
+            },
+            {
+                id: 'b6',
+                title: 'לכל הנערים שאהבתי פעם',
+                author: 'ג׳ני האן',
+                genre: 'רומן נעורים',
+                mood: 'relaxed',
+                cover: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'מכתבי האהבה הסודיים של לארה ג׳ין נשלחים בטעות לכל הבנים שאהבה, והחיים שלה מתהפכים.'
+            },
+            {
+                id: 'b9',
+                title: 'הנסיך הקטן',
+                author: 'אנטואן דה סנט-אכזופרי',
+                genre: 'קלאסיקה / פילוסופיה',
+                mood: 'relaxed',
+                cover: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'סיפור פיוטי ומחמם לב על חברות, אהבה והסתכלות על העולם דרך הלב ולא רק דרך העיניים.'
+            },
+            {
+                id: 'b16',
+                title: 'בית הספר שטוף השמש',
+                author: 'אמילי הנרי',
+                genre: 'רומן רומנטי נעים',
+                mood: 'relaxed',
+                cover: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'סיפור קיצי ומרגיע על חופשה בלתי נשכחת, חברויות ישנות וזיכרונות מתוקים.'
+            },
+
+            // Dramatic Mood
+            {
+                id: 'b3',
+                title: 'משחקי הרעב',
+                author: 'סוזן קולינס',
+                genre: 'דיסטופיה / אקשן',
+                mood: 'dramatic',
+                cover: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'קתניס אוורדין מתנדבת להחליף את אחותה הקטנה בזירה הקטלנית של משחקי הרעב.'
+            },
+            {
+                id: 'b10',
+                title: 'רץ המבוך (The Maze Runner)',
+                author: 'ג׳יימס דשנר',
+                genre: 'מתח / מד"ב לנוער',
+                mood: 'dramatic',
+                cover: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'תומאס מתעורר במעלית ללא זיכרון ומוצא את עצמו במתחם הסגור בתוך מבוך ענקי וקטלני.'
+            },
+            {
+                id: 'b11',
+                title: 'משחקי הירושה (The Inheritance Games)',
+                author: 'ג׳ניפר לין ברנס',
+                genre: 'תעלומה / מתח',
+                mood: 'dramatic',
+                cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'נערה רגילה יורשת מיליארדים ממיליארדר אלמוני, אך עליה לעבור לטירה מלאת חידות ואויבים.'
+            },
+
+            // Melancholic Mood
+            {
+                id: 'b4',
+                title: 'אשמת הכוכבים',
+                author: 'ג׳ון גרין',
+                genre: 'דרמת נעורים מרגשת',
+                mood: 'melancholic',
+                cover: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'סיפור אהבה מרגש, מצחיק ונוגע ללב בין הייזל ואוגוסטוס, שני בני נוער שנפגשים בקבוצת תמיכה.'
+            },
+            {
+                id: 'b12',
+                title: 'כמה טוב להיות פרח קיר',
+                author: 'סטיבן צ׳בוסקי',
+                genre: 'רומן נעורים',
+                mood: 'melancholic',
+                cover: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'צ׳ארלי, נער ביישן ומתבונן, מנווט את השנה הראשונה בתיכון דרך מכתבים לחבר אלמוני.'
+            },
+
+            // Energetic Mood
+            {
+                id: 'b5',
+                title: 'שחקן מספר אחת (Ready Player One)',
+                author: 'ארנסט קליין',
+                genre: 'הרפתקת גיימינג / אקשן',
+                mood: 'energetic',
+                cover: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'מרוץ מטורף ומלא אדרנלין בתוך עולם מציאות וירטואלית עצום למציאות ביצת פסחא ששווה מיליארדים.'
+            },
+            {
+                id: 'b14',
+                title: 'מפוצלים (Divergent)',
+                author: 'וורוניקה רות\'',
+                genre: 'אקשן לנוער',
+                mood: 'energetic',
+                cover: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'בעולם המחולק לפי תכונות אופי, טריס מגלה שהיא מפוצלת - בעלת אומץ ותבונה שלא נכנסת לשום תבנית.'
+            }
+        ];
+
+        const MOVIES_DATA = [
+            // Movies/TV - Energetic
+            {
+                id: 'm24',
+                title: 'דברים מוזרים (Stranger Things)',
+                type: 'tv',
+                seasons: 4,
+                genre: 'מד"ב / הרפתקאות / אקשן',
+                mood: 'energetic',
+                poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'חבורת בני נוער בשנות ה-80 נלחמת במפלצות מעולם מקביל ומגלה סודות ממשלתיים נסתרים.',
+                platforms: ['Netflix']
+            },
+            {
+                id: 'm4',
+                title: 'ספיידרמן: מעבר לממד העכביש',
+                type: 'movie',
+                genre: 'אנימציה / אקשן / גיבורי על',
+                mood: 'energetic',
+                poster: 'https://images.unsplash.com/photo-1635863138275-d9b33299680b?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'מיילס מוראלס יוצא למסע מרהיב וקצבי ברחבי המולטי-וורס לצד צוות אנשי-עכביש מכל הממדים.',
+                platforms: ['Netflix', 'Apple TV']
+            },
+            {
+                id: 'm25',
+                title: 'קוברה קאי (Cobra Kai)',
+                type: 'tv',
+                seasons: 6,
+                genre: 'אומנויות לחימה / דרמת נוער',
+                mood: 'energetic',
+                poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'היריבות הוותיקה בין דניאל לג׳וני ניצטת מחדש דרך אימון דור חדש של בני נוער בקראטה.',
+                platforms: ['Netflix']
+            },
+            {
+                id: 'm7',
+                title: 'טופ גאן: מאבריק',
+                type: 'movie',
+                genre: 'אקשן / דרמה',
+                mood: 'energetic',
+                poster: 'https://images.unsplash.com/photo-1519074069444-1ba4e5695443?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'טייס הקרב הוותיק מאבריק חוזר לאמן קבוצת טייסים צעירים למשימה נכספת וכמעט בלתי אפשרית.',
+                platforms: ['Paramount+', 'Apple TV']
+            },
+
+            // Movies/TV - Dramatic
+            {
+                id: 'm1',
+                title: 'וונסדיי (Wednesday)',
+                type: 'tv',
+                seasons: 1,
+                genre: 'פנטזיה / תעלומה לנוער',
+                mood: 'dramatic',
+                poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'וונסדיי אדמס חוקרת סדרת מעשי רצח מסתוריים בפנימיית נוורמור תוך רכישת חברים ואויבים.',
+                platforms: ['Netflix']
+            },
+            {
+                id: 'm18',
+                title: 'יומני הערפד (The Vampire Diaries)',
+                type: 'tv',
+                seasons: 8,
+                genre: 'על-טבעי / רומנטיקה',
+                mood: 'dramatic',
+                poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'אליינה נלכדת בין שני אחים ערפדים בעיירה מלאת סודות על-טבעיים דרמטיים.',
+                platforms: ['Netflix']
+            },
+            {
+                id: 'm9',
+                title: 'משחקי הרעב: בלדה לשיר צפורים ונחשים',
+                type: 'movie',
+                genre: 'אקשן / מתח לנוער',
+                mood: 'dramatic',
+                poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'הסיפור על עלייתו של סנואו הצעיר כמדריך במשחקי הרעב העשיריים.',
+                platforms: ['Apple TV', 'Amazon Prime']
+            },
+            {
+                id: 'm10',
+                title: 'האביר הכהן (The Dark Knight)',
+                type: 'movie',
+                genre: 'אקשן / פשע',
+                mood: 'dramatic',
+                poster: 'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'באטמן מתמודד מול מוח פשע אנרכיסטי ומבריק הידוע בשם הג׳וקר, המאיים להחריב את גות׳אם.',
+                platforms: ['HBO', 'Apple TV']
+            },
+
+            // Movies/TV - Relaxed
+            {
+                id: 'm22',
+                title: 'הצלחה מובטחת (Heartstopper)',
+                type: 'tv',
+                seasons: 2,
+                genre: 'דרמת נעורים רומנטית',
+                mood: 'relaxed',
+                poster: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'סדרה מתוקה, מחממת לב ומרגיעה על חברות ואהבה ראשונה בתיכון הבריטי.',
+                platforms: ['Netflix']
+            },
+            {
+                id: 'm6',
+                title: 'לכל הנערים שאהבתי פעם - הסרט',
+                type: 'movie',
+                genre: 'קומדיה רומנטית לנוער',
+                mood: 'relaxed',
+                poster: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'מכתבי האהבה הסודיים של לארה ג׳ין נשלחים ומחייבים אותה להיכנס לזוגיות מזויפת מצחיקה.',
+                platforms: ['Netflix']
+            },
+            {
+                id: 'm23',
+                title: 'המקום הטוב (The Good Place)',
+                type: 'tv',
+                seasons: 4,
+                genre: 'קומדיה / פילוסופיה',
+                mood: 'relaxed',
+                poster: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'אישה מגיעה בטעות לעולם הבא ה"טוב" ומנסה להסתיר את מגרעותיה בעזרת לימודי מוסר מצחיקים.',
+                platforms: ['Netflix']
+            },
+
+            // Movies/TV - Melancholic
+            {
+                id: 'm27',
+                title: '13 סיבות (13 Reasons Why)',
+                type: 'tv',
+                seasons: 4,
+                genre: 'דרמת תיכון מותחת',
+                mood: 'melancholic',
+                poster: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'קליי מצא קופסת קלטות שמע שהותירה חברתו לכיתה המפרטות את הסיבות שהובילו אותה להחלטותיה.',
+                platforms: ['Netflix']
+            },
+            {
+                id: 'm14',
+                title: 'אשמת הכוכבים - הסרט',
+                type: 'movie',
+                genre: 'דרמה / רומנטיקה',
+                mood: 'melancholic',
+                poster: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'עיבוד קולנועי מרגש לספר האהוב על הייזל ואוגוסטוס והמסע שלהם לאמסטרדם.',
+                platforms: ['Disney+', 'Apple TV']
+            },
+
+            // Movies/TV - Focused
+            {
+                id: 'm20',
+                title: 'גמביט המלכה (The Queen\'s Gambit)',
+                type: 'tv',
+                seasons: 1,
+                genre: 'דרמה / עניין וריכוז',
+                mood: 'focused',
+                poster: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'נערה יתומה מגלה כישרון עילאי בשחמט ונאבקת לכבוש את אליפות העולם.',
+                platforms: ['Netflix']
+            },
+            {
+                id: 'm21',
+                title: 'אנולה הולמס (Enola Holmes)',
+                type: 'movie',
+                genre: 'בלשי / הרפתקאות לנוער',
+                mood: 'focused',
+                poster: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'אחותו הצעירה והחדה של שרלוק הולמס יוצאת לפתור תעלומה בעצמה ולהוכיח את כישוריה.',
+                platforms: ['Netflix']
+            }
+        ];
+
+        // Updated Modern Music Database featuring top female pop artists and diverse styles
+        const MUSIC_DATA = [
+            // Energetic Mood
+            {
+                id: 'mu_e1',
+                title: 'Espresso',
+                artist: 'Sabrina Carpenter',
+                type: 'פופ קצבי / אלקטרו',
+                mood: 'energetic',
+                cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+                spotifyUrl: 'https://open.spotify.com/track/2q2qGv9N16fH6jNq81yV7E',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Sabrina+Carpenter+Espresso'
+            },
+            {
+                id: 'mu_e2',
+                title: '360 / Von Dutch',
+                artist: 'Charli xcx',
+                type: 'דאנס-פופ / קלאב',
+                mood: 'energetic',
+                cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3',
+                spotifyUrl: 'https://open.spotify.com/artist/25uiY28234SqL1qX2R1LAn',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Charli+XCX+360'
+            },
+            {
+                id: 'mu_e3',
+                title: 'APT.',
+                artist: 'ROSÉ & Bruno Mars',
+                type: 'K-Pop / פופ-רוק אנרגטי',
+                mood: 'energetic',
+                cover: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+                spotifyUrl: 'https://open.spotify.com/track/1PneG2L23j2y0n0gA6R3C1',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=ROSE+Bruno+Mars+APT'
+            },
+            {
+                id: 'mu_e4',
+                title: 'Dance The Night',
+                artist: 'Dua Lipa',
+                type: 'דיסקו פופ',
+                mood: 'energetic',
+                cover: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
+                spotifyUrl: 'https://open.spotify.com/track/12v632313x0x2323',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Dua+Lipa+Dance+The+Night'
+            },
+
+            // Relaxed Mood
+            {
+                id: 'mu_r1',
+                title: 'Cruel Summer / Lover',
+                artist: 'Taylor Swift',
+                type: 'פופ אקוסטי מרגיע',
+                mood: 'relaxed',
+                cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+                spotifyUrl: 'https://open.spotify.com/artist/06HL4z0CvFAxyA27P2C33f',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Taylor+Swift+Lover'
+            },
+            {
+                id: 'mu_r2',
+                title: 'Feather',
+                artist: 'Sabrina Carpenter',
+                type: 'צ׳יל פופ קליל',
+                mood: 'relaxed',
+                cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80',
+                synopsis: 'שיר פופ רענן וקליל שכיף לשמוע ברקע כשרוצים להירגע.',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+                spotifyUrl: 'https://open.spotify.com/track/0vP55032031023',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Sabrina+Carpenter+Feather'
+            },
+            {
+                id: 'mu_r3',
+                title: 'Flowers',
+                artist: 'Miley Cyrus',
+                type: 'פופ נעים ומעצים',
+                mood: 'relaxed',
+                cover: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+                spotifyUrl: 'https://open.spotify.com/track/0y1QJ3ip3k313131',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Miley+Cyrus+Flowers'
+            },
+
+            // Melancholic Mood
+            {
+                id: 'mu_m1',
+                title: 'vampire / drivers license',
+                artist: 'Olivia Rodrigo',
+                type: 'אינדי-פופ רוק נוגה',
+                mood: 'melancholic',
+                cover: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+                spotifyUrl: 'https://open.spotify.com/artist/1McM3113131',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Olivia+Rodrigo+vampire'
+            },
+            {
+                id: 'mu_m2',
+                title: 'WILDFLOWER / What Was I Made For?',
+                artist: 'Billie Eilish',
+                type: 'אלטרנטיבי / בלדה רגשית',
+                mood: 'melancholic',
+                cover: 'https://images.unsplash.com/photo-1519692933481-e162a57d6721?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3',
+                spotifyUrl: 'https://open.spotify.com/artist/6qqNV313131',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Billie+Eilish+WILDFLOWER'
+            },
+            {
+                id: 'mu_m3',
+                title: 'Gracie Abrams Essentials',
+                artist: 'Gracie Abrams',
+                type: 'אינדי פופ עדין',
+                mood: 'melancholic',
+                cover: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
+                spotifyUrl: 'https://open.spotify.com/artist/0v1313131',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Gracie+Abrams'
+            },
+
+            // Focused Mood
+            {
+                id: 'mu_f1',
+                title: 'LUNCH & BIRDS OF A FEATHER (Instrumental Focus)',
+                artist: 'Billie Eilish Ambient Hits',
+                type: 'אמביאנט / לופים ללמידה',
+                mood: 'focused',
+                cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                spotifyUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX8NTLI29OZaM',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=lofi+pop+study+music'
+            },
+            {
+                id: 'mu_f2',
+                title: 'Acoustic Piano Covers - Female Pop Hits',
+                artist: 'Piano Chill Lounge',
+                type: 'פסנתר קלאסי מודרני',
+                mood: 'focused',
+                cover: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3',
+                spotifyUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq331',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=piano+pop+covers+study'
+            },
+
+            // Dramatic Mood
+            {
+                id: 'mu_d1',
+                title: 'good 4 u / bad idea right?',
+                artist: 'Olivia Rodrigo',
+                type: 'פופ-פאנק דרמטי',
+                mood: 'dramatic',
+                cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3',
+                spotifyUrl: 'https://open.spotify.com/track/4Jy31313131',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Olivia+Rodrigo+good+4+u'
+            },
+            {
+                id: 'mu_d2',
+                title: 'Paint The Town Red',
+                artist: 'Doja Cat',
+                type: 'היפ-הופ דרמטי',
+                mood: 'dramatic',
+                cover: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=600&q=80',
+                audioPreview: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3',
+                spotifyUrl: 'https://open.spotify.com/track/2y31313131',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=Doja+Cat+Paint+The+Town+Red'
+            }
+        ];
+
+        // State Variables
+        let activeMood = 'relaxed';
+        let movieTypeFilter = 'all';
+        let currentAudio = null;
+        let playingAudioId = null;
+
+        // LocalStorage Helpers
+        function getFavorites() {
+            try {
+                const favs = localStorage.getItem('moodvibe_favorites');
+                return favs ? JSON.parse(favs) : { books: [], movies: [], music: [] };
+            } catch (e) {
+                return { books: [], movies: [], music: [] };
+            }
+        }
+
+        // User Ratings Helper
+        function getRatings() {
+            try {
+                const ratings = localStorage.getItem('moodvibe_ratings');
+                return ratings ? JSON.parse(ratings) : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function setUserRating(itemId, rating) {
+            const ratings = getRatings();
+            ratings[itemId] = rating;
+            localStorage.setItem('moodvibe_ratings', JSON.stringify(ratings));
+            showToast('הדירוג שלך נשמר בהצלחה!', 'text-amber-400');
+            refreshCurrentPage();
+        }
+
+        function getItemRatingData(itemId, defaultBaseRating = 4.2) {
+            const ratings = getRatings();
+            const userRating = ratings[itemId] || 0;
+            // Calculate pseudo average combining base rating and user's score if given
+            let avg = defaultBaseRating;
+            if (userRating > 0) {
+                avg = Number(((defaultBaseRating * 10 + userRating) / 11).toFixed(1));
+            }
+            return { userRating, avg };
+        }
+
+        function renderStarsHTML(itemId, currentRating) {
+            let starsHTML = `<div class="star-rating flex items-center gap-1 text-amber-400 text-xs">`;
+            for (let i = 1; i <= 5; i++) {
+                const iconClass = i <= currentRating ? 'fa-solid' : 'fa-regular';
+                starsHTML += `<i class="${iconClass} fa-star" onclick="setUserRating('${itemId}', ${i})" title="דרג ${i} כוכבים"></i>`;
+            }
+            starsHTML += `</div>`;
+            return starsHTML;
+        }
+
+        // User Comments Helper
+        function getComments() {
+            try {
+                const comments = localStorage.getItem('moodvibe_comments');
+                return comments ? JSON.parse(comments) : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function getItemComments(itemId) {
+            const comments = getComments();
+            return comments[itemId] || [];
+        }
+
+        function addComment(itemId, author, text) {
+            const comments = getComments();
+            if (!comments[itemId]) comments[itemId] = [];
+            comments[itemId].unshift({
+                author,
+                text,
+                date: new Date().toLocaleDateString('he-IL')
+            });
+            localStorage.setItem('moodvibe_comments', JSON.stringify(comments));
+        }
+
+        function openCommentsModal(itemId, title) {
+            const modal = document.getElementById('comments-modal');
+            const modalTitle = document.getElementById('modal-item-title');
+            const itemIdInput = document.getElementById('modal-item-id');
+            const list = document.getElementById('modal-comments-list');
+
+            if (!modal || !list) return;
+
+            itemIdInput.value = itemId;
+            modalTitle.innerHTML = `<i class="fa-solid fa-comments text-purple-400 ml-2"></i> תגובות עבור: ${title}`;
+
+            renderModalCommentsList(itemId);
+            modal.classList.remove('hidden');
+        }
+
+        function closeCommentsModal() {
+            const modal = document.getElementById('comments-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function renderModalCommentsList(itemId) {
+            const list = document.getElementById('modal-comments-list');
+            if (!list) return;
+
+            const comments = getItemComments(itemId);
+            if (comments.length === 0) {
+                list.innerHTML = `<p class="text-slate-500 text-xs text-center py-4">טרם נכתבו תגובות לפריט זה. היו הראשונים להגיב!</p>`;
+                return;
+            }
+
+            list.innerHTML = comments.map(c => `
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-200">${c.author}</span>
+                        <span class="text-slate-500 text-[10px]">${c.date}</span>
+                    </div>
+                    <p class="text-slate-300 text-xs leading-relaxed">${c.text}</p>
+                </div>
+            `).join('');
+        }
+
+        function handleAddComment(e) {
+            e.preventDefault();
+            const itemId = document.getElementById('modal-item-id').value;
+            const author = document.getElementById('comment-author').value.trim();
+            const text = document.getElementById('comment-text').value.trim();
+
+            if (itemId && author && text) {
+                addComment(itemId, author, text);
+                document.getElementById('comment-text').value = '';
+                renderModalCommentsList(itemId);
+                showToast('התגובה נוספה בהצלחה!', 'text-emerald-400');
+                refreshCurrentPage();
+            }
+        }
+
+        // Sharing Helper
+        function shareItem(title, categoryName) {
+            const shareText = `מצאתי המלצת מעולה ב-MoodVibe! ${categoryName}: "${title}". כדאי לך לבדוק!`;
+            const encodedText = encodeURIComponent(shareText);
+            const currentUrl = encodeURIComponent(window.location.href);
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'MoodVibe Recommendation',
+                    text: shareText,
+                    url: window.location.href,
+                }).catch(() => {});
+            } else {
+                // Fallback action - Copy text & show options
+                const dummy = document.createElement("textarea");
+                document.body.appendChild(dummy);
+                dummy.value = `${shareText} ${window.location.href}`;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+
+                showToast('הקישור והתיאור הועתקו ללוח!', 'text-cyan-400');
+                
+                // Open Whatsapp as direct action option
+                setTimeout(() => {
+                    window.open(`https://api.whatsapp.com/send?text=${encodedText}%20${currentUrl}`, '_blank');
+                }, 800);
+            }
+        }
+
+        function refreshCurrentPage() {
+            const activeSection = document.querySelector('.page-section:not(.hidden)');
+            if (activeSection) {
+                const activePage = activeSection.id.replace('page-', '');
+                if (activePage === 'home') renderCombinedRecommendation(activeMood);
+                if (activePage === 'books') renderBooks();
+                if (activePage === 'movies') renderMovies();
+                if (activePage === 'music') renderMusic();
+                if (activePage === 'favorites') renderFavorites();
+            }
+        }
+
+        function saveFavorites(favs) {
+            localStorage.setItem('moodvibe_favorites', JSON.stringify(favs));
+            updateFavBadge();
+        }
+
+        function toggleFavorite(category, id) {
+            const favs = getFavorites();
+            if (!favs[category]) favs[category] = [];
+
+            const index = favs[category].indexOf(id);
+            let added = false;
+            if (index > -1) {
+                favs[category].splice(index, 1);
+            } else {
+                favs[category].push(id);
+                added = true;
+            }
+
+            saveFavorites(favs);
+            showToast(added ? 'הפריט נשמר במועדפים!' : 'הפריט הוסר מהמועדפים', added ? 'text-pink-500' : 'text-slate-400');
+
+            const activeSection = document.querySelector('.page-section:not(.hidden)');
+            if (activeSection) {
+                const activePage = activeSection.id.replace('page-', '');
+                if (activePage === 'home') renderCombinedRecommendation(activeMood);
+                if (activePage === 'books') renderBooks();
+                if (activePage === 'movies') renderMovies();
+                if (activePage === 'music') renderMusic();
+                if (activePage === 'favorites') renderFavorites();
+            }
+        }
+
+        function isFavorite(category, id) {
+            const favs = getFavorites();
+            return favs[category] && favs[category].includes(id);
+        }
+
+        function updateFavBadge() {
+            const favs = getFavorites();
+            const total = (favs.books?.length || 0) + (favs.movies?.length || 0) + (favs.music?.length || 0);
+            const badge = document.getElementById('fav-badge');
+            if (badge) {
+                if (total > 0) {
+                    badge.textContent = total;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        }
+
+        // Navigation
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+            
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-white', 'font-bold');
+                btn.classList.add('text-slate-300');
+            });
+            const activeNav = document.getElementById(`nav-${pageId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-slate-800', 'text-white', 'font-bold');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (pageId === 'home') renderCombinedRecommendation(activeMood);
+            if (pageId === 'books') renderBooks();
+            if (pageId === 'movies') renderMovies();
+            if (pageId === 'music') renderMusic();
+            if (pageId === 'favorites') renderFavorites();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function showToast(msg, iconColorClass = 'text-pink-500') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            if (toast && toastMsg && toastIcon) {
+                toastMsg.textContent = msg;
+                toastIcon.className = iconColorClass;
+
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 2500);
+            }
+        }
+
+        function selectMood(moodKey) {
+            activeMood = moodKey;
+
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('scale-105', 'ring-2', 'ring-purple-500', 'bg-slate-800/80');
+            });
+            const selectedBtn = document.getElementById(`mood-btn-${moodKey}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('scale-105', 'bg-slate-800/80');
+            }
+
+            renderCombinedRecommendation(moodKey);
+        }
+
+        function getRandomItemByMood(dataArray, moodKey) {
+            const items = dataArray.filter(item => item.mood === moodKey);
+            if (items.length === 0) return dataArray[0];
+            const randomIndex = Math.floor(Math.random() * items.length);
+            return items[randomIndex];
+        }
+
+        function renderCombinedRecommendation(moodKey) {
+            const container = document.getElementById('combined-recommendation-container');
+            if (!container) return;
+
+            const meta = MOOD_META[moodKey];
+            
+            const book = getRandomItemByMood(BOOKS_DATA, moodKey);
+            const movie = getRandomItemByMood(MOVIES_DATA, moodKey);
+            const music = getRandomItemByMood(MUSIC_DATA, moodKey);
+
+            const isMovieTv = movie.type === 'tv';
+            const movieTypeText = isMovieTv ? 'סדרה' : 'סרט';
+            const movieTypeIcon = isMovieTv ? 'fa-tv' : 'fa-film';
+
+            const bookRating = getItemRatingData(book.id, 4.8);
+            const movieRating = getItemRatingData(movie.id, 4.6);
+            const musicRating = getItemRatingData(music.id, 4.7);
+
+            const bookCommentsCount = getItemComments(book.id).length;
+            const movieCommentsCount = getItemComments(movie.id).length;
+            const musicCommentsCount = getItemComments(music.id).length;
+
+            container.innerHTML = `
+                <div class="rounded-3xl bg-gradient-to-br ${meta.bg} border ${meta.border} p-6 sm:p-8 space-y-6 glow-${moodKey} transition-all duration-500">
+                    <div class="flex flex-col sm:flex-row items-center justify-between border-b border-slate-700/50 pb-5 gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">${meta.icon}</span>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-black text-white">מארז המלצות במצב רוח: <span class="text-${meta.color}-400">${meta.name}</span></h3>
+                                <p class="text-slate-400 text-xs sm:text-sm">שילוב אקראי מושלם לקריאה, צפייה והאזנה שתואמים את התחושה שלך</p>
+                            </div>
+                        </div>
+                        <button onclick="renderCombinedRecommendation('${moodKey}')" class="text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                            <i class="fa-solid fa-arrows-rotate"></i> רענן שילוב
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Book Card -->
+                        <div class="glass-card rounded-2xl overflow-hidden border border-slate-700/60 flex flex-col justify-between group hover:border-slate-500 transition">
+                            <div>
+                                <div class="relative h-48 overflow-hidden">
+                                    <img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-emerald-400 text-xs px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                                        <i class="fa-solid fa-book ml-1"></i> ספר
+                                    </span>
+                                    <button onclick="toggleFavorite('books', '${book.id}')" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-slate-300 hover:text-pink-500 transition">
+                                        <i class="${isFavorite('books', book.id) ? 'fa-solid text-pink-500' : 'fa-regular'} fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="p-5 space-y-2">
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">${book.genre}</span>
+                                        <div class="flex items-center gap-1.5 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+                                            ${renderStarsHTML(book.id, bookRating.userRating)}
+                                            <span class="text-slate-400 text-[10px]">(${bookRating.avg})</span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-lg text-white group-hover:text-emerald-300 transition">${book.title}</h4>
+                                    <p class="text-xs text-slate-400">מאת: ${book.author}</p>
+                                    <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">${book.synopsis}</p>
+                                </div>
+                            </div>
+                            <div class="p-5 pt-0 border-t border-slate-800/50 mt-3 pt-3 flex items-center justify-between">
+                                <button onclick="openCommentsModal('${book.id}', '${book.title}')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5">
+                                    <i class="fa-regular fa-comment text-purple-400"></i> תגובות (${bookCommentsCount})
+                                </button>
+                                <button onclick="shareItem('${book.title}', 'ספר')" class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-800/40">
+                                    <i class="fa-solid fa-share-nodes"></i> שתף
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Movie Card -->
+                        <div class="glass-card rounded-2xl overflow-hidden border border-slate-700/60 flex flex-col justify-between group hover:border-slate-500 transition">
+                            <div>
+                                <div class="relative h-48 overflow-hidden">
+                                    <img src="${movie.poster}" alt="${movie.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-rose-400 text-xs px-2.5 py-1 rounded-lg border border-rose-500/30">
+                                        <i class="fa-solid ${movieTypeIcon} ml-1"></i> ${movieTypeText}
+                                    </span>
+                                    <button onclick="toggleFavorite('movies', '${movie.id}')" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-slate-300 hover:text-pink-500 transition">
+                                        <i class="${isFavorite('movies', movie.id) ? 'fa-solid text-pink-500' : 'fa-regular'} fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="p-5 space-y-2">
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">${movie.genre}</span>
+                                        <div class="flex items-center gap-1.5 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+                                            ${renderStarsHTML(movie.id, movieRating.userRating)}
+                                            <span class="text-slate-400 text-[10px]">(${movieRating.avg})</span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-lg text-white group-hover:text-rose-300 transition">${movie.title}</h4>
+                                    ${movie.seasons ? `<p class="text-xs text-rose-400 font-medium">${movie.seasons} עונות</p>` : ''}
+                                    <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">${movie.synopsis}</p>
+                                </div>
+                            </div>
+                            <div class="p-5 pt-0 border-t border-slate-800/50 mt-3 pt-3 flex items-center justify-between">
+                                <button onclick="openCommentsModal('${movie.id}', '${movie.title}')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5">
+                                    <i class="fa-regular fa-comment text-purple-400"></i> תגובות (${movieCommentsCount})
+                                </button>
+                                <button onclick="shareItem('${movie.title}', '${movieTypeText}')" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 bg-rose-950/40 px-2.5 py-1 rounded-lg border border-rose-800/40">
+                                    <i class="fa-solid fa-share-nodes"></i> שתף
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Music Card -->
+                        <div class="glass-card rounded-2xl overflow-hidden border border-slate-700/60 flex flex-col justify-between group hover:border-slate-500 transition">
+                            <div>
+                                <div class="relative h-48 overflow-hidden">
+                                    <img src="${music.cover}" alt="${music.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-cyan-400 text-xs px-2.5 py-1 rounded-lg border border-cyan-500/30">
+                                        <i class="fa-solid fa-music ml-1"></i> מוזיקה
+                                    </span>
+                                    <button onclick="toggleFavorite('music', '${music.id}')" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-slate-300 hover:text-pink-500 transition">
+                                        <i class="${isFavorite('music', music.id) ? 'fa-solid text-pink-500' : 'fa-regular'} fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="p-5 space-y-2">
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">${music.type}</span>
+                                        <div class="flex items-center gap-1.5 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+                                            ${renderStarsHTML(music.id, musicRating.userRating)}
+                                            <span class="text-slate-400 text-[10px]">(${musicRating.avg})</span>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-bold text-lg text-white group-hover:text-cyan-300 transition">${music.title}</h4>
+                                    <p class="text-xs text-slate-400">אמן: ${music.artist}</p>
+                                    <div class="pt-2 grid grid-cols-2 gap-2">
+                                        <a href="${music.spotifyUrl}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white text-xs py-1.5 px-2.5 rounded-xl border border-emerald-500/40 transition flex items-center justify-center gap-1.5 font-medium">
+                                            <i class="fa-brands fa-spotify text-sm"></i> Spotify
+                                        </a>
+                                        <a href="${music.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs py-1.5 px-2.5 rounded-xl border border-rose-500/40 transition flex items-center justify-center gap-1.5 font-medium">
+                                            <i class="fa-brands fa-youtube text-sm"></i> YouTube
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-5 pt-0 border-t border-slate-800/50 mt-3 pt-3 flex items-center justify-between">
+                                <button onclick="openCommentsModal('${music.id}', '${music.title}')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5">
+                                    <i class="fa-regular fa-comment text-purple-400"></i> תגובות (${musicCommentsCount})
+                                </button>
+                                <button onclick="shareItem('${music.title}', 'מוזיקה')" class="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 bg-cyan-950/40 px-2.5 py-1 rounded-lg border border-cyan-800/40">
+                                    <i class="fa-solid fa-share-nodes"></i> שתף
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBooks() {
+            const grid = document.getElementById('books-grid');
+            if (!grid) return;
+
+            const searchVal = (document.getElementById('books-search')?.value || '').toLowerCase();
+            const moodVal = document.getElementById('books-mood-filter')?.value || 'all';
+
+            const filtered = BOOKS_DATA.filter(b => {
+                const matchesSearch = b.title.toLowerCase().includes(searchVal) || b.author.toLowerCase().includes(searchVal);
+                const matchesMood = moodVal === 'all' || b.mood === moodVal;
+                return matchesSearch && matchesMood;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">לא נמצאו ספרים התואמים את המסננים שנבחרו.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(b => {
+                const meta = MOOD_META[b.mood];
+                const fav = isFavorite('books', b.id);
+                const ratingData = getItemRatingData(b.id, 4.7);
+                const commentsCount = getItemComments(b.id).length;
+
+                return `
+                    <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between group">
+                        <div>
+                            <div class="relative h-56 overflow-hidden">
+                                <img src="${b.cover}" alt="${b.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-xs px-2.5 py-1 rounded-lg border border-slate-700 text-slate-300">
+                                    ${meta.icon} ${meta.name}
+                                </span>
+                                <button onclick="toggleFavorite('books', '${b.id}')" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-slate-300 hover:text-pink-500 transition">
+                                    <i class="${fav ? 'fa-solid text-pink-500' : 'fa-regular'} fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="p-5 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-2 py-0.5 rounded-md">${b.genre}</span>
+                                    <div class="flex items-center gap-1.5 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+                                        ${renderStarsHTML(b.id, ratingData.userRating)}
+                                        <span class="text-slate-400 text-[10px]">(${ratingData.avg})</span>
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-bold text-white group-hover:text-emerald-400 transition">${b.title}</h3>
+                                <p class="text-xs text-slate-400">מאת: ${b.author}</p>
+                                <p class="text-xs text-slate-300 leading-relaxed pt-2">${b.synopsis}</p>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 border-t border-slate-800/50 mt-4 flex items-center justify-between">
+                            <button onclick="openCommentsModal('${b.id}', '${b.title}')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5">
+                                <i class="fa-regular fa-comment text-purple-400"></i> תגובות (${commentsCount})
+                            </button>
+                            <button onclick="shareItem('${b.title}', 'ספר')" class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-800/40">
+                                <i class="fa-solid fa-share-nodes"></i> שתף
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setMovieTypeFilter(type) {
+            movieTypeFilter = type;
+            document.querySelectorAll('.movie-type-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById(`btn-type-${type}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-purple-600', 'text-white');
+            }
+            renderMovies();
+        }
+
+        function renderMovies() {
+            const grid = document.getElementById('movies-grid');
+            if (!grid) return;
+
+            const searchVal = (document.getElementById('movies-search')?.value || '').toLowerCase();
+            const moodVal = document.getElementById('movies-mood-filter')?.value || 'all';
+
+            const filtered = MOVIES_DATA.filter(m => {
+                const matchesSearch = m.title.toLowerCase().includes(searchVal) || m.genre.toLowerCase().includes(searchVal);
+                const matchesType = movieTypeFilter === 'all' || m.type === movieTypeFilter;
+                const matchesMood = moodVal === 'all' || m.mood === moodVal;
+                return matchesSearch && matchesType && matchesMood;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">לא נמצאו סרטים או סדרות התואמים את המסננים.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(m => {
+                const meta = MOOD_META[m.mood];
+                const fav = isFavorite('movies', m.id);
+                const typeLabel = m.type === 'tv' ? 'סדרה' : 'סרט';
+                const ratingData = getItemRatingData(m.id, 4.5);
+                const commentsCount = getItemComments(m.id).length;
+
+                return `
+                    <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between group">
+                        <div>
+                            <div class="relative h-56 overflow-hidden">
+                                <img src="${m.poster}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <div class="absolute top-3 right-3 flex gap-2">
+                                    <span class="bg-slate-900/80 backdrop-blur-md text-xs px-2.5 py-1 rounded-lg border border-slate-700 text-slate-300">
+                                        ${meta.icon} ${meta.name}
+                                    </span>
+                                    <span class="bg-rose-950/80 backdrop-blur-md text-rose-300 text-xs px-2.5 py-1 rounded-lg border border-rose-800/50">
+                                        ${typeLabel}
+                                    </span>
+                                </div>
+                                <button onclick="toggleFavorite('movies', '${m.id}')" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-slate-300 hover:text-pink-500 transition">
+                                    <i class="${fav ? 'fa-solid text-pink-500' : 'fa-regular'} fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="p-5 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-medium text-rose-400 bg-rose-950/60 border border-rose-800/50 px-2 py-0.5 rounded-md">${m.genre}</span>
+                                    <div class="flex items-center gap-1.5 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+                                        ${renderStarsHTML(m.id, ratingData.userRating)}
+                                        <span class="text-slate-400 text-[10px]">(${ratingData.avg})</span>
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-bold text-white group-hover:text-rose-400 transition">${m.title}</h3>
+                                <p class="text-xs text-slate-300 leading-relaxed pt-2">${m.synopsis}</p>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 border-t border-slate-800/50 mt-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-400">זמין לצפייה ב:</span>
+                                <div class="flex flex-wrap gap-1">
+                                    ${m.platforms.map(p => `<span class="text-[11px] bg-slate-900 text-slate-300 px-2 py-0.5 rounded border border-slate-800 font-medium">${p}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div class="pt-2 border-t border-slate-800/40 flex items-center justify-between">
+                                <button onclick="openCommentsModal('${m.id}', '${m.title}')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5">
+                                    <i class="fa-regular fa-comment text-purple-400"></i> תגובות (${commentsCount})
+                                </button>
+                                <button onclick="shareItem('${m.title}', '${typeLabel}')" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 bg-rose-950/40 px-2.5 py-1 rounded-lg border border-rose-800/40">
+                                    <i class="fa-solid fa-share-nodes"></i> שתף
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderMusic() {
+            const grid = document.getElementById('music-grid');
+            if (!grid) return;
+
+            const moodVal = document.getElementById('music-mood-filter')?.value || 'all';
+            const filtered = MUSIC_DATA.filter(m => moodVal === 'all' || m.mood === moodVal);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">לא נמצאו יצירות מוזיקליות התואמים את המסננים.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(m => {
+                const meta = MOOD_META[m.mood];
+                const fav = isFavorite('music', m.id);
+                const isPlaying = playingAudioId === m.id;
+                const ratingData = getItemRatingData(m.id, 4.9);
+                const commentsCount = getItemComments(m.id).length;
+
+                return `
+                    <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between group">
+                        <div>
+                            <div class="relative h-52 overflow-hidden">
+                                <img src="${m.cover}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-xs px-2.5 py-1 rounded-lg border border-slate-700 text-slate-300">
+                                    ${meta.icon} ${meta.name}
+                                </span>
+                                <button onclick="toggleFavorite('music', '${m.id}')" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-slate-300 hover:text-pink-500 transition">
+                                    <i class="${fav ? 'fa-solid text-pink-500' : 'fa-regular'} fa-heart"></i>
+                                </button>
+                                ${m.audioPreview ? `
+                                <button onclick="playPreviewAudio('${m.id}', '${m.audioPreview}')" class="absolute bottom-3 right-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold p-3 rounded-full shadow-lg transition flex items-center justify-center w-10 h-10">
+                                    <i class="fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'} text-sm"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+                            <div class="p-5 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-medium text-cyan-400 bg-cyan-950/60 border border-cyan-800/50 px-2 py-0.5 rounded-md">${m.type}</span>
+                                    <div class="flex items-center gap-1.5 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+                                        ${renderStarsHTML(m.id, ratingData.userRating)}
+                                        <span class="text-slate-400 text-[10px]">(${ratingData.avg})</span>
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">${m.title}</h3>
+                                <p class="text-xs text-slate-400">אמן: ${m.artist}</p>
+                                
+                                <div class="pt-2 grid grid-cols-2 gap-2">
+                                    <a href="${m.spotifyUrl}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white text-xs py-2.5 px-3 rounded-xl border border-emerald-500/40 transition flex items-center justify-center gap-1.5 font-semibold">
+                                        <i class="fa-brands fa-spotify text-base"></i> Spotify
+                                    </a>
+                                    <a href="${m.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs py-2.5 px-3 rounded-xl border border-rose-500/40 transition flex items-center justify-center gap-1.5 font-semibold">
+                                        <i class="fa-brands fa-youtube text-base"></i> YouTube
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 border-t border-slate-800/50 mt-4 flex items-center justify-between">
+                            <button onclick="openCommentsModal('${m.id}', '${m.title}')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5">
+                                <i class="fa-regular fa-comment text-purple-400"></i> תגובות (${commentsCount})
+                            </button>
+                            <button onclick="shareItem('${m.title}', 'מוזיקה')" class="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 bg-cyan-950/40 px-2.5 py-1 rounded-lg border border-cyan-800/40">
+                                <i class="fa-solid fa-share-nodes"></i> שתף
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function playPreviewAudio(id, url) {
+            if (currentAudio && playingAudioId === id) {
+                currentAudio.pause();
+                currentAudio = null;
+                playingAudioId = null;
+                refreshMusicUI();
+                return;
+            }
+
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+
+            currentAudio = new Audio(url);
+            playingAudioId = id;
+            refreshMusicUI();
+
+            currentAudio.play().catch(() => {
+                showToast('לא ניתן להפעיל את הקובץ', 'text-amber-500');
+            });
+
+            currentAudio.onended = () => {
+                playingAudioId = null;
+                currentAudio = null;
+                refreshMusicUI();
+            };
+        }
+
+        function refreshMusicUI() {
+            const activeSection = document.querySelector('.page-section:not(.hidden)');
+            if (activeSection) {
+                const activePage = activeSection.id.replace('page-', '');
+                if (activePage === 'music') renderMusic();
+            }
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('favorites-content');
+            if (!container) return;
+
+            const favs = getFavorites();
+
+            const favBooks = BOOKS_DATA.filter(b => favs.books?.includes(b.id));
+            const favMovies = MOVIES_DATA.filter(m => favs.movies?.includes(m.id));
+            const favMusic = MUSIC_DATA.filter(m => favs.music?.includes(m.id));
+
+            const isEmpty = favBooks.length === 0 && favMovies.length === 0 && favMusic.length === 0;
+
+            if (isEmpty) {
+                container.innerHTML = `
+                    <div class="text-center py-20 space-y-4">
+                        <div class="w-16 h-16 rounded-full bg-slate-900 flex items-center justify-center mx-auto text-slate-600 text-2xl">
+                            <i class="fa-solid fa-heart-crack"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-300">טרם שמרת פריטים מועדפים</h3>
+                        <p class="text-slate-500 text-sm max-w-md mx-auto">לחץ על הלב שעל כרטיסיית ספר, סרט או שיר כדי לשמור אותם ברשימה האישית שלך.</p>
+                        <button onclick="navigateTo('home')" class="mt-4 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-purple-600/30">
+                            חזור לדף הבית
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            if (favBooks.length > 0) {
+                html += `
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-emerald-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-book"></i> ספרים מועדפים (${favBooks.length})
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${favBooks.map(b => `
+                                <div class="glass-card rounded-2xl p-4 border border-slate-800 flex gap-4 items-center justify-between">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <img src="${b.cover}" alt="${b.title}" class="w-16 h-20 object-cover rounded-lg flex-shrink-0">
+                                        <div class="truncate">
+                                            <h4 class="font-bold text-white text-sm truncate">${b.title}</h4>
+                                            <p class="text-xs text-slate-400 truncate">${b.author}</p>
+                                            <span class="text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded mt-1 inline-block">${b.genre}</span>
+                                        </div>
+                                    </div>
+                                    <button onclick="toggleFavorite('books', '${b.id}')" class="text-pink-500 hover:text-slate-400 p-2">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (favMovies.length > 0) {
+                html += `
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-film"></i> סרטים וסדרות מועדפים (${favMovies.length})
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${favMovies.map(m => `
+                                <div class="glass-card rounded-2xl p-4 border border-slate-800 flex gap-4 items-center justify-between">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <img src="${m.poster}" alt="${m.title}" class="w-16 h-20 object-cover rounded-lg flex-shrink-0">
+                                        <div class="truncate">
+                                            <h4 class="font-bold text-white text-sm truncate">${m.title}</h4>
+                                            <p class="text-xs text-rose-400 font-medium">${m.type === 'tv' ? 'סדרה' : 'סרט'}</p>
+                                            <span class="text-[10px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded mt-1 inline-block">${m.genre}</span>
+                                        </div>
+                                    </div>
+                                    <button onclick="toggleFavorite('movies', '${m.id}')" class="text-pink-500 hover:text-slate-400 p-2">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (favMusic.length > 0) {
+                html += `
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-music"></i> מוזיקה מועדפת (${favMusic.length})
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${favMusic.map(m => `
+                                <div class="glass-card rounded-2xl p-4 border border-slate-800 flex gap-4 items-center justify-between">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <img src="${m.cover}" alt="${m.title}" class="w-16 h-20 object-cover rounded-lg flex-shrink-0">
+                                        <div class="truncate">
+                                            <h4 class="font-bold text-white text-sm truncate">${m.title}</h4>
+                                            <p class="text-xs text-slate-400 truncate">${m.artist}</p>
+                                            <span class="text-[10px] text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded mt-1 inline-block">${m.type}</span>
+                                        </div>
+                                    </div>
+                                    <button onclick="toggleFavorite('music', '${m.id}')" class="text-pink-500 hover:text-slate-400 p-2">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function clearAllFavorites() {
+            saveFavorites({ books: [], movies: [], music: [] });
+            renderFavorites();
+            showToast('כל המועדפים נמחקו', 'text-slate-400');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateFavBadge();
+            selectMood('relaxed');
+        });
+    </script>
+</body>
+</html>

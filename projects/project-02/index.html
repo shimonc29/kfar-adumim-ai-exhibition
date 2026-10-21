@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מתכונאט - מצילים את המקרר</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Inter / Heebo -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-amber-50/30 min-h-screen flex flex-col text-slate-800">
+
+    <header class="bg-white shadow-sm border-b border-amber-100 py-4 px-6 sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <h1 class="text-2xl font-black text-amber-600 flex items-center gap-2">
+                🍳 מתכונאט <span class="text-xs font-normal bg-amber-100 text-amber-800 py-1 px-3 rounded-full">מצילים את המקרר</span>
+            </h1>
+            <p class="text-sm text-slate-500">הזן את מה שיש לך, וקבל רעיונות לארוחה טעימה!</p>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Left Panel: Ingredients Input -->
+        <section class="md:col-span-1 bg-white p-5 rounded-2xl shadow-sm border border-amber-100 flex flex-col">
+            <h2 class="text-lg font-bold mb-3 text-slate-700">מה יש לך במקרר?</h2>
+            
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="ingredientInput" placeholder="למשל: עגבנייה, ביצים..." 
+                    class="flex-grow border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <button type="button" onclick="addIngredient()" class="bg-amber-500 hover:bg-amber-600 text-white font-medium px-4 py-2 rounded-xl transition text-sm cursor-pointer">הוסף</button>
+            </div>
+
+            <div class="text-xs text-slate-400 mb-2">או בחר מרכיבים נפוצים מהרשימה:</div>
+            <div id="quickIngredients" class="flex flex-wrap gap-1.5 mb-4 max-h-40 overflow-y-auto p-1">
+                <!-- Quick tags injected via JS -->
+            </div>
+
+            <h3 class="text-sm font-bold text-slate-600 mb-2 border-t pt-3">המרכיבים שנבחרו:</h3>
+            <div id="selectedIngredients" class="flex flex-wrap gap-2 mb-6 min-h-[60px] p-2 bg-slate-50 rounded-xl border border-dashed border-slate-200 items-start">
+                <span class="text-xs text-slate-400 self-center mx-auto">טרם נבחרו מרכיבים</span>
+            </div>
+
+            <button type="button" onclick="generateRecipes()" id="generateBtn" disabled 
+                class="mt-auto bg-slate-300 text-slate-500 font-bold py-3 rounded-xl transition cursor-not-allowed">
+                צור מתכונים קסומים ✨
+            </button>
+        </section>
+
+        <!-- Right Panel: Generated Recipes -->
+        <section class="md:col-span-2 flex flex-col gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-amber-100 flex-grow flex flex-col">
+                <h2 class="text-lg font-bold mb-4 text-slate-700">תוצאות והצעות לארוחה</h2>
+                
+                <div id="loading" class="hidden text-center py-12 my-auto">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-amber-500 border-t-transparent mb-2"></div>
+                    <p class="text-sm text-slate-500">השף החכם חושב על מתכון מושלם בשבילך...</p>
+                </div>
+
+                <div id="recipeContainer" class="space-y-4 flex-grow">
+                    <div class="text-center py-16 text-slate-400 border-2 border-dashed border-slate-100 rounded-xl my-auto">
+                        <p class="text-lg font-medium">המקרר מחכה לרעיונות!</p>
+                        <p class="text-sm mt-1">הוסף לפחות מרכיב 1 משמאל כדי לראות מתכונים.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-amber-100 py-4 text-center text-xs text-slate-400 mt-auto">
+        מתכונאט - צמצום בזבוז מזון בסטייל.
+    </footer>
+
+    <script>
+        const commonIngredients = ['ביצים', 'עגבניות', 'גבינה לבנה', 'לחם', 'בצל', 'שום', 'תפוח אדמה', 'גבינה צהובה', 'מלפפון', 'טונה', 'פסטה', 'זיתים', 'חלב', 'גזר', 'פלפל'];
+        let userIngredients = [];
+
+        const quickContainer = document.getElementById('quickIngredients');
+        const selectedContainer = document.getElementById('selectedIngredients');
+        const ingredientInput = document.getElementById('ingredientInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const recipeContainer = document.getElementById('recipeContainer');
+        const loadingDiv = document.getElementById('loading');
+
+        // Initialize quick tags
+        function initQuickTags() {
+            quickContainer.innerHTML = '';
+            commonIngredients.forEach(item => {
+                const tag = document.createElement('button');
+                tag.type = 'button';
+                tag.className = `text-xs py-1 px-2.5 rounded-full border transition cursor-pointer ${userIngredients.includes(item) ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`;
+                tag.textContent = item;
+                tag.onclick = () => toggleIngredient(item);
+                quickContainer.appendChild(tag);
+            });
+        }
+
+        function toggleIngredient(item) {
+            if (userIngredients.includes(item)) {
+                userIngredients = userIngredients.filter(i => i !== item);
+            } else {
+                userIngredients.push(item);
+            }
+            updateUI();
+        }
+
+        function addIngredient() {
+            const val = ingredientInput.value.trim();
+            if (val && !userIngredients.includes(val)) {
+                userIngredients.push(val);
+                ingredientInput.value = '';
+                updateUI();
+            }
+        }
+
+        ingredientInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addIngredient();
+            }
+        });
+
+        function removeIngredient(item) {
+            userIngredients = userIngredients.filter(i => i !== item);
+            updateUI();
+        }
+
+        function updateUI() {
+            initQuickTags();
+            
+            if (userIngredients.length === 0) {
+                selectedContainer.innerHTML = '<span class="text-xs text-slate-400 self-center mx-auto">טרם נבחרו מרכיבים</span>';
+                generateBtn.disabled = true;
+                generateBtn.className = "mt-auto bg-slate-300 text-slate-500 font-bold py-3 rounded-xl transition cursor-not-allowed";
+            } else {
+                selectedContainer.innerHTML = '';
+                userIngredients.forEach(item => {
+                    const chip = document.createElement('span');
+                    chip.className = "bg-amber-500 text-white text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 font-medium shadow-sm";
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = item;
+                    chip.appendChild(textSpan);
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = "hover:text-amber-200 font-bold cursor-pointer";
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        removeIngredient(item);
+                    };
+                    chip.appendChild(removeBtn);
+
+                    selectedContainer.appendChild(chip);
+                });
+                generateBtn.disabled = false;
+                generateBtn.className = "mt-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition shadow-md shadow-amber-200 cursor-pointer";
+            }
+        }
+
+        function generateRecipes() {
+            if (userIngredients.length === 0) return;
+
+            loadingDiv.classList.remove('hidden');
+            recipeContainer.innerHTML = '';
+
+            setTimeout(() => {
+                loadingDiv.classList.add('hidden');
+                
+                const mainItem = userIngredients[0];
+                const secondaryItem = userIngredients.length > 1 ? userIngredients[1] : 'תבלינים מהארון';
+
+                const recipes = [
+                    {
+                        title: `מאפה מחבת מהיר מבוסס על ${mainItem}`,
+                        time: "15 דקות",
+                        difficulty: "קל מאוד",
+                        description: `שילוב מנצח המשלב את הרכיבים ${userIngredients.slice(0, 3).join(', ')} במנה חמה ומהירה.`,
+                        steps: [
+                            "קצצו היטב את המרכיבים שנבחרו לגודל אחיד.",
+                            "ערבבו בקערה יחד עם ביצים או בסיס זמין לבחירתכם ותבלינים.",
+                            "שפכו למחבת חמה עם מעט שמן, כסו ובשלו כ-10 דקות עד להזהבה מלאה."
+                        ]
+                    },
+                    {
+                        title: `סלט שף יצירתי עם ${secondaryItem}`,
+                        time: "10 דקות",
+                        difficulty: "קל",
+                        description: `ניצול אולטימטיבי של הירקות והתוספות הקיימות במקרר שלכם להתרעננות מושלמת.`,
+                        steps: [
+                            "שטפו וחתכו את כל הירקות והמרכיבים הרעננים.",
+                            "הוסיפו קוביות לחם יבש או קרוטונים אם יש ברשותכם.",
+                            "תבלו בנדיבות בשמן זית, מיץ לימון ומלח וערבבו היטב לפני הגשה."
+                        ]
+                    }
+                ];
+
+                recipes.forEach((rec) => {
+                    const card = document.createElement('div');
+                    card.className = "bg-amber-50/40 border border-amber-200 p-4 rounded-xl shadow-sm";
+                    
+                    let stepsHtml = '';
+                    rec.steps.forEach(step => {
+                        stepsHtml += `<li>${step}</li>`;
+                    });
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-amber-800 text-base">${rec.title}</h3>
+                            <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-md font-medium">${rec.time} | ${rec.difficulty}</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mb-3">${rec.description}</p>
+                        <div class="text-xs font-bold text-slate-700 mb-1">אופן הכנה:</div>
+                        <ol class="list-decimal list-inside text-xs text-slate-600 space-y-1">
+                            ${stepsHtml}
+                        </ol>
+                    `;
+                    recipeContainer.appendChild(card);
+                });
+
+            }, 800);
+        }
+
+        // Initialize on load
+        initQuickTags();
+    </script>
+</body>
+</html>
